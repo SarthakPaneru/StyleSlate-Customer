@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 
-class Orientaion extends StatelessWidget {
-  const Orientaion({super.key});
-
-  @override
-  Widget build(BuildContext context) {
+class Orientations {
+  static void setPreferredOrientations() {
+    WidgetsFlutterBinding.ensureInitialized();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    return Container();
   }
 }
