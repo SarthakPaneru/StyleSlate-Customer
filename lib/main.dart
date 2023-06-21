@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'utils/mixins/orientation_mixins.dart';
-import 'modules/screens/login_page.dart';
+import 'package:hamro_barber_mobile/utils/mixins/orientation_mixins.dart';
+import 'core/auth/login.dart';
 
 void main() {
+  Orientations.setPreferredOrientations();
   runApp(const MyApp());
 }
 
@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    
+    // Orientaion();
     
     return MaterialApp(
       debugShowCheckedModeBanner: false,
