@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hamro_barber_mobile/core/auth/register.dart';
 import 'package:hamro_barber_mobile/utils/mixins/orientation_mixins.dart';
 import 'core/auth/login.dart';
 
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Orientaion();
-    
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: LoginPage(),
