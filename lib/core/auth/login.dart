@@ -3,6 +3,7 @@ import 'package:hamro_barber_mobile/widgets/my_button.dart';
 import 'package:hamro_barber_mobile/widgets/my_textfield.dart';
 import 'package:hamro_barber_mobile/widgets/square_tile.dart';
 import 'package:hamro_barber_mobile/modules/screens/HomeScreen.dart';
+import 'register.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -112,10 +113,15 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 1),
-                    const Text(
-                      'Register now',
-                      style: TextStyle(
-                          color: Colors.blue, fontWeight: FontWeight.bold),
+                    GestureDetector(
+                      onTap: () {
+                        navigateTORegister(context);
+                      },
+                      child: const Text(
+                        'Register now',
+                        style: TextStyle(
+                            color: Colors.blue, fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ],
                 )
@@ -136,3 +142,6 @@ class LoginPage extends StatelessWidget {
     );
   }
 }
+void navigateTORegister(BuildContext context){
+    Navigator.push(context, MaterialPageRoute(builder: (context) => RegistrationPage()));
+} 

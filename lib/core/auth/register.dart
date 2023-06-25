@@ -127,7 +127,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     ),
                     padding: EdgeInsets.symmetric(
                       vertical: 16.0,
-                    ),
+                    ),    
                   ),
                 ),
               ),
