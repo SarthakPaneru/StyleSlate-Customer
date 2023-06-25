@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/widgets/my_button.dart';
 import 'package:hamro_barber_mobile/widgets/my_textfield.dart';
 import 'package:hamro_barber_mobile/widgets/square_tile.dart';
+import 'package:hamro_barber_mobile/modules/screens/HomeScreen.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -19,10 +20,10 @@ class LoginPage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 5,
                 ),
-                Icon(
+                const Icon(
                   Icons.lock,
                   size: 100,
                 ),
@@ -60,7 +61,9 @@ class LoginPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 40),
                 MyButton(
-                  onTap: signUserIn,
+                  onTap: () {
+                    navigateToHomeScreen(context);
+                  },
                 ),
                 const SizedBox(height: 5),
                 Padding(
@@ -120,6 +123,15 @@ class LoginPage extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void navigateToHomeScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HomeScreen(),
       ),
     );
   }

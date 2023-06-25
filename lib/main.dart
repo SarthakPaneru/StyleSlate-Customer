@@ -15,7 +15,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Orientaion();
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: LoginPage(),
