@@ -36,6 +36,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   google_nav_bar: ^5.0.6
+  flutter_svg: ^0.22.0 
 
 dev_dependencies:
   flutter_test:
@@ -62,7 +63,14 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - lib/assets/images/google.png
-  #   - images/a_dot_ham.jpeg
+    - lib/assets/images/Profile Image.png
+    - lib/assets/images/Camera Icon.svg
+    - lib/assets/images/Bell.svg
+    - lib/assets/images/Log out.svg
+    - lib/assets/images/Question mark.svg
+    - lib/assets/images/Settings.svg
+    - lib/assets/images/User Icon.svg
+   
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hamro_barber_mobile/core/auth/register.dart';
+import 'package:hamro_barber_mobile/profile/profile_screen.dart';
 import 'package:hamro_barber_mobile/utils/mixins/orientation_mixins.dart';
-import 'core/auth/login.dart';
+
 
 void main() {
   Orientations.setPreferredOrientations();
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
     // Orientaion();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LoginPage(),
+      home: ProfileScreen(),
     );
   }
 }
