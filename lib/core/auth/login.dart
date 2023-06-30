@@ -1,137 +1,145 @@
 import 'package:flutter/material.dart';
-import 'package:hamro_barber_mobile/widgets/my_button.dart';
-import 'package:hamro_barber_mobile/widgets/my_textfield.dart';
-import 'package:hamro_barber_mobile/widgets/square_tile.dart';
-import 'package:hamro_barber_mobile/modules/screens/HomeScreen.dart';
+import 'package:hamro_barber_mobile/core/auth/forgot_pwd.dart';
+import 'package:hamro_barber_mobile/core/auth/register.dart';
+import 'package:hamro_barber_mobile/widgets/appbar.dart';
+import 'package:hamro_barber_mobile/widgets/colors.dart';
+import 'package:hamro_barber_mobile/widgets/homepage.dart';
+import 'package:hamro_barber_mobile/widgets/textfield.dart';
 
-class LoginPage extends StatelessWidget {
-  LoginPage({super.key});
-  final usernameController = TextEditingController();
-  final passwordController = TextEditingController();
+class Login extends StatelessWidget {
+  const Login({super.key});
 
-  void signUserIn() {}
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[300],
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(
-                  height: 5,
-                ),
-                const Icon(
-                  Icons.lock,
-                  size: 100,
-                ),
-                SizedBox(height: 50),
-                Text(
-                  'Welcome back you\'ve been missed!',
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 16,
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(kToolbarHeight),
+            child: MyAppBar(
+              title: 'LoginSection',
+              onpressed: () {
+                Navigator.of(context).pop();
+              },
+            )),
+        body: SingleChildScrollView(
+          child: Container(
+            margin: const EdgeInsets.only(left: 20, right: 20),
+            child: Center(
+              child: Column(
+                children: <Widget>[
+                  const SizedBox(height: 25),
+                  Container(
+                    padding: const EdgeInsets.all(2),
+                    height: 150,
+                    width: 150,
+                    child: Image.asset('lib/assets/images/barberlogo.png'),
                   ),
-                ),
-                const SizedBox(height: 25),
-                MyTextField(
-                  controller: usernameController,
-                  hintText: 'username',
-                  obscureText: false,
-                ),
-                const SizedBox(height: 10),
-                MyTextField(
-                    controller: passwordController,
-                    hintText: 'Password',
-                    obscureText: true),
-                const SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        'Forget password?',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                    ],
+                  Text(
+                    'Login',
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: PrimaryColors.primarybrown,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 40),
-                MyButton(
-                  onTap: () {
-                    navigateToHomeScreen(context);
-                  },
-                ),
-                const SizedBox(height: 5),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Divider(
-                          thickness: 0.5,
-                          color: Colors.grey[400],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text(
-                          'Or continue with',
-                          style: TextStyle(color: Colors.grey[700]),
-                        ),
-                      ),
-                      Expanded(
-                        child: Divider(
-                          thickness: 0.5,
-                          color: Colors.grey[400],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 5),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SquareTile(imagePath: 'lib/assets/images/google.png'),
-                    SizedBox(width: 15),
-                    // SquareTile(imagePath: 'images/apple.png'),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Not a member?',
-                      style: TextStyle(
-                        color: Colors.grey[700],
+                  const SizedBox(height: 15),
+                  const InputField(
+                      hinttext: 'Enter Username',
+                      obscuretext: false,
+                      icon: Icons.mail),
+                  const SizedBox(height: 15),
+                  const InputField(
+                      hinttext: '********',
+                      obscuretext: true,
+                      icon: Icons.lock),
+                  const SizedBox(height: 15),
+                  const SizedBox(height: 15),
+                  SizedBox(
+                    height: 45,
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (BuildContext context) {
+                              return const Homepage();
+                            },
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          elevation: 0,
+                          backgroundColor: PrimaryColors.primarybrown),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Log in',
+                            style: TextStyle(
+                              fontSize: 22,
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Icon(Icons.restart_alt),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 1),
-                    const Text(
-                      'Register now',
-                      style: TextStyle(
-                          color: Colors.blue, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (BuildContext context) {
+                            return const Forgetpassword();
+                          },
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
                     ),
-                  ],
-                )
-              ],
+                    child: Text(
+                      'Forgot Password?',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: PrimaryColors.primarybrown,
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (BuildContext context) {
+                            return const Register();
+                          },
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                    ),
+                    child: Text(
+                      "Don't have an Account? Register Here",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: PrimaryColors.primarybrown,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  void navigateToHomeScreen(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const HomeScreen(),
       ),
     );
   }
