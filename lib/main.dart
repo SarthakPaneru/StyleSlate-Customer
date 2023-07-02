@@ -6,7 +6,7 @@ import 'package:hamro_barber_mobile/core/auth/login.dart';
 
 void main() {
   runApp( const MaterialApp(
-    home: ProfileScreen(),
+    home: Mainpage(),
   ));
 }
 
