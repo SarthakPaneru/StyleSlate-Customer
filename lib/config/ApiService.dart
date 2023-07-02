@@ -3,11 +3,6 @@ import 'package:hamro_barber_mobile/constants/app_constants.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  Map<String, String> headers = {
-    "content-type": "application/json",
-    "accept": "application/json",
-  };
-
   void processData(String responseData) {
     final data = json.decode(responseData);
     // Process the data...
@@ -35,14 +30,17 @@ class ApiService {
     }
   }
 
-  Future<http.Response> post(String url, Map<String, dynamic> body) async {
+  Future<http.Response> post(String url, String body) async {
     try {
-      Uri uri = Uri.parse(ApiConstants.baseUrl + url);
-      String bodyString = json.encode(body);
-      http.Response response =
-          await http.post(uri, headers: headers, body: bodyString);
+      Uri uri = Uri.parse('${ApiConstants.baseUrl}$url');
+      Map<String, dynamic> bodyMap = json.decode(body);
+      String bodyString = json.encode(bodyMap);
+
+      http.Response response = await http.post(uri,
+          headers: ApiConstants.postHeaders, body: bodyString);
       return response;
     } catch (e) {
+      print(e.toString());
       return http.Response({"message": e}.toString(), 400);
     }
   }
@@ -51,8 +49,8 @@ class ApiService {
     try {
       Uri uri = Uri.parse(ApiConstants.baseUrl + url);
       String bodyString = json.encode(body);
-      http.Response response =
-          await http.put(uri, headers: headers, body: bodyString);
+      http.Response response = await http.put(uri,
+          headers: ApiConstants.postHeaders, body: bodyString);
       return response;
     } catch (e) {
       return http.Response({"message": e}.toString(), 400);
@@ -62,7 +60,8 @@ class ApiService {
   Future<http.Response> delete(String url) async {
     try {
       Uri uri = Uri.parse(ApiConstants.baseUrl + url);
-      http.Response response = await http.delete(uri, headers: headers);
+      http.Response response =
+          await http.delete(uri, headers: ApiConstants.postHeaders);
       return response;
     } catch (e) {
       return http.Response({"message": e}.toString(), 400);

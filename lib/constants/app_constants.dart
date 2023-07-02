@@ -29,4 +29,9 @@ class ApiConstants {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer ${Token().retrieveBearerToken().toString()}',
   };
+
+  static const Map<String, String> postHeaders = {
+    'content-type': 'application/json',
+    'accept': 'application/json',
+  };
 }
