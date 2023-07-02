@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class MyAccountScreen extends StatelessWidget {
+  const MyAccountScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,10 +17,10 @@ class MyAccountScreen extends StatelessWidget {
       ),
       body: ListView(
         children: <Widget>[
-          ListTile(
+          const ListTile(
             title: Text('Phone Number',
             style: TextStyle(color: Colors.orange),),
-            leading: const Icon(Icons.email),
+            leading: Icon(Icons.email),
           ),
           ListTile(
             title: const Text('Email',
@@ -31,9 +33,9 @@ class MyAccountScreen extends StatelessWidget {
             },
           ),
           ListTile(
-            title: Text('Username',
+            title: const Text('Username',
             style: TextStyle(color: Colors.orange),),
-            leading: Icon(Icons.description),
+            leading: const Icon(Icons.description),
             onTap: () {
               // Handle "Terms and Conditions" tap
               // You can navigate to a screen displaying the terms and conditions

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class HelpCenterScreen extends StatelessWidget {
+  const HelpCenterScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,10 +17,10 @@ class HelpCenterScreen extends StatelessWidget {
       ),
       body: ListView(
         children: <Widget>[
-          ListTile(
+          const ListTile(
             title: Text('Contact Us',
             style: TextStyle(color: Colors.orange),),
-            leading: const Icon(Icons.email),
+            leading: Icon(Icons.email),
           ),
           ListTile(
             title: const Text('FAQs',
@@ -31,18 +33,18 @@ class HelpCenterScreen extends StatelessWidget {
             },
           ),
           ListTile(
-            title: Text('Terms and Conditions',
+            title: const Text('Terms and Conditions',
             style: TextStyle(color: Colors.orange),),
-            leading: Icon(Icons.description),
+            leading: const Icon(Icons.description),
             onTap: () {
               // Handle "Terms and Conditions" tap
               // You can navigate to a screen displaying the terms and conditions
             },
           ),
           ListTile(
-            title: Text('Privacy Policy',
+            title: const Text('Privacy Policy',
             style: TextStyle(color: Colors.orange),),
-            leading: Icon(Icons.lock),
+            leading: const Icon(Icons.lock),
             onTap: () {
               // Handle "Privacy Policy" tap
               // You can navigate to a screen displaying the privacy policy

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hamro_barber_mobile/profile/profile_screen.dart';
 import 'package:hamro_barber_mobile/widgets/colors.dart';
 import 'package:hamro_barber_mobile/core/auth/login.dart';
 
 void main() {
-  runApp(const MaterialApp(
-    home: Mainpage(),
+  runApp( const MaterialApp(
+    home: ProfileScreen(),
   ));
 }
 
@@ -46,7 +47,7 @@ class Mainpage extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(
                     builder: (BuildContext context) {
-                      return const Login();
+                      return Login();
                     },
                   ));
                 },
