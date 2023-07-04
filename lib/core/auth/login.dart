@@ -3,7 +3,7 @@ import 'package:hamro_barber_mobile/core/auth/forgot_pwd.dart';
 import 'package:hamro_barber_mobile/core/auth/register.dart';
 import 'package:hamro_barber_mobile/widgets/appbar.dart';
 import 'package:hamro_barber_mobile/widgets/colors.dart';
-import 'package:hamro_barber_mobile/widgets/homepage.dart';
+import 'package:hamro_barber_mobile/modules/screens/homepage.dart';
 import 'package:hamro_barber_mobile/widgets/textfield.dart';
 
 class Login extends StatefulWidget {
@@ -56,7 +56,7 @@ class _LoginState extends State<Login> {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (BuildContext context) {
-              return const Homepage();
+              return const HomePage();
             },
           ),
         );
