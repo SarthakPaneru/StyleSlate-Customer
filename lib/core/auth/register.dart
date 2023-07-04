@@ -3,10 +3,121 @@ import 'package:hamro_barber_mobile/core/auth/login.dart';
 import 'package:hamro_barber_mobile/widgets/appbar.dart';
 import 'package:hamro_barber_mobile/widgets/buttons.dart';
 import 'package:hamro_barber_mobile/widgets/colors.dart';
-import 'package:hamro_barber_mobile/widgets/textfield.dart';
+import 'package:email_validator/email_validator.dart';
 
-class Register extends StatelessWidget {
+class Register extends StatefulWidget {
   const Register({super.key});
+
+  @override
+  State<Register> createState() => _RegisterState();
+}
+
+class _RegisterState extends State<Register> {
+  final TextEditingController _firstNameController = TextEditingController();
+
+  final TextEditingController _lastNameController = TextEditingController();
+
+  final TextEditingController _emailController = TextEditingController();
+
+  final TextEditingController _passwordController = TextEditingController();
+
+  final TextEditingController _confirmpasswordController =
+      TextEditingController();
+
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmpasswordController.dispose();
+
+    super.dispose();
+  }
+
+  void _register() {
+    String firstname = _firstNameController.text;
+    String lastname = _lastNameController.text;
+    String email = _emailController.text;
+    String password = _passwordController.text;
+    String confirmpassword = _confirmpasswordController.text;
+    final bool isValid = EmailValidator.validate(_emailController.text.trim());
+
+    if (firstname.isEmpty ||
+        lastname.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty ||
+        confirmpassword.isEmpty) {
+      print('$email');
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Please fill in all fields.'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+    if (password != confirmpassword) {
+      // Show an error message if new password and confirm password don't match
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: const Text('password and confirm password must match.'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+    if (isValid == false) {
+      print('$email');
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Please insert correct email address.'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+    _firstNameController.clear();
+    _lastNameController.clear();
+    _emailController.clear();
+    _passwordController.clear();
+    _confirmpasswordController.clear();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +147,7 @@ class Register extends StatelessWidget {
                     child: Image.asset('lib/assets/images/barberlogo.png'),
                   ),
                   Text(
-                    'Regiser',
+                    'Register',
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
@@ -44,40 +155,100 @@ class Register extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 15),
-                  const InputField(
-                    hinttext: 'First Name',
-                    obscuretext: false,
-                    icon: Icons.person,
+                  TextField(
+                    controller: _firstNameController,
+                    obscureText: false,
+                    decoration: InputDecoration(
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey.shade400),
+                      ),
+                      fillColor: Colors.grey.shade200,
+                      filled: true,
+                      hintStyle: TextStyle(color: Colors.grey[500]),
+                      labelText: 'First Name',
+                      icon: const Icon(Icons.person),
+                    ),
                   ),
                   const SizedBox(height: 15),
-                  const InputField(
-                    hinttext: 'Last Name',
-                    obscuretext: false,
-                    icon: Icons.person,
+                  TextField(
+                    controller: _lastNameController,
+                    obscureText: false,
+                    decoration: InputDecoration(
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey.shade400),
+                      ),
+                      fillColor: Colors.grey.shade200,
+                      filled: true,
+                      hintStyle: TextStyle(color: Colors.grey[500]),
+                      labelText: 'Last Name',
+                      icon: const Icon(Icons.person),
+                    ),
                   ),
                   const SizedBox(height: 15),
-                  const InputField(
-                    hinttext: 'Email',
-                    obscuretext: false,
-                    icon: Icons.mail,
+                  TextField(
+                    controller: _emailController,
+                    obscureText: false,
+                    decoration: InputDecoration(
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey.shade400),
+                      ),
+                      fillColor: Colors.grey.shade200,
+                      filled: true,
+                      hintStyle: TextStyle(color: Colors.grey[500]),
+                      labelText: 'email',
+                      icon: const Icon(Icons.mail),
+                    ),
                   ),
                   const SizedBox(height: 15),
-                  const InputField(
-                    hinttext: 'Password',
-                    obscuretext: true,
-                    icon: Icons.lock,
+                  TextField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey.shade400),
+                      ),
+                      fillColor: Colors.grey.shade200,
+                      filled: true,
+                      hintStyle: TextStyle(color: Colors.grey[500]),
+                      labelText: 'Password',
+                      icon: const Icon(Icons.lock),
+                    ),
                   ),
                   const SizedBox(height: 15),
-                  const InputField(
-                    hinttext: 'Confirm Password',
-                    obscuretext: true,
-                    icon: Icons.lock,
+                  TextField(
+                    controller: _confirmpasswordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey.shade400),
+                      ),
+                      fillColor: Colors.grey.shade200,
+                      filled: true,
+                      hintStyle: TextStyle(color: Colors.grey[500]),
+                      labelText: 'Confirm Password',
+                      icon: const Icon(Icons.lock),
+                    ),
                   ),
                   const SizedBox(height: 15),
                   CustomButton(
                     label: 'Register',
                     icon: Icons.arrow_circle_right_sharp,
-                    onpressed: () {},
+                    onpressed: _register,
                   ),
                   ElevatedButton(
                     onPressed: () {
