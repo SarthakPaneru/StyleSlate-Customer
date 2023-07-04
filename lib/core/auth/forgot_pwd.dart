@@ -2,10 +2,73 @@ import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/widgets/appbar.dart';
 import 'package:hamro_barber_mobile/widgets/buttons.dart';
 import 'package:hamro_barber_mobile/widgets/colors.dart';
-import 'package:hamro_barber_mobile/widgets/textfield.dart';
+import 'package:email_validator/email_validator.dart';
 
-class Forgetpassword extends StatelessWidget {
+class Forgetpassword extends StatefulWidget {
   const Forgetpassword({super.key});
+
+  @override
+  State<Forgetpassword> createState() => _ForgetpasswordState();
+}
+
+class _ForgetpasswordState extends State<Forgetpassword> {
+  final TextEditingController _emailController = TextEditingController();
+  @override
+  void dispose() {
+    _emailController
+        .dispose(); // Dispose of the controller when no longer needed
+    super.dispose();
+  }
+
+  void _forgotpassword() {
+    String email = _emailController.text;
+    final bool isValid = EmailValidator.validate(_emailController.text.trim());
+
+    if (email.isEmpty) {
+      print('$email');
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Please fill  email address field .'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+    if (isValid == false) {
+      print('$email');
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Please insert correct email address.'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,15 +118,28 @@ class Forgetpassword extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 15),
-                  const InputField(
-                      hinttext: 'Enter Email Address',
-                      obscuretext: false,
-                      icon: Icons.mail),
+                  TextField(
+                    controller: _emailController,
+                    obscureText: false,
+                    decoration: InputDecoration(
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey.shade400),
+                      ),
+                      fillColor: Colors.grey.shade200,
+                      filled: true,
+                      hintStyle: TextStyle(color: Colors.grey[500]),
+                      labelText: 'Enter Email Address',
+                      icon: const Icon(Icons.mail),
+                    ),
+                  ),
                   const SizedBox(height: 15),
                   CustomButton(
                     label: 'Send Code',
                     icon: null,
-                    onpressed: () {},
+                    onpressed: _forgotpassword,
                   )
                 ],
               ),
