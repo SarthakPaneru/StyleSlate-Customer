@@ -1,3 +1,4 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/core/auth/forgot_pwd.dart';
 import 'package:hamro_barber_mobile/core/auth/register.dart';
@@ -28,9 +29,10 @@ class _LoginState extends State<Login> {
     String email = _emailController.text;
     String password = _passwordComtroller.text;
 
+    final bool isValid = EmailValidator.validate(_emailController.text.trim());
+
     if (email.isEmpty || password.isEmpty) {
       print('$email');
-      
 
       showDialog(
         context: context,
@@ -51,6 +53,28 @@ class _LoginState extends State<Login> {
       );
 
       return;
+    }
+    if (isValid == false) {
+      print('$email');
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Please insert correct email address.'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
     } else {
       {
         Navigator.of(context).push(
@@ -65,6 +89,7 @@ class _LoginState extends State<Login> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,

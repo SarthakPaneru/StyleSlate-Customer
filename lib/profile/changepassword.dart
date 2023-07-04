@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class ChangePasswordScreen extends StatefulWidget {
   @override
   _ChangePasswordScreenState createState() => _ChangePasswordScreenState();
@@ -123,12 +122,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   borderSide: BorderSide(color: Colors.white),
                 ),
                 focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey.shade400),
+                  borderSide: BorderSide(color: Colors.grey.shade400),
                 ),
                 fillColor: Colors.grey.shade200,
-          filled: true,
-          
-          hintStyle: TextStyle(color: Colors.grey[500]),
+                filled: true,
+                hintStyle: TextStyle(color: Colors.grey[500]),
                 labelText: 'Current Password',
               ),
             ),
@@ -139,16 +137,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               controller: _newPasswordController,
               obscureText: true,
               decoration: InputDecoration(
-                 enabledBorder: const OutlineInputBorder(
+                enabledBorder: const OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.white),
                 ),
                 focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey.shade400),
+                  borderSide: BorderSide(color: Colors.grey.shade400),
                 ),
                 fillColor: Colors.grey.shade200,
-          filled: true,
-          
-          hintStyle: TextStyle(color: Colors.grey[500]),
+                filled: true,
+                hintStyle: TextStyle(color: Colors.grey[500]),
                 labelText: 'New Password',
               ),
             ),
@@ -159,16 +156,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               controller: _confirmPasswordController,
               obscureText: true,
               decoration: InputDecoration(
-                 enabledBorder: const OutlineInputBorder(
+                enabledBorder: const OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.white),
                 ),
                 focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey.shade400),
+                  borderSide: BorderSide(color: Colors.grey.shade400),
                 ),
                 fillColor: Colors.grey.shade200,
-          filled: true,
-          
-          hintStyle: TextStyle(color: Colors.grey[500]),
+                filled: true,
+                hintStyle: TextStyle(color: Colors.grey[500]),
                 labelText: 'Confirm Password',
               ),
             ),
@@ -177,10 +173,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
               ),
-               child:  Text('Change Password',
-              style: TextStyle(
-                color: Colors.grey
-              ),),
+              child: Text(
+                'Change Password',
+                style: TextStyle(color: Colors.grey),
+              ),
               onPressed: _changePassword,
             ),
           ],
