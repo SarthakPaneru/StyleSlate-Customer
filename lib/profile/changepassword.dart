@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 
+import 'package:hamro_barber_mobile/config/api_service.dart';
+import 'package:hamro_barber_mobile/constants/app_constants.dart';
+
 class ChangePasswordScreen extends StatefulWidget {
+  const ChangePasswordScreen({super.key});
+
   @override
   _ChangePasswordScreenState createState() => _ChangePasswordScreenState();
 }
 
 class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
-  TextEditingController _currentPasswordController = TextEditingController();
-  TextEditingController _newPasswordController = TextEditingController();
-  TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _currentPasswordController =
+      TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   @override
   void dispose() {
@@ -18,7 +25,17 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     super.dispose();
   }
 
+  final ApiService _apiService = ApiService();
+
+  @override
+  void initState() {
+    super.initState();
+    _apiService.get('/test');
+  }
+
   void _changePassword() {
+    final response = _apiService.get('${ApiConstants.usersEndpoint}/get-all');
+    
     String currentPassword = _currentPasswordController.text;
     String newPassword = _newPasswordController.text;
     String confirmPassword = _confirmPasswordController.text;
@@ -32,11 +49,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Error'),
-            content: Text('Please fill in all fields.'),
+            title: const Text('Error'),
+            content: const Text('Please fill in all fields.'),
             actions: <Widget>[
               TextButton(
-                child: Text('OK'),
+                child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -54,11 +71,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Error'),
-            content: Text('New password and confirm password must match.'),
+            title: const Text('Error'),
+            content:
+                const Text('New password and confirm password must match.'),
             actions: <Widget>[
               TextButton(
-                child: Text('OK'),
+                child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -73,6 +91,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     // TODO: Perform the password change logic here
     // You can make an API call or update the password in your database
     // Once the password is successfully changed, you can navigate to a success screen
+    // print('call to spring boot');
+    // final response = _apiService.get('${ApiConstants.usersEndpoint}/get-all');
+    // print('done');
 
     // Clear the text fields
     _currentPasswordController.clear();
@@ -83,11 +104,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Success'),
-          content: Text('Password changed successfully.'),
+          title: const Text('Success'),
+          content: const Text('Password changed successfully.'),
           actions: <Widget>[
             TextButton(
-              child: Text('OK'),
+              child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -105,13 +126,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         centerTitle: true,
         elevation: 0.0,
         backgroundColor: Colors.white,
-        title: Text(
+        title: const Text(
           'Change Password',
           style: TextStyle(color: Colors.grey),
         ),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
             TextField(
@@ -173,11 +194,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
               ),
-              child: Text(
+              onPressed: _changePassword,
+              child: const Text(
                 'Change Password',
                 style: TextStyle(color: Colors.grey),
               ),
-              onPressed: _changePassword,
             ),
           ],
         ),

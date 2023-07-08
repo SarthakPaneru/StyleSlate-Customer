@@ -6,6 +6,8 @@ import 'helpcenterscreen.dart';
 import 'Myaccount.dart';
 
 class Body extends StatelessWidget {
+  const Body({super.key});
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -85,15 +87,15 @@ class Body extends StatelessWidget {
 
   void navigateTOChangePassword(BuildContext context) {
     Navigator.push(context,
-        MaterialPageRoute(builder: (context) => ChangePasswordScreen()));
+        MaterialPageRoute(builder: (context) => const ChangePasswordScreen()));
   }
 void navigateTOHelpcenter(BuildContext context) {
     Navigator.push(context,
-        MaterialPageRoute(builder: (context) => HelpCenterScreen()));
+        MaterialPageRoute(builder: (context) => const HelpCenterScreen()));
   }
   void navigateTOMyaccount(BuildContext context) {
     Navigator.push(context,
-        MaterialPageRoute(builder: (context) => MyAccountScreen()));
+        MaterialPageRoute(builder: (context) => const MyAccountScreen()));
   }
 
 }

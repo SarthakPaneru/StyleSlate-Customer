@@ -11,6 +11,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String? _firstName = null;
+
+  @override
+  void initState() {
+    super.initState();
+    
+  }
+
   final List barberType = [
     [
       "Hair style",

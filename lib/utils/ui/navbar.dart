@@ -15,18 +15,18 @@ class _NavBarState extends State<NavBar> {
       bottomNavigationBar: Container(
         color: Colors.black,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 20),
           child: GNav(
               backgroundColor: Colors.black,
               color: Colors.white,
               activeColor: Colors.white,
-              tabBackgroundColor: Color(0xFF616161),
+              tabBackgroundColor: const Color(0xFF616161),
               gap: 8,
               onTabChange: (index) {
                 print(index);
               },
-              padding: EdgeInsets.all(16),
-              tabs: [
+              padding: const EdgeInsets.all(16),
+              tabs: const [
                 GButton(
                   icon: Icons.home,
                   text: 'Home',
@@ -46,6 +46,6 @@ class _NavBarState extends State<NavBar> {
               ]),
         ),
       ),
-    );;
+    );
   }
 }

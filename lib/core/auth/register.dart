@@ -1,9 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Action;
+import 'package:hamro_barber_mobile/config/api_requests.dart';
 import 'package:hamro_barber_mobile/core/auth/login.dart';
 import 'package:hamro_barber_mobile/widgets/appbar.dart';
 import 'package:hamro_barber_mobile/widgets/buttons.dart';
 import 'package:hamro_barber_mobile/widgets/colors.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:http/http.dart' as http;
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -21,8 +23,10 @@ class _RegisterState extends State<Register> {
 
   final TextEditingController _passwordController = TextEditingController();
 
-  final TextEditingController _confirmpasswordController =
+  final TextEditingController _confirmPasswordController =
       TextEditingController();
+
+  final ApiRequests _apiRequests = ApiRequests();
 
   @override
   void dispose() {
@@ -30,24 +34,24 @@ class _RegisterState extends State<Register> {
     _lastNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
-    _confirmpasswordController.dispose();
+    _confirmPasswordController.dispose();
 
     super.dispose();
   }
 
-  void _register() {
+  Future<void> _register() async {
     String firstname = _firstNameController.text;
     String lastname = _lastNameController.text;
     String email = _emailController.text;
     String password = _passwordController.text;
-    String confirmpassword = _confirmpasswordController.text;
+    String confirmPassword = _confirmPasswordController.text;
     final bool isValid = EmailValidator.validate(_emailController.text.trim());
 
     if (firstname.isEmpty ||
         lastname.isEmpty ||
         email.isEmpty ||
         password.isEmpty ||
-        confirmpassword.isEmpty) {
+        confirmPassword.isEmpty) {
       print('$email');
 
       showDialog(
@@ -69,7 +73,7 @@ class _RegisterState extends State<Register> {
       );
       return;
     }
-    if (password != confirmpassword) {
+    if (password != confirmPassword) {
       // Show an error message if new password and confirm password don't match
       showDialog(
         context: context,
@@ -112,11 +116,32 @@ class _RegisterState extends State<Register> {
       );
       return;
     }
+
+    http.Response response = await _apiRequests.register(
+        email, password, confirmPassword, firstname, lastname);
+
+    print('Status code: ${response.statusCode}');
+    print('Payload: ${response.body}');
+
+    if (response.statusCode == 201) {
+      // Successful register
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (BuildContext context) {
+            return const Login();
+          },
+        ),
+      );
+    } else {
+      // Handle login failure
+      print('Registeration failed with code: ${response.statusCode}');
+    }
+
     _firstNameController.clear();
     _lastNameController.clear();
     _emailController.clear();
     _passwordController.clear();
-    _confirmpasswordController.clear();
+    _confirmPasswordController.clear();
   }
 
   @override
@@ -228,7 +253,7 @@ class _RegisterState extends State<Register> {
                   ),
                   const SizedBox(height: 15),
                   TextField(
-                    controller: _confirmpasswordController,
+                    controller: _confirmPasswordController,
                     obscureText: true,
                     decoration: InputDecoration(
                       enabledBorder: const OutlineInputBorder(
@@ -255,7 +280,7 @@ class _RegisterState extends State<Register> {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (BuildContext context) {
-                            return const Login();
+                            return Login();
                           },
                         ),
                       );

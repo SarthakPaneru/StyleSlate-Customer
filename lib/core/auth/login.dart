@@ -1,11 +1,18 @@
 import 'package:email_validator/email_validator.dart';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:hamro_barber_mobile/config/api_service.dart';
+import 'package:hamro_barber_mobile/constants/app_constants.dart';
 import 'package:hamro_barber_mobile/core/auth/forgot_pwd.dart';
 import 'package:hamro_barber_mobile/core/auth/register.dart';
+import 'package:hamro_barber_mobile/core/auth/token.dart';
 import 'package:hamro_barber_mobile/widgets/appbar.dart';
 import 'package:hamro_barber_mobile/widgets/colors.dart';
 import 'package:hamro_barber_mobile/modules/screens/homepage.dart';
 import 'package:hamro_barber_mobile/widgets/textfield.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -25,15 +32,15 @@ class _LoginState extends State<Login> {
     super.dispose();
   }
 
-  void _login() {
+  final ApiService _apiService = ApiService();
+
+  Future<void> _login() async {
     String email = _emailController.text;
     String password = _passwordComtroller.text;
 
     final bool isValid = EmailValidator.validate(_emailController.text.trim());
 
     if (email.isEmpty || password.isEmpty) {
-      print('$email');
-
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -55,8 +62,6 @@ class _LoginState extends State<Login> {
       return;
     }
     if (isValid == false) {
-      print('$email');
-
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -77,13 +82,32 @@ class _LoginState extends State<Login> {
       return;
     } else {
       {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (BuildContext context) {
-              return const HomePage();
-            },
-          ),
-        );
+
+        // If form is validated the follwing code is executed.
+        final payload = {'email': email, 'password': password};
+        final jsonPayload = jsonEncode(payload);
+
+        http.Response response = await _apiService.post(
+            '${ApiConstants.authEndpoint}/login', jsonPayload);
+
+        if (response.statusCode == 200) {
+          // Successful login
+          Map<String, dynamic> jsonResponse = json.decode(response.body);
+          String token = jsonResponse['accessToken'];
+          print('$token');
+          Token().storeBearerToken(token);
+
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (BuildContext context) {
+                return const HomePage();
+              },
+            ),
+          );
+        } else {
+          // Handle login failure
+          print('Login failed with status code: ${response.statusCode}');
+        }
       }
       ;
     }
