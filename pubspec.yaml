@@ -40,6 +40,7 @@ dependencies:
   email_validator: '^2.1.16'
   http: ^1.1.0
   flutter_secure_storage: ^8.0.0
+  heart_toggle: ^0.0.3
 
 dev_dependencies:
   flutter_test:

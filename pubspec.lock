@@ -152,6 +152,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.0.6"
+<<<<<<< HEAD
   http:
     dependency: "direct main"
     description:
@@ -168,6 +169,16 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
+=======
+  heart_toggle:
+    dependency: "direct main"
+    description:
+      name: heart_toggle
+      sha256: "88bed6085f58709adcb27df1cddc0b0833e8c4bb63a5e261107d7da211f2ed8f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
+>>>>>>> prajwal
   js:
     dependency: transitive
     description:
