@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:heart_toggle/heart_toggle.dart';
+import 'booking page.dart';
 
 var serviceList = [
   {'title': 'Men\s Hair Cut', 'duration': 45, 'price': 30},
@@ -244,7 +245,13 @@ class ServiceTile extends StatelessWidget {
             ),
           ),
           MaterialButton(
-            onPressed: () {},
+            onPressed: () {
+               Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BookingPage()));
+
+            },
             color: Color(0xffFF8573),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
