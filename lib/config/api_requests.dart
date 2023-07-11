@@ -10,17 +10,18 @@ import 'package:http/http.dart' as http;
 class ApiRequests {
   final ApiService _apiService = ApiService();
 
-  Future<String?> getLoggedInUser() async {
+  Future<http.Response> getLoggedInUser() async {
     http.Response response = await _apiService
         .get('${ApiConstants.customersEndpoint}/get-logged-in-user');
-
+    print('Logged in users stattus ${response.statusCode}');
     if (response.statusCode == 200) {
       // Successful login
-      return response.body;
+      return response;
     } else {
       print('Login failed with status code: ${response.statusCode}');
+      throw Future.error(
+          'Login failed with status code: ${response.statusCode}');
     }
-    return null;
   }
 
   Future<http.Response> register(String email, String password,
@@ -38,6 +39,11 @@ class ApiRequests {
         '${ApiConstants.authEndpoint}/register', jsonPayload);
 
     return response;
+  }
 
+  Future<http.Response> getBarbers() async {
+    http.Response response =
+        await _apiService.get('${ApiConstants.barbersEndpoint}/get-all');
+    return response;
   }
 }

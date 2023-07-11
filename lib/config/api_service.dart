@@ -17,7 +17,9 @@ class ApiService {
       // params /*String|Iterable<String>*/
       print('URI: $uri');
       // final re = await http.head(uri, headers: ApiConstants.headers);
-      final response = await http.get(uri, headers: ApiConstants.headers);
+      ApiConstants apiConstants = ApiConstants();
+      Map<String, String> headers = await apiConstants.getHeaders();
+      final response = await http.get(uri, headers: headers);
       // print('Response with token: $re');
       print('Spring: ${response.statusCode}');
 

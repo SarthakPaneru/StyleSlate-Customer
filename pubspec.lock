@@ -74,10 +74,10 @@ packages:
     dependency: "direct dev"
     description:
       name: flutter_lints
-      sha256: aeb0b80a8b3709709c9cc496cdc027c5b3216796bc0af0ce1007eaf24464fd4c
+      sha256: "2118df84ef0c3ca93f96123a616ae8540879991b8b57af2f81b76a7ada49b2a4"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.1"
+    version: "2.0.2"
   flutter_secure_storage:
     dependency: "direct main"
     description:
@@ -152,7 +152,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.0.6"
-<<<<<<< HEAD
+  heart_toggle:
+    dependency: "direct main"
+    description:
+      name: heart_toggle
+      sha256: "88bed6085f58709adcb27df1cddc0b0833e8c4bb63a5e261107d7da211f2ed8f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
   http:
     dependency: "direct main"
     description:
@@ -169,16 +176,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
-=======
-  heart_toggle:
-    dependency: "direct main"
-    description:
-      name: heart_toggle
-      sha256: "88bed6085f58709adcb27df1cddc0b0833e8c4bb63a5e261107d7da211f2ed8f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.3"
->>>>>>> prajwal
   js:
     dependency: transitive
     description:

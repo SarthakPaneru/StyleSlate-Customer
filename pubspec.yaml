@@ -37,7 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   google_nav_bar: ^5.0.6
   flutter_svg: ^0.22.0 
-  email_validator: '^2.1.16'
+  email_validator: ^2.1.16
   http: ^1.1.0
   flutter_secure_storage: ^8.0.0
   heart_toggle: ^0.0.3

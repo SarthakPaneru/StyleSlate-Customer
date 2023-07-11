@@ -2,6 +2,7 @@ import 'package:email_validator/email_validator.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:hamro_barber_mobile/Screen/homescreen.dart';
 import 'package:hamro_barber_mobile/config/api_service.dart';
 import 'package:hamro_barber_mobile/constants/app_constants.dart';
 import 'package:hamro_barber_mobile/core/auth/forgot_pwd.dart';
@@ -22,8 +23,8 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordComtroller = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordComtroller = TextEditingController();
 
   @override
   void dispose() {
@@ -33,6 +34,7 @@ class _LoginState extends State<Login> {
   }
 
   final ApiService _apiService = ApiService();
+  final Token _token = Token();
 
   Future<void> _login() async {
     String email = _emailController.text;
@@ -45,11 +47,11 @@ class _LoginState extends State<Login> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Error'),
-            content: Text('Please fill in all fields.'),
+            title: const Text('Error'),
+            content: const Text('Please fill in all fields.'),
             actions: <Widget>[
               TextButton(
-                child: Text('OK'),
+                child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -66,11 +68,11 @@ class _LoginState extends State<Login> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Error'),
-            content: Text('Please insert correct email address.'),
+            title: const Text('Error'),
+            content: const Text('Please insert correct email address.'),
             actions: <Widget>[
               TextButton(
-                child: Text('OK'),
+                child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -82,7 +84,6 @@ class _LoginState extends State<Login> {
       return;
     } else {
       {
-
         // If form is validated the follwing code is executed.
         final payload = {'email': email, 'password': password};
         final jsonPayload = jsonEncode(payload);
@@ -94,13 +95,13 @@ class _LoginState extends State<Login> {
           // Successful login
           Map<String, dynamic> jsonResponse = json.decode(response.body);
           String token = jsonResponse['accessToken'];
-          print('$token');
-          Token().storeBearerToken(token);
+          print('Token: $token');
+          await _token.storeBearerToken(token);
 
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (BuildContext context) {
-                return const HomePage();
+                return const HomeScreen();
               },
             ),
           );

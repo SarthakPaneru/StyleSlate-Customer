@@ -22,13 +22,18 @@ class ApiConstants {
 
   // Appointment's Endpoint
   static const String appointmentEndpoint = '/appointment';
+  final Token _token = Token();
 
   // static const String bearerToken = Token().retrieveBearerToken().toString();
 
-  static Map<String, String> headers = {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer ${Token().retrieveBearerToken().toString()}',
-  };
+  Future<Map<String, String>> getHeaders() async {
+    String? token = await _token.retrieveBearerToken();
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+    return headers;
+  }
 
   static const Map<String, String> postHeaders = {
     'content-type': 'application/json',
