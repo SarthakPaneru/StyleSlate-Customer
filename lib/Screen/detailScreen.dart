@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hamro_barber_mobile/constants/app_constants.dart';
 import 'package:heart_toggle/heart_toggle.dart';
 import 'booking page.dart';
 
@@ -29,10 +30,18 @@ class DetailScreen extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: <Widget>[
-                    Image.asset(
-                      'assets/detail_bg.png',
-                      fit: BoxFit.fill,
-                    ),
+                    Image.network(
+                        '${ApiConstants.baseUrl}${stylist['imageUrl']}',
+                        fit: BoxFit.fill, loadingBuilder: (BuildContext context,
+                            Widget child, ImageChunkEvent? loadingProgress) {
+                      if (loadingProgress == null) {
+                        // Image loaded successfully
+                        return child;
+                      } else {
+                        // Image is still loading
+                        return const CircularProgressIndicator();
+                      }
+                    }),
                     Container(
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
@@ -103,7 +112,7 @@ class DetailScreen extends StatelessWidget {
                         width: MediaQuery.of(context).size.width / 3 - 20,
                         height: MediaQuery.of(context).size.height / 6 + 20,
                         decoration: BoxDecoration(
-                          color: stylist['bgColor'],
+                          color: const Color(0xffFFF0EB),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Stack(
@@ -112,10 +121,21 @@ class DetailScreen extends StatelessWidget {
                             Positioned(
                               top: 5,
                               right: -25,
-                              child: Image.asset(
-                                stylist['imgUrl'],
-                                scale: 1.7,
-                              ),
+                              child: Image.network(
+                                  '${ApiConstants.baseUrl}${stylist['imageUrl']}',
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.60,
+                                  loadingBuilder: (BuildContext context,
+                                      Widget child,
+                                      ImageChunkEvent? loadingProgress) {
+                                if (loadingProgress == null) {
+                                  // Image loaded successfully
+                                  return child;
+                                } else {
+                                  // Image is still loading
+                                  return const CircularProgressIndicator();
+                                }
+                              }),
                             ),
                           ],
                         ),
@@ -127,45 +147,45 @@ class DetailScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            stylist['stylistName'],
-                            style: TextStyle(
+                            stylist['name'],
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 20,
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 5,
                           ),
                           Text(
-                            stylist['salonName'],
-                            style: TextStyle(
+                            stylist['name'],
+                            style: const TextStyle(
                               fontWeight: FontWeight.w300,
                               color: Colors.grey,
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Row(
                             children: <Widget>[
-                              Icon(
+                              const Icon(
                                 Icons.star,
                                 size: 16,
                                 color: Color(0xffFF8573),
                               ),
-                              SizedBox(width: 5),
+                              const SizedBox(width: 5),
                               Text(
-                                stylist['rating'],
-                                style: TextStyle(
+                                stylist['rating'].toString(),
+                                style: const TextStyle(
                                   color: Color(0xffFF8573),
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 5,
                               ),
                               Text(
-                                '(${stylist['rateAmount']})',
-                                style: TextStyle(
+                                '(${stylist['rating'].toString()})', //rateAmount
+                                style: const TextStyle(
                                   color: Colors.grey,
                                 ),
                               ),
@@ -220,18 +240,18 @@ class ServiceTile extends StatelessWidget {
                 width: MediaQuery.of(context).size.width / 2 - 40,
                 child: Text(
                   service['title'],
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 5,
               ),
               Text(
                 '${service['duration']} Min',
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.grey,
                 ),
               ),
@@ -239,24 +259,21 @@ class ServiceTile extends StatelessWidget {
           ),
           Text(
             '\$${service['price']}',
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
             ),
           ),
           MaterialButton(
             onPressed: () {
-               Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => BookingPage()));
-
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const BookingPage()));
             },
-            color: Color(0xffFF8573),
+            color: const Color(0xffFF8573),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
-            child: Text(
+            child: const Text(
               'Book',
               style: TextStyle(color: Colors.white),
             ),
