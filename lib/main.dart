@@ -5,13 +5,15 @@ import 'package:hamro_barber_mobile/widgets/colors.dart';
 import 'package:hamro_barber_mobile/core/auth/login.dart';
 
 void main() {
-  runApp( const MaterialApp(
+
+  runApp(const MaterialApp(
+    debugShowCheckedModeBanner: false,
     home: Mainpage(),
   ));
 }
 
 class Mainpage extends StatelessWidget {
-  const Mainpage({super.key});
+  const Mainpage({Key? key});
 
   @override
   Widget build(BuildContext context) {
