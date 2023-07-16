@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/constants/app_constants.dart';
@@ -10,6 +11,7 @@ import 'package:http/http.dart' as http;
 class ApiRequests {
   final ApiService _apiService = ApiService();
 
+  // Get Email of currently logged in user
   Future<http.Response> getLoggedInUser() async {
     http.Response response = await _apiService
         .get('${ApiConstants.customersEndpoint}/get-logged-in-user');
@@ -24,6 +26,7 @@ class ApiRequests {
     }
   }
 
+  // Register the user
   Future<http.Response> register(String email, String password,
       String confirmPassword, String firstName, String lastName) async {
     final payload = {
@@ -41,9 +44,24 @@ class ApiRequests {
     return response;
   }
 
+  // List all barbers
   Future<http.Response> getBarbers() async {
     http.Response response =
         await _apiService.get('${ApiConstants.barbersEndpoint}/get-all');
+    return response;
+  }
+
+  // Create Appointment
+  Future<http.Response> createAppointment(
+      int bookingStart, int bookingEnd, int barberId) async {
+    final payload = {
+      'bookingStart': bookingStart,
+      'bookingEnd': bookingEnd,
+      'barberId': barberId
+    };
+    final jsonPayload = jsonEncode(payload);
+    http.Response response = await _apiService.post(
+        '${ApiConstants.appointmentEndpoint}/save', jsonPayload);
     return response;
   }
 }

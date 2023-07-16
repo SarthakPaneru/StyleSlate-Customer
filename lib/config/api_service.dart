@@ -38,8 +38,12 @@ class ApiService {
       Map<String, dynamic> bodyMap = json.decode(body);
       String bodyString = json.encode(bodyMap);
 
+      ApiConstants apiConstants = ApiConstants();
+      Map<String, String> headers = await apiConstants.postHeaders();
+
+
       http.Response response = await http.post(uri,
-          headers: ApiConstants.postHeaders, body: bodyString);
+          headers: headers, body: bodyString);
       print('Main http: ${response.body}');
       return response;
     } catch (e) {
@@ -52,8 +56,12 @@ class ApiService {
     try {
       Uri uri = Uri.parse(ApiConstants.baseUrl + url);
       String bodyString = json.encode(body);
+
+      ApiConstants apiConstants = ApiConstants();
+      Map<String, String> headers = await apiConstants.postHeaders();
+
       http.Response response = await http.put(uri,
-          headers: ApiConstants.postHeaders, body: bodyString);
+          headers: headers, body: bodyString);
       return response;
     } catch (e) {
       return http.Response({"message": e}.toString(), 400);
@@ -63,8 +71,12 @@ class ApiService {
   Future<http.Response> delete(String url) async {
     try {
       Uri uri = Uri.parse(ApiConstants.baseUrl + url);
+
+      ApiConstants apiConstants = ApiConstants();
+      Map<String, String> headers = await apiConstants.postHeaders();
+
       http.Response response =
-          await http.delete(uri, headers: ApiConstants.postHeaders);
+          await http.delete(uri, headers: headers);
       return response;
     } catch (e) {
       return http.Response({"message": e}.toString(), 400);

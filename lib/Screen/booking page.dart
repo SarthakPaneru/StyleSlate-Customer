@@ -1,18 +1,26 @@
+import 'package:hamro_barber_mobile/config/api_requests.dart';
+import 'package:hamro_barber_mobile/modules/screens/homepage.dart';
+
 import '../widgets/button.dart';
 import '../widgets/custom_appbar.dart';
 import '../widgets/config.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:http/http.dart' as http;
 
 class BookingPage extends StatefulWidget {
-  const BookingPage({Key? key}) : super(key: key);
+  final int barberId;
+  const BookingPage({Key? key, required this.barberId}) : super(key: key);
 
   @override
-  State<BookingPage> createState() => _BookingPageState();
+  State<BookingPage> createState() => _BookingPageState(barberId);
 }
 
 class _BookingPageState extends State<BookingPage> {
+  late int barberId;
+  _BookingPageState(this.barberId);
+  final ApiRequests _apiRequests = ApiRequests();
   //declaration
   CalendarFormat _format = CalendarFormat.month;
   DateTime _focusDay = DateTime.now();
@@ -21,6 +29,18 @@ class _BookingPageState extends State<BookingPage> {
   bool _isWeekend = false;
   bool _dateSelected = false;
   bool _timeSelected = false;
+  int _serviceTime = 60;
+  late int _barberId;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void _createAppointment(int bookingStart, int bookingEnd) async {
+    http.Response response = await _apiRequests.createAppointment(
+        bookingStart, bookingEnd, barberId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +79,7 @@ class _BookingPageState extends State<BookingPage> {
                         horizontal: 10, vertical: 30),
                     alignment: Alignment.center,
                     child: const Text(
-                      'Weekend is not available, please select another date',
+                      'Tuesday is not available, please select another date',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -111,11 +131,40 @@ class _BookingPageState extends State<BookingPage> {
                 ),
           SliverToBoxAdapter(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 80),
+              padding:  EdgeInsets.symmetric(horizontal: 10, vertical: 80),
               child: Button(
                 width: double.infinity,
                 title: 'Make Appointment',
-                onPressed: () {},
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Successfully Booked'),
+                        content: Text('Barber has been reserved'),
+                        actions: <Widget>[
+                          TextButton(
+                            child: Text('OK'),
+                            onPressed: () {
+                              Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (BuildContext context) {
+                            return HomePage();
+                          },
+                        ),
+                      );;
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                  int appointment = _focusDay.toUtc().millisecondsSinceEpoch;
+                  _createAppointment(
+                      appointment,
+                      appointment +
+                          Duration(minutes: _serviceTime).inMilliseconds);
+                },
                 disable: _timeSelected && _dateSelected ? false : true,
               ),
             ),
@@ -141,6 +190,9 @@ class _BookingPageState extends State<BookingPage> {
       availableCalendarFormats: const {
         CalendarFormat.month: 'Month',
       },
+      onPageChanged: (focusedDay) {
+        _focusDay = focusedDay;
+      },
       onFormatChanged: (format) {
         setState(() {
           _format = format;
@@ -153,7 +205,7 @@ class _BookingPageState extends State<BookingPage> {
           _dateSelected = true;
 
           //check if weekend is selected
-          if (selectedDay.weekday == 6 || selectedDay.weekday == 7) {
+          if (selectedDay.weekday == 2) {
             _isWeekend = true;
             _timeSelected = false;
             _currentIndex = null;

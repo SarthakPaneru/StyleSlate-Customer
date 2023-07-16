@@ -3,7 +3,7 @@ import 'package:hamro_barber_mobile/core/auth/token.dart';
 class ApiConstants {
   static const int maxRetryCount = 3;
   static const int timeoutSeconds = 30;
-  static const String baseUrl = 'http://192.168.31.100:8080';
+  static const String baseUrl = 'http://172.16.3.155:8080';
 
   // Auth's Endpoint
   static const String authEndpoint = '/auth';
@@ -35,8 +35,18 @@ class ApiConstants {
     return headers;
   }
 
-  static const Map<String, String> postHeaders = {
-    'content-type': 'application/json',
-    'accept': 'application/json',
-  };
+  // static const Map<String, String> postHeaders = {
+  //   'content-type': 'application/json',
+  //   'accept': 'application/json',
+  // };
+
+  Future<Map<String, String>> postHeaders() async {
+    String? token = await _token.retrieveBearerToken();
+    Map<String, String> postHeaders = {
+      'content-type': 'application/json',
+      'accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+    return postHeaders;
+  }
 }

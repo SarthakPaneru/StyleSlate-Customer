@@ -7,7 +7,6 @@ import 'package:hamro_barber_mobile/modules/screens/user_book.dart';
 import 'package:hamro_barber_mobile/modules/screens/user_favorite.dart';
 import 'package:hamro_barber_mobile/modules/screens/user_home.dart';
 import 'package:hamro_barber_mobile/modules/screens/user_search.dart';
-import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -17,35 +16,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final ApiRequests _apiRequests = ApiRequests();
-  bool _isLoading = true;
-
-  String _firstName = '';
-
-  @override
-  void initState() {
-    super.initState();
-
-    // if (_firstName == null) {
-    getUserDetails();
-    // }
-  }
-
-  void getUserDetails() async {
-    http.Response response = await _apiRequests.getLoggedInUser();
-
-    Map<String, dynamic> jsonResponse = json.decode(response.body);
-    Map<String, dynamic> user = jsonResponse['user'];
-
-    Map<String, dynamic> jsonResponse1 = jsonDecode(jsonEncode(user));
-    _firstName = jsonResponse1['firstName'];
-
-    print(_firstName);
-    setState(() {
-      _isLoading = false;
-    });
-    print(_isLoading);
-  }
+  
 
   final List barberType = [
     [
@@ -71,11 +42,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   final List<Widget> _children = [
-    UserHome(),
-    UserSearch(),
-    UserFavorite(),
-    UserBook(),
-    UserAccount(),
+    const UserHome(),
+    const UserSearch(),
+    const UserFavorite(),
+    const UserBook(),
+    const UserAccount(),
   ];
 
   @override
@@ -88,9 +59,9 @@ class _HomePageState extends State<HomePage> {
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.grey,
-        backgroundColor: Color(0xff323345),
+        backgroundColor: const Color(0xff323345),
         elevation: 10,
-        items: [
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Favorite'),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),

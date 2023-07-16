@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/constants/app_constants.dart';
+import 'package:hamro_barber_mobile/modules/screens/barber_type.dart';
 import 'package:heart_toggle/heart_toggle.dart';
 import 'booking page.dart';
 
@@ -92,10 +93,10 @@ class DetailScreen extends StatelessWidget {
                         const SizedBox(
                           height: 30,
                         ),
-                        ServiceTile(serviceList[0]),
-                        ServiceTile(serviceList[1]),
-                        ServiceTile(serviceList[2]),
-                        ServiceTile(serviceList[3]),
+                        ServiceTile(serviceList[0], stylist['id']),
+                        ServiceTile(serviceList[1], stylist['id']),
+                        ServiceTile(serviceList[2], stylist['id']),
+                        ServiceTile(serviceList[3], stylist['id']),
                       ],
                     ),
                   ),
@@ -224,7 +225,8 @@ class DetailScreen extends StatelessWidget {
 
 class ServiceTile extends StatelessWidget {
   final service;
-  ServiceTile(this.service);
+  final int barberId;
+  ServiceTile(this.service, this.barberId);
 
   @override
   Widget build(BuildContext context) {
@@ -267,7 +269,7 @@ class ServiceTile extends StatelessWidget {
           MaterialButton(
             onPressed: () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const BookingPage()));
+                  MaterialPageRoute(builder: (context) =>  BookingPage(barberId: barberId)));
             },
             color: const Color(0xffFF8573),
             shape: RoundedRectangleBorder(

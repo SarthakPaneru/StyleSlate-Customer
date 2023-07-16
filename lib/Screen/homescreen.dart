@@ -7,32 +7,32 @@ import 'package:hamro_barber_mobile/constants/app_constants.dart';
 import '/Screen/detailScreen.dart';
 import 'package:http/http.dart' as http;
 
-const stylistData = [
-  {
-    'stylistName': 'Cameron Jones',
-    'salonName': 'Super Cut Salon',
-    'rating': '4.8',
-    'rateAmount': '56',
-    'imgUrl': 'assets/stylist1.png',
-    'bgColor': Color(0xffFFF0EB),
-  },
-  {
-    'stylistName': 'Max Robertson',
-    'salonName': 'Rossano Ferretti Salon',
-    'rating': '4.7',
-    'rateAmount': '80',
-    'imgUrl': 'assets/stylist2.png',
-    'bgColor': Color(0xffEBF6FF),
-  },
-  {
-    'stylistName': 'Beth Watson',
-    'salonName': 'Neville Hair and Beauty',
-    'rating': '4.7',
-    'rateAmount': '70',
-    'imgUrl': 'assets/stylist3.png',
-    'bgColor': Color(0xffFFF3EB),
-  }
-];
+// const stylistData = [
+//   {
+//     'stylistName': 'Cameron Jones',
+//     'salonName': 'Super Cut Salon',
+//     'rating': '4.8',
+//     'rateAmount': '56',
+//     'imgUrl': 'assets/stylist1.png',
+//     'bgColor': Color(0xffFFF0EB),
+//   },
+//   {
+//     'stylistName': 'Max Robertson',
+//     'salonName': 'Rossano Ferretti Salon',
+//     'rating': '4.7',
+//     'rateAmount': '80',
+//     'imgUrl': 'assets/stylist2.png',
+//     'bgColor': Color(0xffEBF6FF),
+//   },
+//   {
+//     'stylistName': 'Beth Watson',
+//     'salonName': 'Neville Hair and Beauty',
+//     'rating': '4.7',
+//     'rateAmount': '70',
+//     'imgUrl': 'assets/stylist3.png',
+//     'bgColor': Color(0xffFFF3EB),
+//   }
+// ];
 
 List<dynamic>? stylistData1;
 
@@ -86,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
+                    children: [
                       const SizedBox(
                         height: 50,
                       ),
@@ -97,11 +97,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontSize: 24,
                         ),
                       ),
-                      StylistCard(stylistData1?[0]),
-                      StylistCard(stylistData1?[1])
-                      // StylistCard(stylistData1?[2]),
-                      // StylistCard(stylistData1?[3]),
-                      // StylistCard(stylistData1?[4]),
+                      ...stylistData1!.map((e) => StylistCard(e)).toList()
+                      
+                          // StylistCard(stylistData1?[1]),
+                          // StylistCard(stylistData1?[2]),
+                          // StylistCard(stylistData1?[3]),
+                          // StylistCard(stylistData1?[4]),
                     ],
                   ),
                 ),
@@ -130,10 +131,10 @@ class StylistCard extends StatelessWidget {
           Positioned(
             top: 1,
             right: -60,
-            child:
-                Image.network('${ApiConstants.baseUrl}${stylist['imageUrl']}',
-                width: MediaQuery.of(context).size.width * 0.60,
-                    loadingBuilder: (BuildContext context, Widget child,
+            child: Image.network(
+                '${ApiConstants.baseUrl}${stylist['imageUrl']}',
+                width: MediaQuery.of(context).size.width * 0.60, loadingBuilder:
+                    (BuildContext context, Widget child,
                         ImageChunkEvent? loadingProgress) {
               if (loadingProgress == null) {
                 // Image loaded successfully

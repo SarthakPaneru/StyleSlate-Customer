@@ -64,9 +64,9 @@ class _LoginState extends State<Login> {
   bool _validatePasswordStrength(String password) {
     // Password validation logic goes here
     // Return true if password meets the criteria, otherwise false
-    return password.length >= 8 &&
-        password.contains(RegExp(r'[A-Z]')) &&
-        password.contains(RegExp(r'[0-9]')) &&
+    return password.length >= 1 ||
+        password.contains(RegExp(r'[A-Z]')) ||
+        password.contains(RegExp(r'[0-9]')) ||
         password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
   }
 
@@ -104,7 +104,7 @@ class _LoginState extends State<Login> {
 
         if (response.statusCode == 200) {
           // Successful login
-          Map<String, dynamic> jsonResponse = json.decode(response.body);
+          Map<String, dynamic> jsonResponse = jsonDecode(response.body);
           String token = jsonResponse['accessToken'];
           print('Token: $token');
           await _token.storeBearerToken(token);
@@ -123,16 +123,6 @@ class _LoginState extends State<Login> {
       }
       ;
     }
-
-    // Login logic goes here
-
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (BuildContext context) {
-          return const HomePage();
-        },
-      ),
-    );
   }
 
   @override
