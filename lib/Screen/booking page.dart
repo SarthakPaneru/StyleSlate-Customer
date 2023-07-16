@@ -7,7 +7,11 @@ import '../widgets/config.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:table_calendar/table_calendar.dart';
+<<<<<<< HEAD
 import 'package:http/http.dart' as http;
+=======
+import 'package:hamro_barber_mobile/Screen/appointment.dart';
+>>>>>>> 0fe72b3212667b397072db22331ee9f8820678cb
 
 class BookingPage extends StatefulWidget {
   final int barberId;
