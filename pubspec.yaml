@@ -41,6 +41,7 @@ dependencies:
   heart_toggle: ^0.0.3
   table_calendar: ^3.0.9
   font_awesome_flutter: ^10.2.1
+  image_picker: ^1.0.1
 
 dev_dependencies:
   flutter_test:
