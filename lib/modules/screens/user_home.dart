@@ -89,7 +89,7 @@ class _UserHomeState extends State<UserHome> {
               ),
             ),
             SizedBox(
-              height: 25,
+              height: 5,
             ),
             // search bar
             Padding(
