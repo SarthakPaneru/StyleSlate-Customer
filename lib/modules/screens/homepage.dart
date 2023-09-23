@@ -26,8 +26,8 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _children = [
     UserHome(),
-    UserSearch(),
     UserFavorite(),
+    UserSearch(),
     UserBook(),
     UserAccount(),
   ];
@@ -35,6 +35,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xff323345),
       body: _children[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,

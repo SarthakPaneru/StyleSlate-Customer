@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/modules/screens/categories_bubble.dart';
 import 'package:hamro_barber_mobile/widgets/barberSelection.dart';
+import 'package:geolocator/geolocator.dart';
+
 
 import 'barber_type.dart';
 import 'categories.dart';
@@ -153,7 +155,7 @@ class _UserHomeState extends State<UserHome> {
                     scrollDirection: Axis.horizontal,
                     itemCount: Categories.length,
                     itemBuilder: (context, index) {
-                      return CategoriesBubble(text: Categories[index]);
+                      return CategoriesBubble(text: Categories[index], imagePath: '/home/clay/Projects/Hamrobarber/lib/assets/images/categories/categories${index}.jpg',);
                     },
                   ),
                 ),

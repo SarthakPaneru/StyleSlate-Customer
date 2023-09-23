@@ -7,7 +7,7 @@ class MyAccountScreen extends StatelessWidget {
       appBar: AppBar(
         centerTitle: true,
         elevation: 0.0,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.red,
         title: const Text(
           'My account',
           style: TextStyle(color: Colors.grey),

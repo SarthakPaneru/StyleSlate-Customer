@@ -65,7 +65,7 @@ class BarberSelection extends StatelessWidget {
                               topRight: Radius.circular(5),
                             ),
                             child: Image.asset(
-                              'assets/images/categories/categories2.jpeg',
+                              '',
                               fit: BoxFit.cover,
                             ),
                           ),

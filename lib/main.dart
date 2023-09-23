@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hamro_barber_mobile/widgets/colors.dart';
 import 'package:hamro_barber_mobile/core/auth/login.dart';
 
 void main() {
@@ -15,16 +14,18 @@ class Mainpage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(statusBarColor: Colors.black),
-    );
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primaryColor: const Color(0xFF616274),
+        scaffoldBackgroundColor: const Color(0xFF616274),
+        appBarTheme: AppBarTheme(
+          color: const Color(0xFF616274),
+        ),
+      ),
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Welcome'),
           centerTitle: true,
-          backgroundColor: PrimaryColors.primarybrown,
         ),
         body: Container(
           margin: const EdgeInsets.only(left: 25, right: 25),
@@ -43,7 +44,7 @@ class Mainpage extends StatelessWidget {
               const SizedBox(height: 45),
               FloatingActionButton(
                 foregroundColor: Colors.white,
-                backgroundColor: PrimaryColors.primarybrown,
+                backgroundColor: const Color(0xFF616274),
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(
                     builder: (BuildContext context) {
