@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:ffi';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/constants/app_constants.dart';
@@ -51,6 +52,15 @@ class ApiRequests {
     return response;
   }
 
+  
+
+  // Get Current Customer
+  Future<http.Response> getLoggedInCustomer() async {
+    http.Response response =
+        await _apiService.get('${ApiConstants.customersEndpoint}/get/');
+    return response;
+  }
+
   // Create Appointment
   Future<http.Response> createAppointment(
       int bookingStart, int bookingEnd, int barberId) async {
@@ -62,6 +72,12 @@ class ApiRequests {
     final jsonPayload = jsonEncode(payload);
     http.Response response = await _apiService.post(
         '${ApiConstants.appointmentEndpoint}/save', jsonPayload);
+    return response;
+  }
+
+  // upload user image
+  Future<http.Response> uploadImage(File file) async {
+    http.Response response = await _apiService.postImg('${ApiConstants.usersEndpoint}/image/save', file);
     return response;
   }
 }

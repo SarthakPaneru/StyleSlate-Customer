@@ -49,4 +49,14 @@ class ApiConstants {
     };
     return postHeaders;
   }
+
+  Future<Map<String, String>> postImgHeaders() async {
+    String? token = await _token.retrieveBearerToken();
+    Map<String, String> postImgHeaders = {
+      'content-type': 'multipart/form-data',
+      'accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+    return postImgHeaders;
+  }
 }

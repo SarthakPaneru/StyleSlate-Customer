@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/config/api_requests.dart';
+import 'package:hamro_barber_mobile/core/auth/customer.dart';
 import 'package:hamro_barber_mobile/modules/screens/categories_bubble.dart';
 import 'package:hamro_barber_mobile/widgets/barberSelection.dart';
 import 'package:http/http.dart' as http;
@@ -15,6 +16,7 @@ class UserHome extends StatefulWidget {
 
 class _UserHomeState extends State<UserHome> {
   final ApiRequests _apiRequests = ApiRequests();
+  final Customer _customer = Customer();
   bool _isLoading = true;
 
   String _firstName = '';
@@ -32,6 +34,9 @@ class _UserHomeState extends State<UserHome> {
     http.Response response = await _apiRequests.getLoggedInUser();
 
     Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+
+    _customer.storeCustomerDetails(jsonResponse);
+
     Map<String, dynamic> user = jsonResponse['user'];
 
     Map<String, dynamic> jsonResponse1 = jsonDecode(jsonEncode(user));
@@ -43,6 +48,7 @@ class _UserHomeState extends State<UserHome> {
     });
     print(_isLoading);
   }
+
   final List<String> categories = [
     "Hairstyle",
     "Saving",
@@ -110,7 +116,8 @@ class _UserHomeState extends State<UserHome> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         padding: const EdgeInsets.all(12),
-                        child: const Icon(Icons.notifications, color: Colors.white),
+                        child: const Icon(Icons.notifications,
+                            color: Colors.white),
                       ),
                     ],
                   ),
@@ -136,8 +143,8 @@ class _UserHomeState extends State<UserHome> {
                         decoration: const InputDecoration(
                           hintText: 'Find Your Barber',
                           border: InputBorder.none,
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 15),
                         ),
                       ),
                     ),
