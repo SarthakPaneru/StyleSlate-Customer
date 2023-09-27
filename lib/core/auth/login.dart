@@ -24,6 +24,7 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
   bool passwordVisible = false;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -79,23 +80,8 @@ class _LoginState extends State<Login> {
         password.isEmpty ||
         !isEmailValid ||
         !isPasswordValid) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Error'),
-            content: Text('Please fill in all fields with valid inputs.'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
+          _showSnackbar('Login failed. Please check your credentials.');
+     
       return;
     } else {
       {
@@ -131,6 +117,7 @@ class _LoginState extends State<Login> {
           }
         } else {
           // Handle login failure
+          _showSnackbar('Login failed. Please check your credentials.');
           print('Login failed with status code: ${response.statusCode}');
         }
       }
@@ -142,7 +129,9 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
+      home: ScaffoldMessenger(
+        key:scaffoldMessengerKey,
+        child: Scaffold(
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
           child: AppBar(
@@ -311,6 +300,16 @@ class _LoginState extends State<Login> {
             ),
           ),
         ),
+      )),
+    );
+  }
+
+
+  void _showSnackbar(String message) {
+    scaffoldMessengerKey.currentState?.showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 2),
       ),
     );
   }
