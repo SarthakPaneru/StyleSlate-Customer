@@ -19,7 +19,7 @@ class _UserHomeState extends State<UserHome> {
   final Customer _customer = Customer();
   bool _isLoading = true;
 
-  String? _firstName = null;
+  String _firstName = '';
 
   @override
   void initState() {
@@ -31,7 +31,8 @@ class _UserHomeState extends State<UserHome> {
   }
 
   void getUserDetails() async {
-    _firstName ??= _customer.retrieveFirstName() as String?;
+    final firstName = await _customer.retrieveFirstName();
+    _firstName = firstName!;
 
     print(_firstName);
     setState(() {
@@ -44,7 +45,7 @@ class _UserHomeState extends State<UserHome> {
     "Hairstyle",
     "Saving",
     "Treatment",
-    "coloring",
+    "Coloring",
     "Custom"
   ];
 
