@@ -30,7 +30,7 @@ class BarberSelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 100,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -41,7 +41,7 @@ class BarberSelection extends StatelessWidget {
               Container(
                 height: 150,
                 width: 200,
-                margin: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
                   boxShadow: [
@@ -64,9 +64,10 @@ class BarberSelection extends StatelessWidget {
                               topLeft: Radius.circular(5),
                               topRight: Radius.circular(5),
                             ),
+                            clipBehavior: Clip.antiAlias,
                             child: Image.asset(
-                              'assets/images/categories/categories2.jpeg',
-                              fit: BoxFit.cover,
+                              'lib/assets/images/categories/categories$index.jpg',
+                              fit: BoxFit.scaleDown,
                             ),
                           ),
                         ),

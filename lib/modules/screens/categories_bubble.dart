@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class CategoriesBubble extends StatelessWidget {
   final String text;
+  final int index;
 
-  CategoriesBubble({required this.text});
+  CategoriesBubble({required this.text, required this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -16,19 +17,21 @@ class CategoriesBubble extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: Colors.grey[400],
-            
           ),
-          child: ClipOval(child: Image.asset('/home/clay/Projects/Hamrobarber/lib/assets/images/categories/coloring.jpg')),
-
+          child: ClipOval(
+              child: Image.asset(
+                  'lib/assets/images/categories/categories$index.jpg')),
         ),
         SizedBox(
           height: 10,
         ),
-        Text(text,
-        style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-        ),)
+        Text(
+          text,
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        )
       ]),
     );
   }

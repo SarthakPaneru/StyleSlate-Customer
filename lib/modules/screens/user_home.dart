@@ -1,12 +1,9 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:hamro_barber_mobile/config/api_requests.dart';
 import 'package:hamro_barber_mobile/core/auth/customer.dart';
 import 'package:hamro_barber_mobile/modules/screens/categories_bubble.dart';
 import 'package:hamro_barber_mobile/widgets/barberSelection.dart';
-import 'package:http/http.dart' as http;
 
 class UserHome extends StatefulWidget {
   const UserHome({Key? key}) : super(key: key);
@@ -16,11 +13,12 @@ class UserHome extends StatefulWidget {
 }
 
 class _UserHomeState extends State<UserHome> {
-  final ApiRequests _apiRequests = ApiRequests();
   final Customer _customer = Customer();
   bool _isLoading = true;
 
   String _firstName = '';
+  double longitude = 0;
+  double latitude = 0;
 
   @override
   void initState() {
@@ -44,11 +42,11 @@ class _UserHomeState extends State<UserHome> {
   }
 
   final List<String> categories = [
-    "Hairstyle",
-    "Saving",
+    "Haircut",
+    "Hair Style",
+    "Beard",
     "Treatment",
-    "Coloring",
-    "Custom"
+    "Beauty Saloon"
   ];
 
   final List barberType = [
@@ -71,6 +69,11 @@ class _UserHomeState extends State<UserHome> {
     Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.low,
     );
+    setState(() {
+      longitude = position.longitude;
+      latitude = position.latitude;
+    });
+
     print("Latitude: ${position.latitude}");
     print("Longitude: ${position.longitude}");
   }
@@ -82,7 +85,11 @@ class _UserHomeState extends State<UserHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xff323345),
-      body: SafeArea(
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : SafeArea(
         child: Column(
           children: [
             Padding(
@@ -107,8 +114,8 @@ class _UserHomeState extends State<UserHome> {
                           const SizedBox(
                             height: 8,
                           ),
-                          const Text(
-                            'Your location',
+                          Text(
+                            'Your location: $longitude, $latitude',
                             style: TextStyle(color: Color(0xff616274)),
                           )
                         ],
@@ -192,7 +199,7 @@ class _UserHomeState extends State<UserHome> {
                     scrollDirection: Axis.horizontal,
                     itemCount: categories.length,
                     itemBuilder: (context, index) {
-                      return CategoriesBubble(text: categories[index]);
+                      return CategoriesBubble(text: categories[index], index: index,);
                     },
                   ),
                 ),

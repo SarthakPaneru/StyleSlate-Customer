@@ -15,7 +15,6 @@ import 'package:hamro_barber_mobile/widgets/colors.dart';
 import 'package:hamro_barber_mobile/modules/screens/homepage.dart';
 import 'package:hamro_barber_mobile/widgets/textfield.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -111,7 +110,6 @@ class _LoginState extends State<Login> {
           // Successful login
           Map<String, dynamic> jsonResponse = jsonDecode(response.body);
           String token = jsonResponse['accessToken'];
-          print('Token: $token');
           await _token.storeBearerToken(token);
 
           http.Response response1 = await _apiRequests.getLoggedInUser();
@@ -120,13 +118,17 @@ class _LoginState extends State<Login> {
 
           _customer.storeCustomerDetails(jsonResponse1);
 
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (BuildContext context) {
-                return const HomePage();
-              },
-            ),
-          );
+          try {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (BuildContext context) {
+                  return const HomePage();
+                },
+              ),
+            );
+          } catch (e) {
+            print('Error Navigating: $e');
+          }
         } else {
           // Handle login failure
           print('Login failed with status code: ${response.statusCode}');

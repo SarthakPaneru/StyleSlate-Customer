@@ -9,7 +9,7 @@ void main() {
 
   runApp(const MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: HomePage(),
+    home: Mainpage(),
   ));
 }
 
