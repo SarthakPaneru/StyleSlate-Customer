@@ -1,5 +1,8 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:hamro_barber_mobile/config/api_requests.dart';
+import 'package:http/http.dart' as http;
 
 class ScheduledAppointmentPage extends StatefulWidget {
   @override
@@ -10,11 +13,60 @@ class ScheduledAppointmentPage extends StatefulWidget {
 class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  ApiRequests _apiRequests = ApiRequests();
+  bool isCompleted = false;
+  List<String> _barberNames = List.empty(growable: true);
+  List<String> _dates = List.empty(growable: true);
+  List<String> _times = List.empty(growable: true);
+  List<String> _serviceNames = List.empty(growable: true);
+  int _lengthOfResponse = 0;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    getAppointments("upcoming");
     _tabController = TabController(length: 3, vsync: this);
+  }
+
+  Future<void> getAppointments(String status) async {
+    try {
+      http.Response response = await _apiRequests.getAppointments(status);
+      List<dynamic> jsonResponse = jsonDecode(response.body);
+      _lengthOfResponse = jsonResponse.length;
+      print('Length of response: $_lengthOfResponse');
+      for (int i = 0; i < _lengthOfResponse; i++) {
+        getAppointment(jsonResponse[i]);
+      }
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error decoding JSON: $e');
+    }
+  }
+
+  Future<void> getAppointment(final response) async {
+    Map<String, dynamic> jsonResponseAppointment = jsonDecode(jsonEncode(response));
+    final bookingStart = jsonResponseAppointment['bookingStart'];
+    final DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(bookingStart);
+    final date = '${dateTime.year}-${dateTime.month}-${dateTime.hour}';
+    _dates.add(date);
+    final time = '${dateTime.hour}:${dateTime.minute}';
+    _times.add(time);
+
+    Map<String, dynamic> barber = jsonResponseAppointment['barber'];
+    Map<String, dynamic> jsonResponseBarber = jsonDecode(jsonEncode(barber));
+
+    Map<String, dynamic> user = jsonResponseBarber['user'];
+    Map<String, dynamic> jsonResponseUser = jsonDecode(jsonEncode(user));
+    final barberName =
+        '${jsonResponseUser['firstName']} ${jsonResponseUser['lastName']}';
+    _barberNames.add(barberName);
+
+    Map<String, dynamic> service = jsonResponseAppointment['services'][0];
+    final serviceName = service['serviceName'];
+    _serviceNames.add(serviceName);
   }
 
   @override
@@ -40,6 +92,27 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
             Tab(text: 'Completed'),
             Tab(text: 'Cancelled'),
           ],
+          onTap: (value) => setState(() async {
+            switch (value) {
+              case 0:
+                isCompleted = false;
+                await getAppointments("upcoming");
+                break;
+
+              case 1:
+                isCompleted = true;
+                await getAppointments("completed");
+                break;
+
+              case 2:
+                isCompleted = true;
+                await getAppointments("cancelled");
+                break;
+
+              default:
+                break;
+            }
+          }),
         ),
       ),
       body: TabBarView(
@@ -47,14 +120,20 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
         children: [
           _buildAppointmentList(false), // Upcoming Appointments
           _buildAppointmentList(true), // Completed Appointments
+          _buildAppointmentList(false)
         ],
       ),
     );
   }
 
   Widget _buildAppointmentList(bool isCompleted) {
-    return ListView.builder(
-      itemCount: isCompleted ? 2 : 3,
+    return Scaffold( 
+      body: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : ListView.builder(
+      itemCount: _lengthOfResponse,
       itemBuilder: (context, index) {
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -64,18 +143,18 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
               leading: const CircleAvatar(
                 backgroundImage: AssetImage('assets/stylist2.png'),
               ),
-              title: const Text(
-                'Barber Name',
+              title: Text(
+                _barberNames[index],
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: const Column(
+              subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Date: July 20, 2023'),
-                  Text('Time: 10:00 AM'),
-                  Text('Service: Haircut'),
+                  Text('Date: ${_dates[index]}'),
+                  Text('Time: ${_times[index]}'),
+                  Text('Service: ${_serviceNames[index]}'),
                 ],
               ),
               trailing: isCompleted
@@ -91,6 +170,6 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
           ),
         );
       },
-    );
+    ));
   }
 }
