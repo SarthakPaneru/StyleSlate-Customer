@@ -17,7 +17,6 @@ class ApiService {
     try {
       print('.......................');
       Uri uri = Uri.parse('${ApiConstants.baseUrl}$value');
-      // params /*String|Iterable<String>*/
       print('URI: $uri');
       // final re = await http.head(uri, headers: ApiConstants.headers);
       ApiConstants apiConstants = ApiConstants();
@@ -25,9 +24,6 @@ class ApiService {
       final response = await http.get(uri, headers: headers);
       // print('Response with token: $re');
       print('Spring: ${response.statusCode}');
-
-      print('HERE ');
-      print(response.body);
       processData(response.body);
       return response;
     } catch (e) {

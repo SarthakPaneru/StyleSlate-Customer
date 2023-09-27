@@ -3,8 +3,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/Screen/homescreen.dart';
+import 'package:hamro_barber_mobile/config/api_requests.dart';
 import 'package:hamro_barber_mobile/config/api_service.dart';
 import 'package:hamro_barber_mobile/constants/app_constants.dart';
+import 'package:hamro_barber_mobile/core/auth/customer.dart';
 import 'package:hamro_barber_mobile/core/auth/forgot_pwd.dart';
 import 'package:hamro_barber_mobile/core/auth/register.dart';
 import 'package:hamro_barber_mobile/core/auth/token.dart';
@@ -23,7 +25,6 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-
   bool passwordVisible = false;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -45,7 +46,8 @@ class _LoginState extends State<Login> {
 
   final ApiService _apiService = ApiService();
   final Token _token = Token();
-
+  final ApiRequests _apiRequests = ApiRequests();
+  final Customer _customer = Customer();
 
   void _validateEmail() {
     String email = _emailController.text.trim();
@@ -74,7 +76,10 @@ class _LoginState extends State<Login> {
     String email = _emailController.text.trim();
     String password = _passwordController.text;
 
-    if (email.isEmpty || password.isEmpty || !isEmailValid || !isPasswordValid) {
+    if (email.isEmpty ||
+        password.isEmpty ||
+        !isEmailValid ||
+        !isPasswordValid) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -108,6 +113,12 @@ class _LoginState extends State<Login> {
           String token = jsonResponse['accessToken'];
           print('Token: $token');
           await _token.storeBearerToken(token);
+
+          http.Response response1 = await _apiRequests.getLoggedInUser();
+
+          Map<String, dynamic> jsonResponse1 = jsonDecode(response1.body);
+
+          _customer.storeCustomerDetails(jsonResponse1);
 
           Navigator.of(context).push(
             MaterialPageRoute(
@@ -167,7 +178,8 @@ class _LoginState extends State<Login> {
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: isEmailValid ? Colors.grey.shade400 : Colors.red,
+                          color:
+                              isEmailValid ? Colors.grey.shade400 : Colors.red,
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -192,7 +204,9 @@ class _LoginState extends State<Login> {
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: isPasswordValid ? Colors.grey.shade400 : Colors.red,
+                          color: isPasswordValid
+                              ? Colors.grey.shade400
+                              : Colors.red,
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -215,7 +229,9 @@ class _LoginState extends State<Login> {
                             passwordVisible = !passwordVisible;
                           });
                         },
-                        icon: Icon(passwordVisible ? Icons.visibility : Icons.visibility_off),
+                        icon: Icon(passwordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off),
                       ),
                     ),
                   ),

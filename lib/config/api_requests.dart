@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/constants/app_constants.dart';
+import 'package:hamro_barber_mobile/core/auth/customer.dart';
 import 'package:hamro_barber_mobile/core/auth/login.dart';
 
 import 'api_service.dart';
@@ -52,8 +53,6 @@ class ApiRequests {
     return response;
   }
 
-  
-
   // Get Current Customer
   Future<http.Response> getLoggedInCustomer() async {
     http.Response response =
@@ -77,7 +76,18 @@ class ApiRequests {
 
   // upload user image
   Future<http.Response> uploadImage(File file) async {
-    http.Response response = await _apiService.postImg('${ApiConstants.usersEndpoint}/image/save', file);
+    http.Response response = await _apiService.postImg(
+        '${ApiConstants.usersEndpoint}/image/save', file);
+    return response;
+  }
+
+  // get Appointments
+  Future<http.Response> getAppointments(String status) async {
+    Customer customer = Customer();
+    final customerId = await customer.retrieveCustomerId();
+    print("Customer Id: ${customerId.toString()}");
+    http.Response response = await _apiService.get(
+        '${ApiConstants.appointmentEndpoint}/get/customer/${customerId.toString()}?status=$status');
     return response;
   }
 }

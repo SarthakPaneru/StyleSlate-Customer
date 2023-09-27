@@ -19,7 +19,7 @@ class _UserHomeState extends State<UserHome> {
   final Customer _customer = Customer();
   bool _isLoading = true;
 
-  String _firstName = '';
+  String? _firstName = null;
 
   @override
   void initState() {
@@ -31,16 +31,7 @@ class _UserHomeState extends State<UserHome> {
   }
 
   void getUserDetails() async {
-    http.Response response = await _apiRequests.getLoggedInUser();
-
-    Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-
-    _customer.storeCustomerDetails(jsonResponse);
-
-    Map<String, dynamic> user = jsonResponse['user'];
-
-    Map<String, dynamic> jsonResponse1 = jsonDecode(jsonEncode(user));
-    _firstName = jsonResponse1['firstName'];
+    _firstName ??= _customer.retrieveFirstName() as String?;
 
     print(_firstName);
     setState(() {
