@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:hamro_barber_mobile/config/api_requests.dart';
 import 'package:hamro_barber_mobile/core/auth/customer.dart';
 import 'package:hamro_barber_mobile/modules/screens/categories_bubble.dart';
@@ -26,6 +27,7 @@ class _UserHomeState extends State<UserHome> {
     super.initState();
 
     // if (_firstName == null) {
+    getLocation();
     getUserDetails();
     // }
   }
@@ -61,6 +63,15 @@ class _UserHomeState extends State<UserHome> {
       }
       barberType[index][1] = true;
     });
+  }
+
+  void getLocation() async {
+    LocationPermission permission = await Geolocator.requestPermission();
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.low,
+    );
+    print("Latitude: ${position.latitude}");
+    print("Longitude: ${position.longitude}");
   }
 
   final _textController = TextEditingController();
