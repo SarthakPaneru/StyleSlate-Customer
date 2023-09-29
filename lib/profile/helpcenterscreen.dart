@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class HelpCenterScreen extends StatelessWidget {
-  const HelpCenterScreen({super.key});
+  const HelpCenterScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -9,23 +9,31 @@ class HelpCenterScreen extends StatelessWidget {
       appBar: AppBar(
         centerTitle: true,
         elevation: 0.0,
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xff323345),
         title: const Text(
           'Help Center',
-          style: TextStyle(color: Colors.grey),
+          style: TextStyle(color: Colors.white),
         ),
       ),
+      backgroundColor: const Color(0xff323345), // Set the background color here
       body: ListView(
         children: <Widget>[
-          const ListTile(
-            title: Text('Contact Us',
-            style: TextStyle(color: Colors.orange),),
-            leading: Icon(Icons.email),
+          ListTile(
+            title: const Text(
+              'Contact Us',
+              style: TextStyle(color: Colors.white), // Set text color to white
+            ),
+            leading: Icon(Icons.email, color: Colors.white), // Set icon color
           ),
           ListTile(
-            title: const Text('FAQs',
-            style: TextStyle(color: Colors.orange),),
-            leading: const Icon(Icons.question_answer),
+            title: const Text(
+              'FAQs',
+              style: TextStyle(color: Colors.white), // Set text color to white
+            ),
+            leading: const Icon(
+              Icons.question_answer,
+              color: Colors.white, // Set icon color
+            ),
             onTap: () {
               // Handle "FAQs" tap
               // You can navigate to a list of frequently asked questions
@@ -33,18 +41,28 @@ class HelpCenterScreen extends StatelessWidget {
             },
           ),
           ListTile(
-            title: const Text('Terms and Conditions',
-            style: TextStyle(color: Colors.orange),),
-            leading: const Icon(Icons.description),
+            title: const Text(
+              'Terms and Conditions',
+              style: TextStyle(color: Colors.white), // Set text color to white
+            ),
+            leading: const Icon(
+              Icons.description,
+              color: Colors.white, // Set icon color
+            ),
             onTap: () {
               // Handle "Terms and Conditions" tap
               // You can navigate to a screen displaying the terms and conditions
             },
           ),
           ListTile(
-            title: const Text('Privacy Policy',
-            style: TextStyle(color: Colors.orange),),
-            leading: const Icon(Icons.lock),
+            title: const Text(
+              'Privacy Policy',
+              style: TextStyle(color: Colors.white), // Set text color to white
+            ),
+            leading: const Icon(
+              Icons.lock,
+              color: Colors.white, // Set icon color
+            ),
             onTap: () {
               // Handle "Privacy Policy" tap
               // You can navigate to a screen displaying the privacy policy

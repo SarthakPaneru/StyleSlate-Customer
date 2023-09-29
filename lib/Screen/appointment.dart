@@ -81,11 +81,11 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
       appBar: AppBar(
         title: const Text(
           'Scheduled Appointments',
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xff323345),
         bottom: TabBar(
-          labelColor: Colors.black,
+          labelColor: Colors.white,
           controller: _tabController,
           tabs: const [
             Tab(text: 'Upcoming'),
@@ -128,6 +128,7 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
 
   Widget _buildAppointmentList(bool isCompleted) {
     return Scaffold( 
+      backgroundColor: const Color(0xff323345),
       body: isLoading
           ? const Center(
               child: CircularProgressIndicator(),
@@ -142,6 +143,7 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
             child: ListTile(
               leading: const CircleAvatar(
                 backgroundImage: AssetImage('assets/stylist2.png'),
+
               ),
               title: Text(
                 _barberNames[index],

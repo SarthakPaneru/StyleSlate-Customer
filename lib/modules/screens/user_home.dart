@@ -1,6 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:hamro_barber_mobile/Screen/detailScreen.dart';
 import 'package:hamro_barber_mobile/core/auth/customer.dart';
 import 'package:hamro_barber_mobile/modules/screens/categories_bubble.dart';
 import 'package:hamro_barber_mobile/widgets/barberSelection.dart';
@@ -90,145 +90,150 @@ class _UserHomeState extends State<UserHome> {
               child: CircularProgressIndicator(),
             )
           : SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25.0),
               child: Column(
                 children: [
-                  // greetings row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                    child: Column(
+                      children: [
+                        // greetings row
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Hi, $_firstName",
+                                  style: const TextStyle(
+                                    color: Color(0xffbfa58c),
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 8,
+                                ),
+                                Text(
+                                  'Your location: $longitude, $latitude',
+                                  style: TextStyle(color: Color(0xff616274)),
+                                )
+                              ],
+                            ),
+                            // Notification
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: const EdgeInsets.all(12),
+                              child: const Icon(Icons.notifications,
+                                  color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  // search bar
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
                         children: [
-                          Text(
-                            "Hi, $_firstName",
-                            style: const TextStyle(
-                              color: Color(0xffbfa58c),
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: TextField(
+                              controller: _textController,
+                              decoration: const InputDecoration(
+                                hintText: 'Find Your Barber',
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 15),
+                              ),
                             ),
                           ),
-                          const SizedBox(
-                            height: 8,
+                          IconButton(
+                            onPressed: () {
+
+                              // Clear the text that is typed
+                              _textController.clear();
+                            },
+                            icon: const Icon(Icons.clear),
                           ),
-                          Text(
-                            'Your location: $longitude, $latitude',
-                            style: TextStyle(color: Color(0xff616274)),
-                          )
                         ],
                       ),
-                      // Notification
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  // how do you feel?
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Category',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
-                        padding: const EdgeInsets.all(12),
-                        child: const Icon(Icons.notifications,
-                            color: Colors.white),
+                      ),
+                      Icon(
+                        Icons.more_horiz,
+                        color: Colors.white,
                       ),
                     ],
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  // 4 different faces
+                  Column(
+                    children: [
+                      Container(
+                        height: 130,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: categories.length,
+                          itemBuilder: (context, index) {
+                            return CategoriesBubble(
+                              text: categories[index],
+                              index: index,
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 2,
+                  ),
+
+                  Padding(
+                    padding: EdgeInsets.only(left: 5, top: 5, right: 5),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Recommended Barbers',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Expanded(
+                    child: BarberSelection(),
                   ),
                 ],
               ),
             ),
-            const SizedBox(
-              height: 25,
-            ),
-            // search bar
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _textController,
-                        decoration: const InputDecoration(
-                          hintText: 'Find Your Barber',
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 15),
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        // Clear the text that is typed
-                        _textController.clear();
-                      },
-                      icon: const Icon(Icons.clear),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            // how do you feel?
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Category',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Icon(
-                  Icons.more_horiz,
-                  color: Colors.white,
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            // 4 different faces
-            Column(
-              children: [
-                Container(
-                  height: 130,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: categories.length,
-                    itemBuilder: (context, index) {
-                      return CategoriesBubble(text: categories[index], index: index,);
-                    },
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 2,
-            ),
-            const Padding(
-              padding: EdgeInsets.all(5),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Recommended Barbers',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 5),
-            Expanded(
-              child: BarberSelection(),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
