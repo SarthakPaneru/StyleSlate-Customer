@@ -4,9 +4,9 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Your App'),
-      ),
+      // appBar: AppBar(
+      //   title: Text('Your App'),
+      // ),
       body: Column(
         children: [
           Container(
@@ -40,7 +40,7 @@ class BarberSelection extends StatelessWidget {
             children: [
               Container(
                 height: 150,
-                width: 200,
+                width: 150,
                 margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
@@ -67,8 +67,10 @@ class BarberSelection extends StatelessWidget {
                             clipBehavior: Clip.antiAlias,
                             child: Image.asset(
                               'lib/assets/images/categories/categories$index.jpg',
-                              fit: BoxFit.scaleDown,
+                              fit: BoxFit.fitHeight,
+                              height: 110,
                             ),
+                          
                           ),
                         ),
                         Align(

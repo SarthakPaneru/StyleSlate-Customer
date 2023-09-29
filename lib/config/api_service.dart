@@ -1,11 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
+import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/constants/app_constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart';
 
 class ApiService {
+  ApiConstants _apiConstants = ApiConstants();
+
   void processData(String responseData) {
     final data = json.decode(responseData);
     // Process the data...
@@ -69,8 +73,8 @@ class ApiService {
         return http.Response("ERROR UPLOADING FILE", 400);
       }
 
-      request.files.add(await http.MultipartFile.fromPath(
-          'file', file.path, contentType: MediaType.parse(mimeType))); //, contentType: headers))
+      request.files.add(await http.MultipartFile.fromPath('file', file.path,
+          contentType: MediaType.parse(mimeType))); //, contentType: headers))
       request.send().then((response) {
         if (response.statusCode == 200) {
           print("Uploaded!");
@@ -113,5 +117,10 @@ class ApiService {
     } catch (e) {
       return http.Response({"message": e}.toString(), 400);
     }
+  }
+
+  Future<Uri> fetchProtectedImage(String imageUrl) async {
+    return Uri.parse(imageUrl);
+       
   }
 }

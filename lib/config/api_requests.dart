@@ -90,4 +90,11 @@ class ApiRequests {
         '${ApiConstants.appointmentEndpoint}/get/customer/${customerId.toString()}?status=$status');
     return response;
   }
+
+  Future<String> retrieveImageUrl() async {
+    Customer customer = Customer();
+    final userId = await customer.retrieveUserId();
+    return _apiService
+        .fetchProtectedImage('${ApiConstants.baseUrl}${ApiConstants.usersEndpoint}/$userId/get-image').toString();
+  }
 }

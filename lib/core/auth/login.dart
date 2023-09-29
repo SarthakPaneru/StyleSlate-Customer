@@ -86,7 +86,7 @@ class _LoginState extends State<Login> {
     } else {
       {
         // If form is validated the follwing code is executed.
-        final payload = {'email': email, 'password': password};
+        final payload = {'email': email, 'password': password, 'userRole': 'CUSTOMER'};
         final jsonPayload = jsonEncode(payload);
 
         http.Response response = await _apiService.post(
