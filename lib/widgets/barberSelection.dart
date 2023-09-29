@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:hamro_barber_mobile/Screen/appointment.dart';
+import 'package:hamro_barber_mobile/Screen/booking%20page.dart';
+import 'package:hamro_barber_mobile/Screen/detailScreen.dart';
+import 'package:hamro_barber_mobile/Screen/homescreen.dart';
+
+
 
 class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Your App'),
-      ),
       body: Column(
         children: [
           Container(
-            height: MediaQuery.of(context).size.height - kToolbarHeight - MediaQuery.of(context).padding.top,
+            height: MediaQuery.of(context).size.height -
+                kToolbarHeight -
+                MediaQuery.of(context).padding.top,
             child: BarberSelection(),
           ),
         ],
@@ -27,6 +32,8 @@ class BarberSelection extends StatelessWidget {
     "Hamro shaloon",
     "Unique Hairstyle",
   ];
+  
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +48,8 @@ class BarberSelection extends StatelessWidget {
               Container(
                 height: 150,
                 width: 200,
-                margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
                   boxShadow: [
@@ -58,7 +66,10 @@ class BarberSelection extends StatelessWidget {
                     Stack(
                       children: [
                         InkWell(
-                          onTap: () {},
+                          onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ScheduledAppointmentPage()),
+      ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(5),
@@ -68,7 +79,9 @@ class BarberSelection extends StatelessWidget {
                             child: Image.asset(
                               'lib/assets/images/categories/categories$index.jpg',
                               fit: BoxFit.scaleDown,
+                              height: 110,
                             ),
+                            
                           ),
                         ),
                         Align(
@@ -81,12 +94,21 @@ class BarberSelection extends StatelessWidget {
                       ],
                     ),
                     SizedBox(
-                      height: 8,
+                      height: 5,
                     ),
                     Text(
                       barbershop[index],
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.yellow),
+
                     ),
+                    Text('km : 5',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.green,
+
+                      
+                    ),
+                    )
                   ],
                 ),
               ),

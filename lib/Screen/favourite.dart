@@ -12,11 +12,14 @@ class _FavourtiePageState extends State<FavourtiePage> {
       appBar: AppBar(
         title: const Text(
           'Favourtie Barbers',
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xff323345),
       ),
-      body: _buildAppointmentList(false),
+      body: Container(
+        color: const Color(0xff323345), // Set the background color here
+        child: _buildAppointmentList(false),
+      ),
     );
   }
 
@@ -28,14 +31,16 @@ class _FavourtiePageState extends State<FavourtiePage> {
           padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
           child: Card(
             elevation: 2.0,
+            color: Color(0xff323345), // Set the card background color here
             child: ListTile(
               leading: const CircleAvatar(
                 backgroundImage: AssetImage('assets/stylist2.png'),
               ),
               title: const Text(
-                'Bhoj Raj Mishra',
+                'SK Hair Style',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
+                  color: Colors.white
                 ),
               ),
               subtitle: const Column(
@@ -44,7 +49,10 @@ class _FavourtiePageState extends State<FavourtiePage> {
                   SizedBox(
                     height: 10,
                   ),
-                  Text('Location: Satdobato'),
+                  Text('Location: Satdobato',
+                  style: TextStyle(
+                    color: Colors.white
+                  ),),
                 ],
               ),
               trailing: isCompleted
