@@ -124,98 +124,72 @@ class _BarberSelectionState extends State<BarberSelection> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : SizedBox(
-              height: 100,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: _lengthOfResponse,
-                itemBuilder: (context, index) {
-                  if (index >= _lengthOfResponse) {
-                    // Check if the index is out of bounds for names or distances lists
-                    // You can handle this case by displaying a placeholder or empty data
-                    return Text(
-                        'No data available'); // Replace with your desired UI
-                  }
-                  return Column(
+  backgroundColor: Color(0xff323345),
+  body: SingleChildScrollView(
+    child: _isLoading
+        ? Center(
+            child: CircularProgressIndicator(),
+          )
+        : SizedBox(
+            height: 200, // Adjust this height as needed
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: _lengthOfResponse,
+              itemBuilder: (context, index) {
+                if (index >= _lengthOfResponse) {
+                  return Text('No data available');
+                }
+                return Container(
+                  width: 200,
+                  margin: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        height: 150,
-                        width: 200,
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 20),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black,
-                              blurRadius: 0,
-                              spreadRadius: 5,
-                            ),
-                          ],
+                      InkWell(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                DetailScreen(_barberIds[index]),
+                          ),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Stack(
-                              children: [
-                                InkWell(
-                                  onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            ScheduledAppointmentPage()),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(5),
-                                      topRight: Radius.circular(5),
-                                    ),
-                                    clipBehavior: Clip.antiAlias,
-                                    child: CachedNetworkImage(
-                                      imageUrl:
-                                          '${_imageUrl}',
-                                      placeholder: (context, url) => const Icon(
-                                        Icons.person,
-                                        size: 80,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Align(
-                                  alignment: Alignment.topRight,
-                                  child: Container(
-                                    margin: EdgeInsets.all(5),
-                                    height: 40,
-                                  ),
-                                ),
-                              ],
+                        child: FittedBox(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(5),
+                              topRight: Radius.circular(5),
                             ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Text(
-                              '${_names[index]}',
-                              style: TextStyle(color: Colors.yellow),
-                            ),
-                            Text(
-                              'km : ${_distances[index]}',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.green,
+                            clipBehavior: Clip.antiAlias,
+                            child: CachedNetworkImage(
+                              imageUrl: '${_imageUrl}',
+                              placeholder: (context, url) => const Icon(
+                                Icons.person,
+                                size: 80,
                               ),
-                            )
-                          ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Text(
+                        '${_names[index]}',
+                        style: TextStyle(color: Colors.yellow),
+                      ),
+                      Text(
+                        'km : ${_distances[index]}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.green,
                         ),
                       ),
                     ],
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
-    );
+          ),
+  ),
+);
+
   }
 }
