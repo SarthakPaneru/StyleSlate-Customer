@@ -1,43 +1,78 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'dart:convert';
+import 'dart:typed_data';
 
-class ProfilePic extends StatelessWidget {
-  const ProfilePic({
-    Key? key,
-  }) : super(key: key);
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:hamro_barber_mobile/config/api_requests.dart';
+import 'package:hamro_barber_mobile/constants/app_constants.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+
+class ProfilePage extends StatefulWidget {
+  @override
+  _ProfilePageState createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  ApiRequests _apiRequests = ApiRequests();
+  File? _image;
+  String _imageUrl = '';
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getImageUrl();
+  }
+
+  Future<void> getImageUrl() async {
+    String image = await _apiRequests.retrieveImageUrl();
+    setState(() {
+      _imageUrl = image;
+    });
+  }
+
+  Future getImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+        _apiRequests.uploadImage(_image!);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 115,
-      width: 115,
-      child: Stack(
-        fit: StackFit.expand,
-        clipBehavior: Clip.none,
-        children: [
-          const CircleAvatar(
-            backgroundImage: AssetImage("lib/assets/images/Profile Image.png"),
-          ),
-          Positioned(
-            right: -16,
-            bottom: 0,
-            child: SizedBox(
-              height: 46,
-              width: 46,
-              child: TextButton(
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.white, shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50),
-                    side: const BorderSide(color: Colors.white),
+      height: 300,
+      width: 300,
+      child: Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 80,
+                child: CachedNetworkImage(
+                  imageUrl: '${_imageUrl}',
+                  placeholder: (context, url) => const Icon(
+                    Icons.person,
+                    size: 80,
                   ),
-                  backgroundColor: const Color(0xFFF5F6F9),
                 ),
-                onPressed: () {},
-                child: SvgPicture.asset("lib/assets/images/Camera Icon.svg"),
               ),
-            ),
-          )
-        ],
+              ElevatedButton(
+                onPressed: getImage,
+                child: const Text('Edit Profile Picture'),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

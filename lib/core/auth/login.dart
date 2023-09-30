@@ -3,8 +3,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/Screen/homescreen.dart';
+import 'package:hamro_barber_mobile/config/api_requests.dart';
 import 'package:hamro_barber_mobile/config/api_service.dart';
 import 'package:hamro_barber_mobile/constants/app_constants.dart';
+import 'package:hamro_barber_mobile/core/auth/customer.dart';
 import 'package:hamro_barber_mobile/core/auth/forgot_pwd.dart';
 import 'package:hamro_barber_mobile/core/auth/register.dart';
 import 'package:hamro_barber_mobile/core/auth/token.dart';
@@ -13,7 +15,6 @@ import 'package:hamro_barber_mobile/widgets/colors.dart';
 import 'package:hamro_barber_mobile/modules/screens/homepage.dart';
 import 'package:hamro_barber_mobile/widgets/textfield.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -23,7 +24,7 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-
+  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
   bool passwordVisible = false;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -45,7 +46,8 @@ class _LoginState extends State<Login> {
 
   final ApiService _apiService = ApiService();
   final Token _token = Token();
-
+  final ApiRequests _apiRequests = ApiRequests();
+  final Customer _customer = Customer();
 
   void _validateEmail() {
     String email = _emailController.text.trim();
@@ -74,29 +76,17 @@ class _LoginState extends State<Login> {
     String email = _emailController.text.trim();
     String password = _passwordController.text;
 
-    if (email.isEmpty || password.isEmpty || !isEmailValid || !isPasswordValid) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Error'),
-            content: Text('Please fill in all fields with valid inputs.'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
+    if (email.isEmpty ||
+        password.isEmpty ||
+        !isEmailValid ||
+        !isPasswordValid) {
+          _showSnackbar('Login failed. Please check your credentials.');
+     
       return;
     } else {
       {
         // If form is validated the follwing code is executed.
-        final payload = {'email': email, 'password': password};
+        final payload = {'email': email, 'password': password, 'userRole': 'CUSTOMER'};
         final jsonPayload = jsonEncode(payload);
 
         http.Response response = await _apiService.post(
@@ -106,18 +96,28 @@ class _LoginState extends State<Login> {
           // Successful login
           Map<String, dynamic> jsonResponse = jsonDecode(response.body);
           String token = jsonResponse['accessToken'];
-          print('Token: $token');
           await _token.storeBearerToken(token);
 
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (BuildContext context) {
-                return const HomeScreen();
-              },
-            ),
-          );
+          http.Response response1 = await _apiRequests.getLoggedInUser();
+
+          Map<String, dynamic> jsonResponse1 = jsonDecode(response1.body);
+
+          _customer.storeCustomerDetails(jsonResponse1);
+
+          try {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (BuildContext context) {
+                  return const HomePage();
+                },
+              ),
+            );
+          } catch (e) {
+            print('Error Navigating: $e');
+          }
         } else {
           // Handle login failure
+          _showSnackbar('Login failed. Please check your credentials.');
           print('Login failed with status code: ${response.statusCode}');
         }
       }
@@ -129,7 +129,9 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
+      home: ScaffoldMessenger(
+        key:scaffoldMessengerKey,
+        child: Scaffold(
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
           child: AppBar(
@@ -167,7 +169,8 @@ class _LoginState extends State<Login> {
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: isEmailValid ? Colors.grey.shade400 : Colors.red,
+                          color:
+                              isEmailValid ? Colors.grey.shade400 : Colors.red,
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -192,7 +195,9 @@ class _LoginState extends State<Login> {
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: isPasswordValid ? Colors.grey.shade400 : Colors.red,
+                          color: isPasswordValid
+                              ? Colors.grey.shade400
+                              : Colors.red,
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -215,7 +220,9 @@ class _LoginState extends State<Login> {
                             passwordVisible = !passwordVisible;
                           });
                         },
-                        icon: Icon(passwordVisible ? Icons.visibility : Icons.visibility_off),
+                        icon: Icon(passwordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off),
                       ),
                     ),
                   ),
@@ -293,6 +300,16 @@ class _LoginState extends State<Login> {
             ),
           ),
         ),
+      )),
+    );
+  }
+
+
+  void _showSnackbar(String message) {
+    scaffoldMessengerKey.currentState?.showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 2),
       ),
     );
   }

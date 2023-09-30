@@ -3,7 +3,7 @@ import 'package:hamro_barber_mobile/core/auth/token.dart';
 class ApiConstants {
   static const int maxRetryCount = 3;
   static const int timeoutSeconds = 30;
-  static const String baseUrl = 'http://172.16.3.155:8080';
+  static const String baseUrl = 'http://192.168.1.121:8080';
 
   // Auth's Endpoint
   static const String authEndpoint = '/auth';
@@ -48,5 +48,15 @@ class ApiConstants {
       'Authorization': 'Bearer $token',
     };
     return postHeaders;
+  }
+
+  Future<Map<String, String>> postImgHeaders() async {
+    String? token = await _token.retrieveBearerToken();
+    Map<String, String> postImgHeaders = {
+      'content-type': 'multipart/form-data',
+      'accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+    return postImgHeaders;
   }
 }
