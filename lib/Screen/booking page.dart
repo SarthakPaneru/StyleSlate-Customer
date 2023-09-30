@@ -1,6 +1,5 @@
 import 'package:hamro_barber_mobile/config/api_requests.dart';
 import 'package:hamro_barber_mobile/modules/screens/homepage.dart';
-
 import '../widgets/button.dart';
 import '../widgets/custom_appbar.dart';
 import '../widgets/config.dart';
