@@ -12,23 +12,7 @@ import 'package:hamro_barber_mobile/core/auth/customer.dart';
 import 'package:hamro_barber_mobile/modules/models/barber.dart';
 import 'package:http/http.dart' as http;
 
-// class MyHomePage extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Column(
-//         children: [
-//           Container(
-//             height: MediaQuery.of(context).size.height -
-//                 kToolbarHeight -
-//                 MediaQuery.of(context).padding.top,
-//             child: BarberSelection(),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+
 
 class BarberSelection extends StatefulWidget {
   final double latitude;
@@ -89,10 +73,6 @@ class _BarberSelectionState extends State<BarberSelection> {
       print('COMPLETED');
       setState(() {
         _lengthOfResponse = jsonResponse.length;
-        print(_lengthOfResponse);
-        print(_barberIds[0]);
-        print(_distances[0]);
-        print(_names[0]);
         _isLoading = false;
       });
     } catch (e) {
@@ -164,7 +144,7 @@ class _BarberSelectionState extends State<BarberSelection> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            DetailScreen(_barberIds[index])
+                                            DetailScreen(barberId: _barberIds[index],)
                                             ),
                                   ),
                                   child: ClipRRect(

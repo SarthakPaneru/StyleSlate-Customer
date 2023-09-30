@@ -106,4 +106,9 @@ class ApiRequests {
     return await _apiService.get(
         '${ApiConstants.barbersEndpoint}/get/nearest?latitude=${latitude.toDouble()}&longitude=${longitude.toDouble()}');
   }
+
+  Future<http.Response> getBarber(int barberId) async {
+    return await _apiService.get(
+        '${ApiConstants.baseUrl}${ApiConstants.barbersEndpoint}/get/$barberId');
+  }
 }

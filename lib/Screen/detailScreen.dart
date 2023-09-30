@@ -1,32 +1,105 @@
+import 'dart:convert';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/config/api_requests.dart';
 import 'package:hamro_barber_mobile/constants/app_constants.dart';
 import 'package:hamro_barber_mobile/modules/screens/barber_type.dart';
 import 'package:heart_toggle/heart_toggle.dart';
 import 'booking page.dart';
+import 'package:http/http.dart' as http;
 
 var serviceList;
 
 class DetailScreen extends StatefulWidget {
-  final stylist;
+  final int barberId;
 
-  DetailScreen(this.stylist);
+  const DetailScreen({Key? key, required this.barberId}) : super(key: key);
 
   @override
-  State<DetailScreen> createState() => _DetailScreenState();
+  State<DetailScreen> createState() => _DetailScreenState(barberId);
 }
 
 class _DetailScreenState extends State<DetailScreen> {
-  ApiRequests _apiRequests = ApiRequests();
+  late int barberId;
+
+  _DetailScreenState(this.barberId);
+
+  final ApiRequests _apiRequests = ApiRequests();
+
+  // List<Barber> barbershop = List.empty(growable: true);
+  String _panNo = '';
+  String _name = '';
+  String _phone = '';
+
+  List<int> _servicesId = List.empty(growable: true);
+  List<String> _servicesName = List.empty(growable: true);
+  List<String> _servicesFee = List.empty(growable: true);
+  List<String> _servicesTimeInMinutes = List.empty(growable: true);
+
+  String _rating = '';
+  late int _lengthOfResponse;
+  String _imageUrl = '';
+  bool _isLoading = true;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    getBarber(barberId);
+    // getBarberImage(barberId);
+    getImageUrl();
   }
 
-  void getServices() async {
+  void getBarberImage(int id) async {
     _apiRequests.retrieveImageUrl();
+  }
+
+  Future<void> getBarber(int barberId) async {
+    // await Future.delayed(Duration(seconds: 2));
+    try {
+      http.Response response = await _apiRequests.getBarber(barberId);
+      print(response.body);
+
+      final jsonResponse = jsonDecode(response.body);
+
+      _panNo = jsonResponse['panNo'];
+      _phone = jsonResponse['phone'];
+      _name = jsonResponse['name'];
+      _rating = jsonResponse['rating'];
+
+      List<dynamic> services = jsonResponse['services'];
+      _lengthOfResponse = jsonResponse.length;
+
+      for (int i = 0; i < _lengthOfResponse; i++) {
+        getService(services[i]);
+      }
+
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> getImageUrl() async {
+    String image = await _apiRequests.retrieveImageUrl();
+    setState(() {
+      _imageUrl = image;
+    });
+  }
+
+  Future<void> getService(final service) async {
+    Map<String, dynamic> jsonResponseservice = jsonDecode(jsonEncode(service));
+    int id = jsonResponseservice['id'];
+    _servicesId.add(id);
+    String serviceName = jsonResponseservice['serviceName'];
+    _servicesName.add(serviceName);
+    String fee = jsonResponseservice['fee'];
+    _servicesName.add(fee);
+    String duration = jsonResponseservice['serviceTimeInMinutes'];
+    _servicesTimeInMinutes.add(duration);
   }
 
   @override
@@ -44,18 +117,13 @@ class _DetailScreenState extends State<DetailScreen> {
                 child: Stack(
                   fit: StackFit.expand,
                   children: <Widget>[
-                    Image.network(
-                        '${ApiConstants.baseUrl}${widget.stylist['imageUrl']}',
-                        fit: BoxFit.fill, loadingBuilder: (BuildContext context,
-                            Widget child, ImageChunkEvent? loadingProgress) {
-                      if (loadingProgress == null) {
-                        // Image loaded successfully
-                        return child;
-                      } else {
-                        // Image is still loading
-                        return const CircularProgressIndicator();
-                      }
-                    }),
+                    CachedNetworkImage(
+                      imageUrl: '${_imageUrl}',
+                      placeholder: (context, url) => const Icon(
+                        Icons.person,
+                        size: 80,
+                      ),
+                    ),
                     Container(
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
@@ -106,10 +174,18 @@ class _DetailScreenState extends State<DetailScreen> {
                         const SizedBox(
                           height: 30,
                         ),
-                        ServiceTile(serviceList[0], widget.stylist['id']),
-                        ServiceTile(serviceList[1], widget.stylist['id']),
-                        ServiceTile(serviceList[2], widget.stylist['id']),
-                        ServiceTile(serviceList[3], widget.stylist['id']),
+                        ListView.builder(
+                          itemCount: _lengthOfResponse,
+                          itemBuilder: (BuildContext context, int index) {
+                            return ServiceTile(
+                              _servicesId[index],
+                              barberId,
+                              _servicesName[index],
+                              _servicesTimeInMinutes[index],
+                              _servicesFee[index],
+                            );
+                          },
+                        )
                       ],
                     ),
                   ),
@@ -135,21 +211,13 @@ class _DetailScreenState extends State<DetailScreen> {
                             Positioned(
                               top: 5,
                               right: -25,
-                              child: Image.network(
-                                  '${ApiConstants.baseUrl}${widget.stylist['imageUrl']}',
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.60,
-                                  loadingBuilder: (BuildContext context,
-                                      Widget child,
-                                      ImageChunkEvent? loadingProgress) {
-                                if (loadingProgress == null) {
-                                  // Image loaded successfully
-                                  return child;
-                                } else {
-                                  // Image is still loading
-                                  return const CircularProgressIndicator();
-                                }
-                              }),
+                              child: CachedNetworkImage(
+                                imageUrl: '${_imageUrl}',
+                                placeholder: (context, url) => const Icon(
+                                  Icons.person,
+                                  size: 80,
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -160,51 +228,44 @@ class _DetailScreenState extends State<DetailScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text(
-                            widget.stylist['name'],
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            widget.stylist['name'],
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w300,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Row(
-                            children: <Widget>[
-                              const Icon(
-                                Icons.star,
-                                size: 16,
-                                color: Color(0xffFF8573),
-                              ),
-                              const SizedBox(width: 5),
-                              Text(
-                                widget.stylist['rating'].toString(),
-                                style: const TextStyle(
-                                  color: Color(0xffFF8573),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              Text(
-                                '(${widget.stylist['rating'].toString()})', //rateAmount
-                                style: const TextStyle(
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                          )
+                          ListView.builder(
+                              itemCount: _lengthOfResponse,
+                              itemBuilder: (BuildContext context, int index) {
+                                return Scaffold(
+                                    body: Column(
+                                  children: <Widget>[
+                                    Text(
+                                      _name[index],
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 5,
+                                    ),
+                                    Row(
+                                      children: <Widget>[
+                                        const Icon(
+                                          Icons.star,
+                                          size: 16,
+                                          color: Color(0xffFF8573),
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Text(
+                                          _rating[index],
+                                          style: const TextStyle(
+                                            color: Color(0xffFF8573),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 5,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ));
+                              })
                         ],
                       ),
                     ],
@@ -237,9 +298,14 @@ class _DetailScreenState extends State<DetailScreen> {
 }
 
 class ServiceTile extends StatelessWidget {
-  final service;
+  final serviceId;
   final int barberId;
-  ServiceTile(this.service, this.barberId);
+  final String serviceName;
+  final String serviceTimeInMinutes;
+  final String price;
+
+  ServiceTile(this.serviceId, this.barberId, this.serviceName,
+      this.serviceTimeInMinutes, this.price);
 
   @override
   Widget build(BuildContext context) {
@@ -254,7 +320,7 @@ class ServiceTile extends StatelessWidget {
               SizedBox(
                 width: MediaQuery.of(context).size.width / 2 - 40,
                 child: Text(
-                  service['title'],
+                  serviceName,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
@@ -265,7 +331,7 @@ class ServiceTile extends StatelessWidget {
                 height: 5,
               ),
               Text(
-                '${service['duration']} Min',
+                '${serviceTimeInMinutes} Min',
                 style: const TextStyle(
                   color: Colors.grey,
                 ),
@@ -273,7 +339,7 @@ class ServiceTile extends StatelessWidget {
             ],
           ),
           Text(
-            '\$${service['price']}',
+            price,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,

@@ -192,10 +192,11 @@ class StylistCard extends StatelessWidget {
                 ),
                 MaterialButton(
                   onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => DetailScreen(stylist)));
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //         builder: (context) => 
+                    //         DetailScreen(barberId: ,)));
                   },
                   color: const Color(0xff4E295B),
                   shape: RoundedRectangleBorder(
