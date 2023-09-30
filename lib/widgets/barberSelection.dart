@@ -124,72 +124,71 @@ class _BarberSelectionState extends State<BarberSelection> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-  backgroundColor: Color(0xff323345),
-  body: SingleChildScrollView(
-    child: _isLoading
-        ? Center(
-            child: CircularProgressIndicator(),
-          )
-        : SizedBox(
-            height: 200, // Adjust this height as needed
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: _lengthOfResponse,
-              itemBuilder: (context, index) {
-                if (index >= _lengthOfResponse) {
-                  return Text('No data available');
-                }
-                return Container(
-                  width: 200,
-                  margin: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      InkWell(
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                DetailScreen(_barberIds[index]),
-                          ),
-                        ),
-                        child: FittedBox(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(5),
-                              topRight: Radius.circular(5),
+      backgroundColor: Color(0xff323345),
+      body: SingleChildScrollView(
+        child: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : SizedBox(
+                height: 200, // Adjust this height as needed
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _lengthOfResponse,
+                  itemBuilder: (context, index) {
+                    if (index >= _lengthOfResponse) {
+                      return Text('No data available');
+                    }
+                    return Container(
+                      width: 200,
+                      margin: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          InkWell(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    DetailScreen(_barberIds[index]),
+                              ),
                             ),
-                            clipBehavior: Clip.antiAlias,
-                            child: CachedNetworkImage(
-                              imageUrl: '${_imageUrl}',
-                              placeholder: (context, url) => const Icon(
-                                Icons.person,
-                                size: 80,
+                            child: FittedBox(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(5),
+                                  topRight: Radius.circular(5),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: CachedNetworkImage(
+                                  imageUrl: '${_imageUrl}',
+                                  placeholder: (context, url) => const Icon(
+                                    Icons.person,
+                                    size: 80,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
+                          SizedBox(height: 5),
+                          Text(
+                            '${_names[index]}',
+                            style: TextStyle(color: Colors.yellow),
+                          ),
+                          Text(
+                            'km : ${_distances[index]}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 5),
-                      Text(
-                        '${_names[index]}',
-                        style: TextStyle(color: Colors.yellow),
-                      ),
-                      Text(
-                        'km : ${_distances[index]}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.green,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-  ),
-);
-
+                    );
+                  },
+                ),
+              ),
+      ),
+    );
   }
 }
