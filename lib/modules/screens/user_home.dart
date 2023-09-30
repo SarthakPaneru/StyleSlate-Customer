@@ -160,7 +160,6 @@ class _UserHomeState extends State<UserHome> {
                           ),
                           IconButton(
                             onPressed: () {
-
                               // Clear the text that is typed
                               _textController.clear();
                             },
@@ -229,7 +228,11 @@ class _UserHomeState extends State<UserHome> {
                   ),
                   const SizedBox(height: 5),
                   Expanded(
-                    child: BarberSelection(),
+                    child: _isLoading
+                        ? const Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : BarberSelection(latitude, longitude),
                   ),
                 ],
               ),

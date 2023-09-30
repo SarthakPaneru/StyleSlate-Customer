@@ -1,10 +1,14 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/config/api_requests.dart';
+import 'package:hamro_barber_mobile/constants/app_constants.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -14,17 +18,13 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   ApiRequests _apiRequests = ApiRequests();
   File? _image;
+  String imageUrl='';
 
-  void fetchData() async {
-    http.Response response = await _apiRequests.getLoggedInCustomer();
-    List<dynamic> jsonResponse = jsonDecode(response.body);
-    // String barber = jsonResponse['name'];
-    _image = response.body as File?;
-    // print(stylistData1);
-
-    // setState(() {
-    //   _isLoading = false;
-    // });
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    imageUrl = {_apiRequests.retrieveImageUrl().toString()} as String;
   }
 
   Future getImage() async {
@@ -50,18 +50,17 @@ class _ProfilePageState extends State<ProfilePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircleAvatar(
-                radius: 80,
-                backgroundImage: _image != null ? FileImage(_image!) : null,
-                child: _image == null
-                    ? Icon(
-                        Icons.person,
-                        size: 80,
-                      )
-                    : null,
-              ),
+                  radius: 80,
+                  child: CachedNetworkImage(
+                    imageUrl: '${_apiRequests.retrieveImageUrl().toString()}',
+                    placeholder: (context, url) => const Icon(
+                      Icons.person,
+                      size: 80,
+                    ),
+                  )),
               ElevatedButton(
                 onPressed: getImage,
-                child: Text('Edit Profile Picture'),
+                child: const Text('Edit Profile Picture'),
               ),
             ],
           ),
