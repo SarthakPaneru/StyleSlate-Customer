@@ -63,11 +63,12 @@ class ApiRequests {
 
   // Create Appointment
   Future<http.Response> createAppointment(
-      int bookingStart, int bookingEnd, int barberId) async {
+      int bookingStart, int bookingEnd, int barberId, List<int> servicesIds) async {
     final payload = {
       'bookingStart': bookingStart,
       'bookingEnd': bookingEnd,
-      'barberId': barberId
+      'barberId': barberId,
+      'servicesIds': servicesIds
     };
     final jsonPayload = jsonEncode(payload);
     http.Response response = await _apiService.post(

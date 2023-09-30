@@ -11,15 +11,20 @@ import 'package:http/http.dart' as http;
 
 class BookingPage extends StatefulWidget {
   final int barberId;
-  const BookingPage({Key? key, required this.barberId}) : super(key: key);
+  final int serviceId;
+  const BookingPage({Key? key, required this.barberId, required this.serviceId})
+      : super(key: key);
 
   @override
-  State<BookingPage> createState() => _BookingPageState(barberId);
+  State<BookingPage> createState() => _BookingPageState(barberId, serviceId);
 }
 
 class _BookingPageState extends State<BookingPage> {
   late int barberId;
-  _BookingPageState(this.barberId);
+  late int serviceId;
+
+  _BookingPageState(this.barberId, int serviceId);
+
   final ApiRequests _apiRequests = ApiRequests();
   //declaration
   CalendarFormat _format = CalendarFormat.month;
@@ -31,6 +36,7 @@ class _BookingPageState extends State<BookingPage> {
   bool _timeSelected = false;
   int _serviceTime = 60;
   late int _barberId;
+  List<int> servicesIds = List.empty(growable: true);
 
   @override
   void initState() {
@@ -38,8 +44,9 @@ class _BookingPageState extends State<BookingPage> {
   }
 
   void _createAppointment(int bookingStart, int bookingEnd) async {
+    servicesIds.add(serviceId);
     http.Response response = await _apiRequests.createAppointment(
-        bookingStart, bookingEnd, barberId);
+        bookingStart, bookingEnd, barberId, servicesIds);
   }
 
   @override
@@ -131,7 +138,7 @@ class _BookingPageState extends State<BookingPage> {
                 ),
           SliverToBoxAdapter(
             child: Container(
-              padding:  EdgeInsets.symmetric(horizontal: 10, vertical: 80),
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 80),
               child: Button(
                 width: double.infinity,
                 title: 'Make Appointment',
@@ -147,12 +154,13 @@ class _BookingPageState extends State<BookingPage> {
                             child: Text('OK'),
                             onPressed: () {
                               Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (BuildContext context) {
-                            return HomePage();
-                          },
-                        ),
-                      );;
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) {
+                                    return HomePage();
+                                  },
+                                ),
+                              );
+                              ;
                             },
                           ),
                         ],
