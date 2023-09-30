@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/constants/app_constants.dart';
 import 'package:hamro_barber_mobile/core/auth/customer.dart';
 import 'package:hamro_barber_mobile/core/auth/login.dart';
+import 'package:hamro_barber_mobile/modules/models/barber.dart';
 
 import 'api_service.dart';
 import 'package:http/http.dart' as http;
@@ -94,7 +95,15 @@ class ApiRequests {
   Future<String> retrieveImageUrl() async {
     Customer customer = Customer();
     final userId = await customer.retrieveUserId();
-    return _apiService
-        .fetchProtectedImage('${ApiConstants.baseUrl}${ApiConstants.usersEndpoint}/$userId/get-image').toString();
+    return '${ApiConstants.baseUrl}${ApiConstants.usersEndpoint}/$userId/get-image';
+    // .toString();
+  }
+
+  Future<http.Response> getNearestBarber(
+      double latitude, double longitude) async {
+    print('API REQUEST: $latitude');
+
+    return await _apiService.get(
+        '${ApiConstants.barbersEndpoint}/get/nearest?latitude=${latitude.toDouble()}&longitude=${longitude.toDouble()}');
   }
 }

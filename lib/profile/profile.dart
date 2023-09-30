@@ -18,11 +18,13 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   ApiRequests _apiRequests = ApiRequests();
   File? _image;
+  String imageUrl='';
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    imageUrl = {_apiRequests.retrieveImageUrl().toString()} as String;
   }
 
   Future getImage() async {
@@ -50,8 +52,7 @@ class _ProfilePageState extends State<ProfilePage> {
               CircleAvatar(
                   radius: 80,
                   child: CachedNetworkImage(
-                    imageUrl:
-                        '${_apiRequests.retrieveImageUrl()}',
+                    imageUrl: '${_apiRequests.retrieveImageUrl().toString()}',
                     placeholder: (context, url) => const Icon(
                       Icons.person,
                       size: 80,

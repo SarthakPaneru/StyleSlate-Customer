@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/constants/app_constants.dart';
 import 'package:hamro_barber_mobile/modules/screens/barber_type.dart';
-import 'package:hamro_barber_mobile/profile/body.dart';
 import 'package:heart_toggle/heart_toggle.dart';
 import 'booking page.dart';
 
