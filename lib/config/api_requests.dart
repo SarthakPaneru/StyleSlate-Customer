@@ -62,8 +62,8 @@ class ApiRequests {
   }
 
   // Create Appointment
-  Future<http.Response> createAppointment(
-      int bookingStart, int bookingEnd, int barberId, List<int> servicesIds) async {
+  Future<http.Response> createAppointment(int bookingStart, int bookingEnd,
+      int barberId, List<int> servicesIds) async {
     final payload = {
       'bookingStart': bookingStart,
       'bookingEnd': bookingEnd,
@@ -106,5 +106,10 @@ class ApiRequests {
 
     return await _apiService.get(
         '${ApiConstants.barbersEndpoint}/get/nearest?latitude=${latitude.toDouble()}&longitude=${longitude.toDouble()}');
+  }
+
+  Future<http.Response> getBarber(int barberId) async {
+    return await _apiService
+        .get('${ApiConstants.barbersEndpoint}/get/$barberId');
   }
 }
