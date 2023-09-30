@@ -1,20 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:hamro_barber_mobile/config/api_requests.dart';
 import 'package:hamro_barber_mobile/constants/app_constants.dart';
 import 'package:hamro_barber_mobile/modules/screens/barber_type.dart';
 import 'package:heart_toggle/heart_toggle.dart';
 import 'booking page.dart';
 
-var serviceList = [
-  {'title': 'Men\s Hair Cut', 'duration': 45, 'price': 30},
-  {'title': 'Women\s Hair Cut', 'duration': 60, 'price': 50},
-  {'title': 'Color & Blow Dry', 'duration': 90, 'price': 75},
-  {'title': 'Oil Treatment', 'duration': 30, 'price': 20},
-];
+var serviceList;
 
-class DetailScreen extends StatelessWidget {
+class DetailScreen extends StatefulWidget {
   final stylist;
 
   DetailScreen(this.stylist);
+
+  @override
+  State<DetailScreen> createState() => _DetailScreenState();
+}
+
+class _DetailScreenState extends State<DetailScreen> {
+  ApiRequests _apiRequests = ApiRequests();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  void getServices() async {
+    _apiRequests.retrieveImageUrl();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +45,7 @@ class DetailScreen extends StatelessWidget {
                   fit: StackFit.expand,
                   children: <Widget>[
                     Image.network(
-                        '${ApiConstants.baseUrl}${stylist['imageUrl']}',
+                        '${ApiConstants.baseUrl}${widget.stylist['imageUrl']}',
                         fit: BoxFit.fill, loadingBuilder: (BuildContext context,
                             Widget child, ImageChunkEvent? loadingProgress) {
                       if (loadingProgress == null) {
@@ -93,10 +106,10 @@ class DetailScreen extends StatelessWidget {
                         const SizedBox(
                           height: 30,
                         ),
-                        ServiceTile(serviceList[0], stylist['id']),
-                        ServiceTile(serviceList[1], stylist['id']),
-                        ServiceTile(serviceList[2], stylist['id']),
-                        ServiceTile(serviceList[3], stylist['id']),
+                        ServiceTile(serviceList[0], widget.stylist['id']),
+                        ServiceTile(serviceList[1], widget.stylist['id']),
+                        ServiceTile(serviceList[2], widget.stylist['id']),
+                        ServiceTile(serviceList[3], widget.stylist['id']),
                       ],
                     ),
                   ),
@@ -123,7 +136,7 @@ class DetailScreen extends StatelessWidget {
                               top: 5,
                               right: -25,
                               child: Image.network(
-                                  '${ApiConstants.baseUrl}${stylist['imageUrl']}',
+                                  '${ApiConstants.baseUrl}${widget.stylist['imageUrl']}',
                                   width:
                                       MediaQuery.of(context).size.width * 0.60,
                                   loadingBuilder: (BuildContext context,
@@ -148,7 +161,7 @@ class DetailScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            stylist['name'],
+                            widget.stylist['name'],
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 20,
@@ -158,7 +171,7 @@ class DetailScreen extends StatelessWidget {
                             height: 5,
                           ),
                           Text(
-                            stylist['name'],
+                            widget.stylist['name'],
                             style: const TextStyle(
                               fontWeight: FontWeight.w300,
                               color: Colors.grey,
@@ -176,7 +189,7 @@ class DetailScreen extends StatelessWidget {
                               ),
                               const SizedBox(width: 5),
                               Text(
-                                stylist['rating'].toString(),
+                                widget.stylist['rating'].toString(),
                                 style: const TextStyle(
                                   color: Color(0xffFF8573),
                                 ),
@@ -185,7 +198,7 @@ class DetailScreen extends StatelessWidget {
                                 width: 5,
                               ),
                               Text(
-                                '(${stylist['rating'].toString()})', //rateAmount
+                                '(${widget.stylist['rating'].toString()})', //rateAmount
                                 style: const TextStyle(
                                   color: Colors.grey,
                                 ),
@@ -268,8 +281,10 @@ class ServiceTile extends StatelessWidget {
           ),
           MaterialButton(
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) =>  BookingPage(barberId: barberId)));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => BookingPage(barberId: barberId)));
             },
             color: const Color(0xffFF8573),
             shape: RoundedRectangleBorder(

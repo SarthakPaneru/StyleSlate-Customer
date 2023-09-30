@@ -58,7 +58,7 @@ class _BarberSelectionState extends State<BarberSelection> {
     // TODO: implement initState
     super.initState();
     getImageUrl();
-    test();
+    getBarbers();
   }
 
   Future<void> getImageUrl() async {
@@ -68,9 +68,6 @@ class _BarberSelectionState extends State<BarberSelection> {
     });
   }
 
-  Future<void> test() async {
-    await getBarbers();
-  }
 
   Future<void> getBarbers() async {
     try {
@@ -167,7 +164,8 @@ class _BarberSelectionState extends State<BarberSelection> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            ScheduledAppointmentPage()),
+                                            DetailScreen(_barberIds[index])
+                                            ),
                                   ),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.only(
