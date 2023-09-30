@@ -62,14 +62,16 @@ class ApiRequests {
   }
 
   // Create Appointment
-  Future<http.Response> createAppointment(int bookingStart, int bookingEnd,
-      int barberId, List<int> servicesIds) async {
+  Future<http.Response> createAppointment(
+      int bookingStart, int bookingEnd, int barberId, int serviceId) async {
     final payload = {
       'bookingStart': bookingStart,
       'bookingEnd': bookingEnd,
       'barberId': barberId,
-      'servicesIds': servicesIds
+      'servicesIds': [serviceId.toString()]
     };
+
+    print("HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
     final jsonPayload = jsonEncode(payload);
     http.Response response = await _apiService.post(
         '${ApiConstants.appointmentEndpoint}/save', jsonPayload);

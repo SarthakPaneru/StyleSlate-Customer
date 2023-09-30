@@ -101,7 +101,7 @@ class _DetailScreenState extends State<DetailScreen> {
     String serviceName = jsonResponseservice['serviceName'];
     _servicesName.add(serviceName);
     String fee = jsonResponseservice['fee'];
-    _servicesName.add(fee);
+    _servicesFee.add(fee);
     String duration = jsonResponseservice['serviceTimeInMinutes'];
     _servicesTimeInMinutes.add(duration);
   }
@@ -319,7 +319,8 @@ class ServiceTile extends StatefulWidget {
   final String price;
 
   const ServiceTile(this.serviceId, this.barberId, this.serviceName,
-      this.serviceTimeInMinutes, this.price, {super.key});
+      this.serviceTimeInMinutes, this.price,
+      {super.key});
 
   @override
   State<ServiceTile> createState() => _ServiceTileState();
@@ -328,8 +329,8 @@ class ServiceTile extends StatefulWidget {
 class _ServiceTileState extends State<ServiceTile> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 30),
+    return SingleChildScrollView(
+      // margin: const EdgeInsets.only(bottom: 30),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[

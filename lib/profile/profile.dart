@@ -18,13 +18,20 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   ApiRequests _apiRequests = ApiRequests();
   File? _image;
-  String imageUrl='';
+  String _imageUrl = '';
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    imageUrl = {_apiRequests.retrieveImageUrl().toString()} as String;
+    getImageUrl();
+  }
+
+  Future<void> getImageUrl() async {
+    String image = await _apiRequests.retrieveImageUrl();
+    setState(() {
+      _imageUrl = image;
+    });
   }
 
   Future getImage() async {
@@ -50,14 +57,15 @@ class _ProfilePageState extends State<ProfilePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircleAvatar(
-                  radius: 80,
-                  child: CachedNetworkImage(
-                    imageUrl: '${_apiRequests.retrieveImageUrl().toString()}',
-                    placeholder: (context, url) => const Icon(
-                      Icons.person,
-                      size: 80,
-                    ),
-                  )),
+                radius: 80,
+                child: CachedNetworkImage(
+                  imageUrl: '${_imageUrl}',
+                  placeholder: (context, url) => const Icon(
+                    Icons.person,
+                    size: 80,
+                  ),
+                ),
+              ),
               ElevatedButton(
                 onPressed: getImage,
                 child: const Text('Edit Profile Picture'),

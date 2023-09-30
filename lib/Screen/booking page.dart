@@ -15,14 +15,10 @@ class BookingPage extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<BookingPage> createState() => _BookingPageState(barberId, serviceId);
+  State<BookingPage> createState() => _BookingPageState();
 }
 
 class _BookingPageState extends State<BookingPage> {
-  late int barberId;
-  late int serviceId;
-
-  _BookingPageState(this.barberId, int serviceId);
 
   final ApiRequests _apiRequests = ApiRequests();
   //declaration
@@ -34,18 +30,17 @@ class _BookingPageState extends State<BookingPage> {
   bool _dateSelected = false;
   bool _timeSelected = false;
   int _serviceTime = 60;
-  late int _barberId;
-  List<int> servicesIds = List.empty(growable: true);
+  // List<int> servicesIds = List.empty(growable: true);
 
   @override
   void initState() {
     super.initState();
   }
 
-  void _createAppointment(int bookingStart, int bookingEnd) async {
-    servicesIds.add(serviceId);
+  void createAppointment(int bookingStart, int bookingEnd) async {
+    // servicesIds.add(serviceId);
     http.Response response = await _apiRequests.createAppointment(
-        bookingStart, bookingEnd, barberId, servicesIds);
+        bookingStart, bookingEnd, widget.barberId, widget.serviceId);
   }
 
   @override
@@ -167,7 +162,7 @@ class _BookingPageState extends State<BookingPage> {
                     },
                   );
                   int appointment = _focusDay.toUtc().millisecondsSinceEpoch;
-                  _createAppointment(
+                  createAppointment(
                       appointment,
                       appointment +
                           Duration(minutes: _serviceTime).inMilliseconds);
