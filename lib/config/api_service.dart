@@ -89,10 +89,11 @@ class ApiService {
     }
   }
 
-  Future<http.Response> put(String url, Map<String, dynamic> body) async {
+  Future<http.Response> put(String url, String body) async {
     try {
       Uri uri = Uri.parse(ApiConstants.baseUrl + url);
-      String bodyString = json.encode(body);
+      Map<String, dynamic> bodyMap = json.decode(body);
+      String bodyString = json.encode(bodyMap);
 
       ApiConstants apiConstants = ApiConstants();
       Map<String, String> headers = await apiConstants.postHeaders();

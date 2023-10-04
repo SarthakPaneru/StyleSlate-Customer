@@ -12,8 +12,6 @@ import 'package:hamro_barber_mobile/core/auth/customer.dart';
 import 'package:hamro_barber_mobile/modules/models/barber.dart';
 import 'package:http/http.dart' as http;
 
-
-
 class BarberSelection extends StatefulWidget {
   final double latitude;
   final double longitude;
@@ -33,7 +31,7 @@ class _BarberSelectionState extends State<BarberSelection> {
   List<double> _distances = List.empty(growable: true);
   late int _lengthOfResponse;
   bool _isLoading = true;
-  String _imageUrl = '';
+  List<String> _imageUrls = List.empty(growable: true);
 
   // bool _isLoading = true;
 
@@ -41,17 +39,20 @@ class _BarberSelectionState extends State<BarberSelection> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getImageUrl();
     getBarbers();
+    // getImageUrl();
   }
 
-  Future<void> getImageUrl() async {
-    String image = await _apiRequests.retrieveImageUrl();
+  void getImageUrl() {
+    for (int i = 0; i < _lengthOfResponse; i++) {
+      String image = _apiRequests.retrieveImageUrlFromUserId(_userIds[i]);
+      print('Image URL: $image');
+      _imageUrls.add(image);
+    }
     setState(() {
-      _imageUrl = image;
+      _isLoading = false;
     });
   }
-
 
   Future<void> getBarbers() async {
     try {
@@ -63,9 +64,9 @@ class _BarberSelectionState extends State<BarberSelection> {
       print(response.body);
 
       List<dynamic> jsonResponse = jsonDecode(response.body);
-      print("HERE 1");
 
       _lengthOfResponse = jsonResponse.length;
+
       print('Length: $_lengthOfResponse');
       for (int i = 0; i < _lengthOfResponse; i++) {
         getBarber(jsonResponse[i]);
@@ -73,8 +74,9 @@ class _BarberSelectionState extends State<BarberSelection> {
       print('COMPLETED');
       setState(() {
         _lengthOfResponse = jsonResponse.length;
-        _isLoading = false;
+        // _isLoading = false;
       });
+      getImageUrl();
     } catch (e) {
       print(e);
     }
@@ -85,6 +87,7 @@ class _BarberSelectionState extends State<BarberSelection> {
     int id = jsonResponseBarber['id'];
     _barberIds.add(id);
     Map<String, dynamic> user = jsonResponseBarber['user'];
+    _userIds.add(user['id']);
     Map<String, dynamic> jsonResponseUser = jsonDecode(jsonEncode(user));
     final barberName =
         '${jsonResponseUser['firstName']} ${jsonResponseUser['lastName']}';
@@ -126,8 +129,9 @@ class _BarberSelectionState extends State<BarberSelection> {
                             onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    DetailScreen(barberId: _barberIds[index],),
+                                builder: (context) => DetailScreen(
+                                  barberId: _barberIds[index],
+                                ),
                               ),
                             ),
                             child: FittedBox(
@@ -138,10 +142,20 @@ class _BarberSelectionState extends State<BarberSelection> {
                                 ),
                                 clipBehavior: Clip.antiAlias,
                                 child: CachedNetworkImage(
-                                  imageUrl: '${_imageUrl}',
+                                  imageUrl: _imageUrls[index],
                                   placeholder: (context, url) => const Icon(
                                     Icons.person,
                                     size: 80,
+                                  ),
+                                  fit: BoxFit.cover,
+                                  height: 100,
+                                  width: 100,
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(
+                                    Icons
+                                        .person, // You can use any widget as the error placeholder
+                                    size: 80,
+                                    
                                   ),
                                 ),
                               ),

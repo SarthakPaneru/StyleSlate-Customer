@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:hamro_barber_mobile/config/api_requests.dart';
+import 'package:hamro_barber_mobile/core/auth/forgot_password_update.dart';
+import 'package:hamro_barber_mobile/core/auth/login.dart';
 import 'package:hamro_barber_mobile/widgets/appbar.dart';
 import 'package:hamro_barber_mobile/widgets/buttons.dart';
 import 'package:hamro_barber_mobile/widgets/colors.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:http/http.dart' as http;
 
 class Forgetpassword extends StatefulWidget {
   const Forgetpassword({super.key});
@@ -13,6 +17,7 @@ class Forgetpassword extends StatefulWidget {
 
 class _ForgetpasswordState extends State<Forgetpassword> {
   final TextEditingController _emailController = TextEditingController();
+  ApiRequests _apiRequests = ApiRequests();
   @override
   void dispose() {
     _emailController
@@ -20,7 +25,7 @@ class _ForgetpasswordState extends State<Forgetpassword> {
     super.dispose();
   }
 
-  void _forgotpassword() {
+  void _forgotpassword() async {
     String email = _emailController.text;
     final bool isValid = EmailValidator.validate(_emailController.text.trim());
 
@@ -68,12 +73,23 @@ class _ForgetpasswordState extends State<Forgetpassword> {
       );
       return;
     }
+    http.Response response = await _apiRequests.forgotPassword(email);
+    if (response.statusCode == 200) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (BuildContext context) {
+            return const ForgotChangePasswordScreen();
+          },
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        backgroundColor: const Color(0xff323345),
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
           child: MyAppBar(

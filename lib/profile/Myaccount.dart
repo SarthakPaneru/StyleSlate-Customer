@@ -1,7 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:hamro_barber_mobile/config/api_requests.dart';
+import 'package:hamro_barber_mobile/core/auth/customer.dart';
 
-class MyAccountScreen extends StatelessWidget {
+class MyAccountScreen extends StatefulWidget {
   const MyAccountScreen({Key? key}) : super(key: key);
+
+  @override
+  State<MyAccountScreen> createState() => _MyAccountScreenState();
+}
+
+class _MyAccountScreenState extends State<MyAccountScreen> {
+  String _email = '';
+
+  String _phone = '';
+
+  String _username = '';
+
+  ApiRequests _apiRequests = ApiRequests();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadAccountDetails();
+  }
+
+  _loadAccountDetails() async {
+  try {
+    final email = await Customer().retrieveCustomerEmail();
+    final phone = await Customer().retrievePhone();
+    final firstName = await Customer().retrieveFirstName();
+    final lastName = await Customer().retrieveLastName();
+    setState(() {
+      _email = email!;
+      _phone = phone!;
+      _username = '$firstName $lastName';
+    });
+  } catch (e) {
+    // Handle any errors here
+    print('Error loading account details: $e');
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -12,15 +51,16 @@ class MyAccountScreen extends StatelessWidget {
         backgroundColor: const Color(0xff323345),
         title: const Text(
           'My account',
-          style: TextStyle(color: Colors.white), // Set title text color to white
+          style:
+              TextStyle(color: Colors.white), // Set title text color to white
         ),
       ),
       backgroundColor: const Color(0xff323345), // Set background color here
       body: ListView(
         children: <Widget>[
           ListTile(
-            title: const Text(
-              'Phone Number',
+            title: Text(
+              _phone,
               style: TextStyle(color: Colors.white), // Set text color to orange
             ),
             leading: const Icon(
@@ -29,8 +69,8 @@ class MyAccountScreen extends StatelessWidget {
             ),
           ),
           ListTile(
-            title: const Text(
-              'Email',
+            title: Text(
+              _email,
               style: TextStyle(color: Colors.white), // Set text color to orange
             ),
             leading: const Icon(
@@ -43,8 +83,8 @@ class MyAccountScreen extends StatelessWidget {
             },
           ),
           ListTile(
-            title: const Text(
-              'Username',
+            title: Text(
+              _username,
               style: TextStyle(color: Colors.white), // Set text color to orange
             ),
             leading: const Icon(

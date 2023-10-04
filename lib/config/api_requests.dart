@@ -102,6 +102,11 @@ class ApiRequests {
     // .toString();
   }
 
+  String retrieveImageUrlFromUserId(int userId) {
+    return '${ApiConstants.baseUrl}${ApiConstants.usersEndpoint}/$userId/get-image';
+    // .toString();
+  }
+
   Future<http.Response> getNearestBarber(
       double latitude, double longitude) async {
     print('API REQUEST: $latitude');
@@ -114,4 +119,41 @@ class ApiRequests {
     return await _apiService
         .get('${ApiConstants.barbersEndpoint}/get/$barberId');
   }
+
+  Future<http.Response> updatePassword(String currentPassword,
+      String newPassword, String confirmPassword) async {
+    String? email = await Customer().retrieveCustomerEmail();
+    final payload = {
+      'email': email!,
+      'currentPassword': currentPassword,
+      'newPassword': newPassword,
+      'confirmNewPassword': confirmPassword
+    };
+    final jsonPayload = jsonEncode(payload);
+    return await _apiService.put(
+        '${ApiConstants.usersEndpoint}/update-password', jsonPayload);
+  }
+
+  Future<http.Response> forgotPassword(String email) async {
+    final payload = {'email': email};
+    final jsonPayload = jsonEncode(payload);
+    return await _apiService.post(
+        '${ApiConstants.authEndpoint}/forgot-password?email=$email',
+        jsonPayload);
+  }
+
+  Future<http.Response> forgotChangePassword(String email, String newPassword,
+      String confirmPassword, String otp) async {
+    final payload = {
+      'email': email,
+      'newPassword': newPassword,
+      'confirmNewPassword': confirmPassword,
+      'otp': otp
+    };
+    final jsonPayload = jsonEncode(payload);
+    return await _apiService.put(
+        '${ApiConstants.authEndpoint}/confirm-forgot-password', jsonPayload);
+  }
+
+  
 }

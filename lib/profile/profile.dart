@@ -49,26 +49,46 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 300,
-      width: 300,
+      height: 250,
+      width: 170,
       child: Scaffold(
+        backgroundColor: Colors.transparent,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircleAvatar(
-                radius: 80,
-                child: CachedNetworkImage(
-                  imageUrl: '${_imageUrl}',
-                  placeholder: (context, url) => const Icon(
-                    Icons.person,
-                    size: 80,
+              InkWell(
+                child: FittedBox(
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(5),
+                      topRight: Radius.circular(5),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: CachedNetworkImage(
+                      imageUrl: _imageUrl,
+                      placeholder: (context, url) => const Icon(
+                        Icons.person,
+                        size: 80,
+                      ),
+                      fit: BoxFit.cover,
+                      height: 200,
+                      width: 150,
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons
+                            .person, // You can use any widget as the error placeholder
+                        size: 80,
+                      ),
+                    ),
                   ),
                 ),
               ),
               ElevatedButton(
                 onPressed: getImage,
                 child: const Text('Edit Profile Picture'),
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateColor.resolveWith(
+                        (states) => Colors.transparent)),
               ),
             ],
           ),

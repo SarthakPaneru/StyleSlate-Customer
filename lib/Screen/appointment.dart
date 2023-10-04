@@ -47,7 +47,8 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
   }
 
   Future<void> getAppointment(final response) async {
-    Map<String, dynamic> jsonResponseAppointment = jsonDecode(jsonEncode(response));
+    Map<String, dynamic> jsonResponseAppointment =
+        jsonDecode(jsonEncode(response));
     final bookingStart = jsonResponseAppointment['bookingStart'];
     final DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(bookingStart);
     final date = '${dateTime.year}-${dateTime.month}-${dateTime.hour}';
@@ -78,6 +79,7 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xff323345),
       appBar: AppBar(
         title: const Text(
           'Scheduled Appointments',
@@ -127,51 +129,51 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
   }
 
   Widget _buildAppointmentList(bool isCompleted) {
-    return Scaffold( 
-      backgroundColor: const Color(0xff323345),
-      body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : ListView.builder(
-      itemCount: _lengthOfResponse,
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-          child: Card(
-            elevation: 2.0,
-            child: ListTile(
-              leading: const CircleAvatar(
-                backgroundImage: AssetImage('assets/stylist2.png'),
-
-              ),
-              title: Text(
-                _barberNames[index],
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Date: ${_dates[index]}'),
-                  Text('Time: ${_times[index]}'),
-                  Text('Service: ${_serviceNames[index]}'),
-                ],
-              ),
-              trailing: isCompleted
-                  ? Icon(Icons.check_circle, color: Colors.green)
-                  : IconButton(
-                      icon: Icon(Icons.cancel),
-                      color: Colors.red,
-                      onPressed: () {
-                        // Cancel appointment logic here
-                      },
+    return Scaffold(
+        backgroundColor: const Color(0xff323345),
+        body: isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : ListView.builder(
+                itemCount: _lengthOfResponse,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 16.0),
+                    child: Card(
+                      elevation: 2.0,
+                      child: ListTile(
+                        leading: const CircleAvatar(
+                          backgroundImage: AssetImage('assets/stylist2.png'),
+                        ),
+                        title: Text(
+                          _barberNames[index],
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Date: ${_dates[index]}'),
+                            Text('Time: ${_times[index]}'),
+                            Text('Service: ${_serviceNames[index]}'),
+                          ],
+                        ),
+                        trailing: isCompleted
+                            ? Icon(Icons.check_circle, color: Colors.green)
+                            : IconButton(
+                                icon: Icon(Icons.cancel),
+                                color: Colors.red,
+                                onPressed: () {
+                                  // Cancel appointment logic here
+                                },
+                              ),
+                      ),
                     ),
-            ),
-          ),
-        );
-      },
-    ));
+                  );
+                },
+              ));
   }
 }
