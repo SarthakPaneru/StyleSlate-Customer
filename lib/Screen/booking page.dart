@@ -19,7 +19,6 @@ class BookingPage extends StatefulWidget {
 }
 
 class _BookingPageState extends State<BookingPage> {
-
   final ApiRequests _apiRequests = ApiRequests();
   //declaration
   CalendarFormat _format = CalendarFormat.month;
@@ -37,10 +36,39 @@ class _BookingPageState extends State<BookingPage> {
     super.initState();
   }
 
-  void createAppointment(int bookingStart, int bookingEnd) async {
+  _createAppointment(int bookingStart, int bookingEnd) async {
     // servicesIds.add(serviceId);
+    print('Appointment Start: $bookingStart');
+    print('Appointment Start: $bookingEnd');
     http.Response response = await _apiRequests.createAppointment(
         bookingStart, bookingEnd, widget.barberId, widget.serviceId);
+
+    if (response.statusCode == 200) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Successfully Booked'),
+            content: Text('Barber has been reserved'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (BuildContext context) {
+                        return HomePage();
+                      },
+                    ),
+                  );
+                  ;
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override
@@ -137,35 +165,13 @@ class _BookingPageState extends State<BookingPage> {
                 width: double.infinity,
                 title: 'Make Appointment',
                 onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text('Successfully Booked'),
-                        content: Text('Barber has been reserved'),
-                        actions: <Widget>[
-                          TextButton(
-                            child: Text('OK'),
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (BuildContext context) {
-                                    return HomePage();
-                                  },
-                                ),
-                              );
-                              ;
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                  int appointment = _focusDay.toUtc().millisecondsSinceEpoch;
-                  createAppointment(
-                      appointment,
-                      appointment +
-                          Duration(minutes: _serviceTime).inMilliseconds);
+                  int appointmentStart =
+                      _focusDay.toUtc().millisecondsSinceEpoch;
+                  int appointmentEnd = appointmentStart +
+                      Duration(minutes: _serviceTime).inMilliseconds;
+
+                  _createAppointment((appointmentStart ~/ 1000) as int,
+                      (appointmentEnd ~/ 1000) as int);
                 },
                 disable: _timeSelected && _dateSelected ? false : true,
               ),
