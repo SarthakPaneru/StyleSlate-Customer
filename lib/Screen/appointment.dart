@@ -142,6 +142,7 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
                     padding: const EdgeInsets.symmetric(
                         vertical: 8.0, horizontal: 16.0),
                     child: Card(
+                      color: Color(0xff323345),
                       elevation: 2.0,
                       child: ListTile(
                         leading: const CircleAvatar(
@@ -150,15 +151,17 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
                         title: Text(
                           _barberNames[index],
                           style: TextStyle(
+                            color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Date: ${_dates[index]}'),
-                            Text('Time: ${_times[index]}'),
-                            Text('Service: ${_serviceNames[index]}'),
+                            Text('Date: ${_dates[index]}',style: TextStyle(color: Colors.white70)),
+                            Text('Time: ${_times[index]}',style: TextStyle(color: Colors.white70)),
+                            Text('Service: ${_serviceNames[index]}',style: TextStyle(color: Colors.white70)),
+                            
                           ],
                         ),
                         trailing: isCompleted
