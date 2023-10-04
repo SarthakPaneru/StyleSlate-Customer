@@ -165,8 +165,22 @@ class _BookingPageState extends State<BookingPage> {
                 width: double.infinity,
                 title: 'Make Appointment',
                 onPressed: () {
+                  // Define the desired time (11:00 AM)
+                  final desiredTime = TimeOfDay(hour: _currentIndex! + 9, minute: 0);
+
+                  // Create a DateTime object for the selected date (_focusDay) with the desired time
+                  final DateTime appointmentDateTime = DateTime(
+                    _focusDay.year,
+                    _focusDay.month,
+                    _focusDay.day,
+                    desiredTime.hour,
+                    desiredTime.minute,
+                  );
+
+                  // Convert the appointmentDateTime to UTC timestamp
                   int appointmentStart =
-                      _focusDay.toUtc().millisecondsSinceEpoch;
+                      appointmentDateTime.toUtc().millisecondsSinceEpoch;
+
                   int appointmentEnd = appointmentStart +
                       Duration(minutes: _serviceTime).inMilliseconds;
 

@@ -49,6 +49,7 @@ dependencies:
   geolocator: ^10.1.0
   google_maps_flutter: ^2.5.0
   cached_network_image: ^3.3.0
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:
