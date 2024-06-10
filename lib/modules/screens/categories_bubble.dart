@@ -4,7 +4,7 @@ class CategoriesBubble extends StatelessWidget {
   final String text;
   final int index;
 
-  CategoriesBubble({required this.text, required this.index});
+  const CategoriesBubble({super.key, required this.text, required this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -22,12 +22,12 @@ class CategoriesBubble extends StatelessWidget {
               child: Image.asset(
                   'lib/assets/images/categories/categories$index.jpg')),
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         Text(
           text,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),

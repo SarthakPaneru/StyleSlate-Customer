@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:hamro_barber_mobile/Screen/detailScreen.dart';
 import 'package:hamro_barber_mobile/core/auth/customer.dart';
 import 'package:hamro_barber_mobile/modules/screens/categories_bubble.dart';
 import 'package:hamro_barber_mobile/widgets/barberSelection.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserHome extends StatefulWidget {
   const UserHome({Key? key}) : super(key: key);
@@ -27,6 +27,7 @@ class _UserHomeState extends State<UserHome> {
     // if (_firstName == null) {
     getLocation();
     getUserDetails();
+    loadLocation();
     // }
   }
 
@@ -65,6 +66,7 @@ class _UserHomeState extends State<UserHome> {
   }
 
   void getLocation() async {
+    Future.delayed(const Duration(seconds: 2), () {});
     LocationPermission permission = await Geolocator.requestPermission();
     Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.low,
@@ -72,14 +74,29 @@ class _UserHomeState extends State<UserHome> {
     setState(() {
       longitude = position.longitude;
       latitude = position.latitude;
+      print("Latitude: ${position.latitude}");
+      print("Longitude: ${position.longitude}");
     });
 
-    print("Latitude: ${position.latitude}");
-    print("Longitude: ${position.longitude}");
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    await prefs.setDouble('longitude', longitude);
+    await prefs.setDouble('latitude', latitude);
+    print('longitude stored' + '$longitude');
+    print('latitude stored' + '$latitude');
   }
 
   final _textController = TextEditingController();
   String userPost = '';
+
+  void loadLocation() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      longitude = prefs.getDouble('longitude') ?? 0;
+      //fall back value
+      latitude = prefs.getDouble('latitude') ?? 0;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +133,8 @@ class _UserHomeState extends State<UserHome> {
                                 ),
                                 Text(
                                   'Your location: $longitude, $latitude',
-                                  style: TextStyle(color: Color(0xff616274)),
+                                  style:
+                                      const TextStyle(color: Color(0xff616274)),
                                 )
                               ],
                             ),
@@ -193,7 +211,7 @@ class _UserHomeState extends State<UserHome> {
                   // 4 different faces
                   Column(
                     children: [
-                      Container(
+                      SizedBox(
                         height: 130,
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
@@ -212,7 +230,7 @@ class _UserHomeState extends State<UserHome> {
                     height: 2,
                   ),
 
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.only(left: 5, top: 5, right: 5),
                     child: Align(
                       alignment: Alignment.centerLeft,

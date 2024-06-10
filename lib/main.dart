@@ -1,12 +1,16 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hamro_barber_mobile/Screen/mapflutter.dart';
-import 'package:hamro_barber_mobile/profile/profile_screen.dart';
-import 'package:hamro_barber_mobile/widgets/colors.dart';
+import 'package:hamro_barber_mobile/config/firebase_api.dart';
 import 'package:hamro_barber_mobile/core/auth/login.dart';
+import 'package:hamro_barber_mobile/firebase_options.dart';
+import 'package:hamro_barber_mobile/widgets/colors.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
+  await FirebaseApi().initializeNotifications();
   runApp(const MaterialApp(
     debugShowCheckedModeBanner: false,
     home: Mainpage(),
@@ -14,7 +18,9 @@ void main() {
 }
 
 class Mainpage extends StatelessWidget {
-  const Mainpage({Key? key});
+  const Mainpage({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +56,7 @@ class Mainpage extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(
                     builder: (BuildContext context) {
-                      return Login();
+                      return const Login();
                     },
                   ));
                 },

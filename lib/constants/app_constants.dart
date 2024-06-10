@@ -3,7 +3,7 @@ import 'package:hamro_barber_mobile/core/auth/token.dart';
 class ApiConstants {
   static const int maxRetryCount = 3;
   static const int timeoutSeconds = 30;
-  static const String baseUrl = 'http://192.168.1.121:8080';
+  static const String baseUrl = 'http://192.168.1.101:8080';
 
   // Auth's Endpoint
   static const String authEndpoint = '/auth';

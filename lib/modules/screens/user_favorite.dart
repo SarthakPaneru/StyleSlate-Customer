@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:hamro_barber_mobile/Screen/favourite.dart';
 
 class UserFavorite extends StatelessWidget {
   const UserFavorite({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Text('favorite'),
-      backgroundColor: const Color(0xff323345),
-    );
+    return const FavourtiePage();
   }
 }

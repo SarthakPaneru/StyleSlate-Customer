@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class FavourtiePage extends StatefulWidget {
+  const FavourtiePage({super.key});
+
   @override
   State<FavourtiePage> createState() => _FavourtiePageState();
 }
@@ -28,10 +30,10 @@ class _FavourtiePageState extends State<FavourtiePage> {
       itemCount: 5,
       itemBuilder: (context, index) {
         return Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
           child: Card(
             elevation: 2.0,
-            color: Color(0xff323345), // Set the card background color here
+            color: const Color(0xff323345), // Set the card background color here
             child: ListTile(
               leading: const CircleAvatar(
                 backgroundImage: AssetImage('assets/stylist2.png'),
@@ -56,9 +58,9 @@ class _FavourtiePageState extends State<FavourtiePage> {
                 ],
               ),
               trailing: isCompleted
-                  ? Icon(Icons.check_circle, color: Colors.green)
+                  ? const Icon(Icons.check_circle, color: Colors.green)
                   : IconButton(
-                      icon: Icon(Icons.cancel),
+                      icon: const Icon(Icons.cancel),
                       color: Colors.red,
                       onPressed: () {
                         // Cancel appointment logic here

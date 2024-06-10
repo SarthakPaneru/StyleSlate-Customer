@@ -16,7 +16,7 @@ class Body extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 20),
         child: Column(
           children: [
-            ProfilePage(),
+            const ProfilePage(),
             const SizedBox(height: 20),
             ProfileMenu(
               text: "My Account",
@@ -57,7 +57,7 @@ class Body extends StatelessWidget {
                         ElevatedButton(
                           style: ButtonStyle(
                             backgroundColor:
-                                MaterialStateProperty.all<Color>(Colors.white),
+                                WidgetStateProperty.all<Color>(Colors.white),
                           ),
                           child: const Text(
                             'Yes',
@@ -70,7 +70,7 @@ class Body extends StatelessWidget {
                         ElevatedButton(
                           style: ButtonStyle(
                             backgroundColor:
-                                MaterialStateProperty.all<Color>(Colors.white),
+                                WidgetStateProperty.all<Color>(Colors.white),
                           ),
                           child: const Text(
                             'NO',

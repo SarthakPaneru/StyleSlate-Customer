@@ -18,12 +18,12 @@ class MyAccountScreen extends StatelessWidget {
       backgroundColor: const Color(0xff323345), // Set background color here
       body: ListView(
         children: <Widget>[
-          ListTile(
-            title: const Text(
+          const ListTile(
+            title: Text(
               'Phone Number',
               style: TextStyle(color: Colors.white), // Set text color to orange
             ),
-            leading: const Icon(
+            leading: Icon(
               Icons.phone,
               color: Colors.white, // Set icon color to orange
             ),

@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/config/api_requests.dart';
-import 'package:hamro_barber_mobile/constants/app_constants.dart';
-import 'package:hamro_barber_mobile/modules/screens/barber_type.dart';
 import 'package:heart_toggle/heart_toggle.dart';
 import 'booking page.dart';
 import 'package:http/http.dart' as http;
@@ -32,10 +30,10 @@ class _DetailScreenState extends State<DetailScreen> {
   String _name = '';
   String? _phone = '';
 
-  List<int> _servicesId = List.empty(growable: true);
-  List<String> _servicesName = List.empty(growable: true);
-  List<String> _servicesFee = List.empty(growable: true);
-  List<String> _servicesTimeInMinutes = List.empty(growable: true);
+  final List<int> _servicesId = List.empty(growable: true);
+  final List<String> _servicesName = List.empty(growable: true);
+  final List<String> _servicesFee = List.empty(growable: true);
+  final List<String> _servicesTimeInMinutes = List.empty(growable: true);
 
   late double _rating;
   late int _lengthOfResponse;
@@ -114,19 +112,19 @@ class _DetailScreenState extends State<DetailScreen> {
             ? const Center(
                 child: CircularProgressIndicator(),
               )
-            : Container(
+            : SizedBox(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
                 child: Stack(
                   children: <Widget>[
-                    Container(
+                    SizedBox(
                       height: MediaQuery.of(context).size.height / 3 + 10,
                       width: MediaQuery.of(context).size.width,
                       child: Stack(
                         fit: StackFit.expand,
                         children: <Widget>[
                           CachedNetworkImage(
-                            imageUrl: '${_imageUrl}',
+                            imageUrl: _imageUrl,
                             placeholder: (context, url) => const Icon(
                               Icons.person,
                               size: 80,
@@ -231,7 +229,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                     top: 5,
                                     right: -25,
                                     child: CachedNetworkImage(
-                                      imageUrl: '${_imageUrl}',
+                                      imageUrl: _imageUrl,
                                       placeholder: (context, url) => const Icon(
                                         Icons.person,
                                         size: 80,

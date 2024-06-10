@@ -5,6 +5,8 @@ import 'package:hamro_barber_mobile/config/api_requests.dart';
 import 'package:http/http.dart' as http;
 
 class ScheduledAppointmentPage extends StatefulWidget {
+  const ScheduledAppointmentPage({super.key});
+
   @override
   _ScheduledAppointmentPageState createState() =>
       _ScheduledAppointmentPageState();
@@ -13,12 +15,12 @@ class ScheduledAppointmentPage extends StatefulWidget {
 class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  ApiRequests _apiRequests = ApiRequests();
+  final ApiRequests _apiRequests = ApiRequests();
   bool isCompleted = false;
-  List<String> _barberNames = List.empty(growable: true);
-  List<String> _dates = List.empty(growable: true);
-  List<String> _times = List.empty(growable: true);
-  List<String> _serviceNames = List.empty(growable: true);
+  final List<String> _barberNames = List.empty(growable: true);
+  final List<String> _dates = List.empty(growable: true);
+  final List<String> _times = List.empty(growable: true);
+  final List<String> _serviceNames = List.empty(growable: true);
   int _lengthOfResponse = 0;
   bool isLoading = true;
 
@@ -147,7 +149,7 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
               ),
               title: Text(
                 _barberNames[index],
-                style: TextStyle(
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -160,9 +162,9 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
                 ],
               ),
               trailing: isCompleted
-                  ? Icon(Icons.check_circle, color: Colors.green)
+                  ? const Icon(Icons.check_circle, color: Colors.green)
                   : IconButton(
-                      icon: Icon(Icons.cancel),
+                      icon: const Icon(Icons.cancel),
                       color: Colors.red,
                       onPressed: () {
                         // Cancel appointment logic here

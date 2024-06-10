@@ -1,24 +1,22 @@
-import 'dart:convert';
-import 'dart:typed_data';
+import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/config/api_requests.dart';
-import 'package:hamro_barber_mobile/constants/app_constants.dart';
-import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
 
 class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
+
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  ApiRequests _apiRequests = ApiRequests();
+  final ApiRequests _apiRequests = ApiRequests();
   File? _image;
+
   String _imageUrl = '';
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -31,6 +29,7 @@ class _ProfilePageState extends State<ProfilePage> {
     String image = await _apiRequests.retrieveImageUrl();
     setState(() {
       _imageUrl = image;
+      print(_imageUrl);
     });
   }
 
@@ -58,13 +57,7 @@ class _ProfilePageState extends State<ProfilePage> {
             children: [
               CircleAvatar(
                 radius: 80,
-                child: CachedNetworkImage(
-                  imageUrl: '${_imageUrl}',
-                  placeholder: (context, url) => const Icon(
-                    Icons.person,
-                    size: 80,
-                  ),
-                ),
+                child: Image.network(_imageUrl),
               ),
               ElevatedButton(
                 onPressed: getImage,

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "16245552672",
+    "project_id": "styleslate-a5cb4",
+    "storage_bucket": "styleslate-a5cb4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:16245552672:android:af7926f09f9a9d7193ae45",
+        "android_client_info": {
+          "package_name": "com.example.hamro_barber_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkj_VcnMejbZFgrUhAM9TKzYNflO7dy84"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
