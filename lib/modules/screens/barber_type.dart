@@ -5,7 +5,7 @@ class BarberType extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
-  BarberType({
+  const BarberType({super.key, 
     required this.barberType,
     required this.isSelected,
     required this.onTap,

@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 class ScheduledAppointmentPage extends StatefulWidget {
+  const ScheduledAppointmentPage({super.key});
+
   @override
   _ScheduledAppointmentPageState createState() =>
       _ScheduledAppointmentPageState();
@@ -15,7 +17,7 @@ class ScheduledAppointmentPage extends StatefulWidget {
 class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  ApiRequests _apiRequests = ApiRequests();
+  final ApiRequests _apiRequests = ApiRequests();
   bool isCompleted = false;
   List<String> _barberNames = List.empty(growable: true);
   List<int> _userIds = List.empty(growable: true);

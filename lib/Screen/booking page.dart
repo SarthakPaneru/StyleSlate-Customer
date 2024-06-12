@@ -28,7 +28,7 @@ class _BookingPageState extends State<BookingPage> {
   bool _isWeekend = false;
   bool _dateSelected = false;
   bool _timeSelected = false;
-  int _serviceTime = 60;
+  final int _serviceTime = 60;
   // List<int> servicesIds = List.empty(growable: true);
 
   @override
@@ -76,9 +76,9 @@ class _BookingPageState extends State<BookingPage> {
     Config().init(context);
 
     return Scaffold(
-      appBar: CustomAppBar(
+      appBar: const CustomAppBar(
         appTitle: 'Appointment',
-        icon: const FaIcon(Icons.arrow_back_ios),
+        icon: FaIcon(Icons.arrow_back_ios),
       ),
       body: CustomScrollView(
         slivers: <Widget>[
@@ -160,7 +160,7 @@ class _BookingPageState extends State<BookingPage> {
                 ),
           SliverToBoxAdapter(
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 80),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 80),
               child: Button(
                 width: double.infinity,
                 title: 'Make Appointment',

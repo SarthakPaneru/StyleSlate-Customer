@@ -1,19 +1,16 @@
-import 'package:email_validator/email_validator.dart';
 import 'dart:convert';
 
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
-import 'package:hamro_barber_mobile/Screen/homescreen.dart';
 import 'package:hamro_barber_mobile/config/api_requests.dart';
 import 'package:hamro_barber_mobile/config/api_service.dart';
 import 'package:hamro_barber_mobile/constants/app_constants.dart';
 import 'package:hamro_barber_mobile/core/auth/customer.dart';
-import 'package:hamro_barber_mobile/core/auth/forgot_pwd.dart';
 import 'package:hamro_barber_mobile/core/auth/register.dart';
+import 'package:hamro_barber_mobile/core/auth/forgot_pwd.dart';
 import 'package:hamro_barber_mobile/core/auth/token.dart';
-import 'package:hamro_barber_mobile/widgets/appbar.dart';
-import 'package:hamro_barber_mobile/widgets/colors.dart';
 import 'package:hamro_barber_mobile/modules/screens/homepage.dart';
-import 'package:hamro_barber_mobile/widgets/textfield.dart';
+import 'package:hamro_barber_mobile/widgets/colors.dart';
 import 'package:http/http.dart' as http;
 
 class Login extends StatefulWidget {
@@ -67,7 +64,7 @@ class _LoginState extends State<Login> {
   bool _validatePasswordStrength(String password) {
     // Password validation logic goes here
     // Return true if password meets the criteria, otherwise false
-    return password.length >= 1 ||
+    return password.isNotEmpty ||
         password.contains(RegExp(r'[A-Z]')) ||
         password.contains(RegExp(r'[0-9]')) ||
         password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
@@ -126,7 +123,6 @@ class _LoginState extends State<Login> {
           print('Login failed with status code: ${response.statusCode}');
         }
       }
-      ;
     }
   }
 
@@ -186,7 +182,7 @@ class _LoginState extends State<Login> {
                           filled: true,
                           hintStyle: TextStyle(color: Colors.grey[500]),
                           labelText: 'Email',
-                          prefixIcon: Icon(Icons.mail),
+                          prefixIcon: const Icon(Icons.mail),
                           helperText: isEmailValid ? null : 'Invalid email',
                           helperStyle: TextStyle(
                             color: isEmailValid ? Colors.grey[500] : Colors.red,
@@ -213,7 +209,7 @@ class _LoginState extends State<Login> {
                           filled: true,
                           hintStyle: TextStyle(color: Colors.grey[500]),
                           labelText: 'Password',
-                          prefixIcon: Icon(Icons.lock),
+                          prefixIcon: const Icon(Icons.lock),
                           helperText: isPasswordValid
                               ? 'Password must contain at least 8 characters, a capital letter, a number, and a special character.'
                               : 'Invalid password',
@@ -322,7 +318,7 @@ class _LoginState extends State<Login> {
     scaffoldMessengerKey.currentState?.showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
     );
   }

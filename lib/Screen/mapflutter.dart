@@ -11,16 +11,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Completer<GoogleMapController> _controller = Completer();
+  final Completer<GoogleMapController> _controller = Completer();
 // on below line we have specified camera position
-  static final CameraPosition _kGoogle = const CameraPosition(
+  static const CameraPosition _kGoogle = CameraPosition(
     target: LatLng(20.42796133580664, 80.885749655962),
     zoom: 14.4746,
   );
 
 // on below line we have created the list of markers
   final List<Marker> _markers = <Marker>[
-    Marker(
+    const Marker(
         markerId: MarkerId('1'),
         position: LatLng(20.42796133580664, 75.885749655962),
         infoWindow: InfoWindow(
@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> {
     await Geolocator.requestPermission().then((value){
     }).onError((error, stackTrace) async {
       await Geolocator.requestPermission();
-      print("ERROR"+error.toString());
+      print("ERROR$error");
     });
     return await Geolocator.getCurrentPosition();
   }
@@ -43,9 +43,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF0F9D58),
+        backgroundColor: const Color(0xFF0F9D58),
         // on below line we have given title of app
-        title: Text("GFG"),
+        title: const Text("GFG"),
       ),
       body: Container(
         child: SafeArea(
@@ -72,21 +72,21 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () async{
           getUserCurrentLocation().then((value) async {
-            print(value.latitude.toString() +" "+value.longitude.toString());
+            print("${value.latitude} ${value.longitude}");
 
             // marker added for current users location
             _markers.add(
                 Marker(
-                  markerId: MarkerId("2"),
+                  markerId: const MarkerId("2"),
                   position: LatLng(value.latitude, value.longitude),
-                  infoWindow: InfoWindow(
+                  infoWindow: const InfoWindow(
                     title: 'My Current Location',
                   ),
                 )
             );
 
             // specified current users location
-            CameraPosition cameraPosition = new CameraPosition(
+            CameraPosition cameraPosition = CameraPosition(
               target: LatLng(value.latitude, value.longitude),
               zoom: 14,
             );
@@ -97,7 +97,7 @@ class _HomePageState extends State<HomePage> {
             });
           });
         },
-        child: Icon(Icons.local_activity),
+        child: const Icon(Icons.local_activity),
       ),
     );
   }

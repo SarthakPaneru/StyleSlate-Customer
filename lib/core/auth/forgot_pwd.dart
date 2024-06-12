@@ -30,17 +30,17 @@ class _ForgetpasswordState extends State<Forgetpassword> {
     final bool isValid = EmailValidator.validate(_emailController.text.trim());
 
     if (email.isEmpty) {
-      print('$email');
+      print(email);
 
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Error'),
-            content: Text('Please fill  email address field .'),
+            title: const Text('Error'),
+            content: const Text('Please fill  email address field .'),
             actions: <Widget>[
               TextButton(
-                child: Text('OK'),
+                child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -52,17 +52,17 @@ class _ForgetpasswordState extends State<Forgetpassword> {
       return;
     }
     if (isValid == false) {
-      print('$email');
+      print(email);
 
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Error'),
-            content: Text('Please insert correct email address.'),
+            title: const Text('Error'),
+            content: const Text('Please insert correct email address.'),
             actions: <Widget>[
               TextButton(
-                child: Text('OK'),
+                child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },

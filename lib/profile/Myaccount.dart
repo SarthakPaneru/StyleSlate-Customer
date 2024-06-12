@@ -63,7 +63,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
               _phone,
               style: TextStyle(color: Colors.white), // Set text color to orange
             ),
-            leading: const Icon(
+            leading: Icon(
               Icons.phone,
               color: Colors.white, // Set icon color to orange
             ),

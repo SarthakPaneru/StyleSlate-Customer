@@ -1,10 +1,8 @@
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/config/api_requests.dart';
 import 'package:hamro_barber_mobile/constants/app_constants.dart';
-import '/Screen/detailScreen.dart';
 import 'package:http/http.dart' as http;
 
 // const stylistData = [
@@ -82,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 30),
+                padding: const EdgeInsets.symmetric(horizontal: 30),
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class StylistCard extends StatelessWidget {
   final stylist;
-  StylistCard(this.stylist);
+  const StylistCard(this.stylist, {super.key});
 
   @override
   Widget build(BuildContext context) {
