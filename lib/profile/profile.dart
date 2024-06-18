@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/config/api_requests.dart';
 import 'package:image_picker/image_picker.dart';
@@ -64,7 +65,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       topRight: Radius.circular(5),
                     ),
                     clipBehavior: Clip.antiAlias,
-                    child: CacheNetworkImage(
+                    child: CachedNetworkImage(
                       imageUrl: _imageUrl,
                       placeholder: (context, url) => const Icon(
                         Icons.person,

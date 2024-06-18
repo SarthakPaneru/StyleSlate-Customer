@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:hamro_barber_mobile/core/auth/customer.dart';
 import 'package:hamro_barber_mobile/modules/screens/user_account.dart';
 import 'package:hamro_barber_mobile/modules/screens/user_book.dart';
 import 'package:hamro_barber_mobile/modules/screens/user_favorite.dart';
 import 'package:hamro_barber_mobile/modules/screens/user_home.dart';
-import 'package:hamro_barber_mobile/modules/screens/user_search.dart';
+import 'package:hamro_barber_mobile/socket/user_search.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -29,6 +30,15 @@ class _HomePageState extends State<HomePage> {
   ];
 
   int _selectedIndex = 0;
+  late String id;
+  Customer customer = Customer();
+
+  @override
+  void initState() {
+    getCustomerId();
+    super.initState();
+
+  }
 
   void _navigateBottomNavBar(int index) {
     setState(() {
@@ -48,6 +58,14 @@ class _HomePageState extends State<HomePage> {
     print('Floating action button pressed');
   }
 
+  void getCustomerId() async {
+    String tempid = (await customer.retrieveCustomerId())!;
+
+    setState(() {
+      id = tempid;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,7 +78,7 @@ class _HomePageState extends State<HomePage> {
             context,
             MaterialPageRoute(
               builder: (context) {
-                return UserSearch();
+                return ChatPage(id);
               },
             ),
           );
