@@ -6,8 +6,8 @@ import 'package:hamro_barber_mobile/config/api_requests.dart';
 import 'package:hamro_barber_mobile/config/api_service.dart';
 import 'package:hamro_barber_mobile/constants/app_constants.dart';
 import 'package:hamro_barber_mobile/core/auth/customer.dart';
-import 'package:hamro_barber_mobile/core/auth/register.dart';
 import 'package:hamro_barber_mobile/core/auth/forgot_pwd.dart';
+import 'package:hamro_barber_mobile/core/auth/register.dart';
 import 'package:hamro_barber_mobile/core/auth/token.dart';
 import 'package:hamro_barber_mobile/modules/screens/homepage.dart';
 import 'package:hamro_barber_mobile/widgets/colors.dart';
@@ -79,50 +79,43 @@ class _LoginState extends State<Login> {
         !isEmailValid ||
         !isPasswordValid) {
       _showSnackbar('Login failed. Please check your credentials.');
-
       return;
+    }
+
+    final payload = {
+      'email': email,
+      'password': password,
+      'userRole': 'CUSTOMER',
+    };
+    final jsonPayload = jsonEncode(payload);
+
+    http.Response response = await _apiService.post(
+        '${ApiConstants.authEndpoint}/login', jsonPayload);
+
+    if (response.statusCode == 200) {
+      // Successful login
+      Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+      String token = jsonResponse['accessToken'];
+
+      // Store the token
+      await _token.storeBearerToken(token);
+
+      // Retrieve and store customer details
+      http.Response response1 = await _apiRequests.getLoggedInUser();
+      Map<String, dynamic> jsonResponse1 = jsonDecode(response1.body);
+      _customer.storeCustomerDetails(jsonResponse1);
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (BuildContext context) {
+            return const HomePage();
+          },
+        ),
+      );
     } else {
-      {
-        // If form is validated the follwing code is executed.
-        final payload = {
-          'email': email,
-          'password': password,
-          'userRole': 'CUSTOMER'
-        };
-        final jsonPayload = jsonEncode(payload);
-
-        http.Response response = await _apiService.post(
-            '${ApiConstants.authEndpoint}/login', jsonPayload);
-
-        if (response.statusCode == 200) {
-          // Successful login
-          Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-          String token = jsonResponse['accessToken'];
-          await _token.storeBearerToken(token);
-
-          http.Response response1 = await _apiRequests.getLoggedInUser();
-
-          Map<String, dynamic> jsonResponse1 = jsonDecode(response1.body);
-
-          _customer.storeCustomerDetails(jsonResponse1);
-
-          try {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (BuildContext context) {
-                  return const HomePage();
-                },
-              ),
-            );
-          } catch (e) {
-            print('Error Navigating: $e');
-          }
-        } else {
-          // Handle login failure
-          _showSnackbar('Login failed. Please check your credentials.');
-          print('Login failed with status code: ${response.statusCode}');
-        }
-      }
+      // Handle login failure
+      _showSnackbar('Login failed. Please check your credentials.');
+      print('Login failed with status code: ${response.statusCode}');
     }
   }
 
@@ -262,7 +255,6 @@ class _LoginState extends State<Login> {
                       const SizedBox(height: 12),
                       ElevatedButton(
                         onPressed: () {
-                          // Handle forgot password logic or navigation here
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (BuildContext context) {
@@ -318,7 +310,7 @@ class _LoginState extends State<Login> {
     scaffoldMessengerKey.currentState?.showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: const Duration(seconds: 2),
+        duration: const Duration(seconds: 1),
       ),
     );
   }

@@ -1,11 +1,10 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/config/api_requests.dart';
 import 'package:hamro_barber_mobile/core/auth/forgot_password_update.dart';
-import 'package:hamro_barber_mobile/core/auth/login.dart';
 import 'package:hamro_barber_mobile/widgets/appbar.dart';
 import 'package:hamro_barber_mobile/widgets/buttons.dart';
 import 'package:hamro_barber_mobile/widgets/colors.dart';
-import 'package:email_validator/email_validator.dart';
 import 'package:http/http.dart' as http;
 
 class Forgetpassword extends StatefulWidget {
@@ -89,7 +88,6 @@ class _ForgetpasswordState extends State<Forgetpassword> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        backgroundColor: const Color(0xff323345),
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
           child: MyAppBar(

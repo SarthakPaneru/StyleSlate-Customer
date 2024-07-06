@@ -37,7 +37,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     getCustomerId();
     super.initState();
-
   }
 
   void _navigateBottomNavBar(int index) {
@@ -71,6 +70,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: _children[_selectedIndex],
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      extendBody: true,
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.white,
         onPressed: () {
