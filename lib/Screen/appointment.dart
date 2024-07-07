@@ -1,10 +1,14 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/config/api_requests.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class ScheduledAppointmentPage extends StatefulWidget {
+  const ScheduledAppointmentPage({super.key});
+
   @override
   _ScheduledAppointmentPageState createState() =>
       _ScheduledAppointmentPageState();
@@ -13,9 +17,11 @@ class ScheduledAppointmentPage extends StatefulWidget {
 class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  ApiRequests _apiRequests = ApiRequests();
+  final ApiRequests _apiRequests = ApiRequests();
   bool isCompleted = false;
   List<String> _barberNames = List.empty(growable: true);
+  List<int> _userIds = List.empty(growable: true);
+  List<String> _imageUrls = List.empty(growable: true);
   List<String> _dates = List.empty(growable: true);
   List<String> _times = List.empty(growable: true);
   List<String> _serviceNames = List.empty(growable: true);
@@ -29,6 +35,17 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
     _tabController = TabController(length: 3, vsync: this);
   }
 
+  void getImageUrl() {
+    for (int i = 0; i < _lengthOfResponse; i++) {
+      String image = _apiRequests.retrieveImageUrlFromUserId(_userIds[i]);
+      print('Image URL: $image');
+      _imageUrls.add(image);
+    }
+    // setState(() {
+    //   isLoading = false;
+    // });
+  }
+
   Future<void> getAppointments(String status) async {
     try {
       http.Response response = await _apiRequests.getAppointments(status);
@@ -38,6 +55,7 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
       for (int i = 0; i < _lengthOfResponse; i++) {
         getAppointment(jsonResponse[i]);
       }
+      getImageUrl();
       setState(() {
         isLoading = false;
       });
@@ -47,19 +65,28 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
   }
 
   Future<void> getAppointment(final response) async {
-    Map<String, dynamic> jsonResponseAppointment = jsonDecode(jsonEncode(response));
+    Map<String, dynamic> jsonResponseAppointment =
+        jsonDecode(jsonEncode(response));
     final bookingStart = jsonResponseAppointment['bookingStart'];
-    final DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(bookingStart);
-    final date = '${dateTime.year}-${dateTime.month}-${dateTime.hour}';
+    print('Booking start: $bookingStart');
+    final DateTime dateTime =
+        DateTime.fromMillisecondsSinceEpoch(bookingStart * 1000);
+    print('DateTime: ${dateTime.toLocal()}');
+    print('DateTime: ${dateTime}');
+
+    final date = DateFormat('yyyy-MM-dd').format(dateTime);
     _dates.add(date);
-    final time = '${dateTime.hour}:${dateTime.minute}';
+    final time = DateFormat('HH:mm').format(dateTime);
     _times.add(time);
 
     Map<String, dynamic> barber = jsonResponseAppointment['barber'];
     Map<String, dynamic> jsonResponseBarber = jsonDecode(jsonEncode(barber));
 
     Map<String, dynamic> user = jsonResponseBarber['user'];
+    _userIds.add(user['id']);
+
     Map<String, dynamic> jsonResponseUser = jsonDecode(jsonEncode(user));
+
     final barberName =
         '${jsonResponseUser['firstName']} ${jsonResponseUser['lastName']}';
     _barberNames.add(barberName);
@@ -78,6 +105,7 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xff323345),
       appBar: AppBar(
         title: const Text(
           'Scheduled Appointments',
@@ -127,51 +155,57 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
   }
 
   Widget _buildAppointmentList(bool isCompleted) {
-    return Scaffold( 
-      backgroundColor: const Color(0xff323345),
-      body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : ListView.builder(
-      itemCount: _lengthOfResponse,
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-          child: Card(
-            elevation: 2.0,
-            child: ListTile(
-              leading: const CircleAvatar(
-                backgroundImage: AssetImage('assets/stylist2.png'),
-
-              ),
-              title: Text(
-                _barberNames[index],
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Date: ${_dates[index]}'),
-                  Text('Time: ${_times[index]}'),
-                  Text('Service: ${_serviceNames[index]}'),
-                ],
-              ),
-              trailing: isCompleted
-                  ? Icon(Icons.check_circle, color: Colors.green)
-                  : IconButton(
-                      icon: Icon(Icons.cancel),
-                      color: Colors.red,
-                      onPressed: () {
-                        // Cancel appointment logic here
-                      },
+    return Scaffold(
+        backgroundColor: const Color(0xff323345),
+        body: isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : ListView.builder(
+                itemCount: _lengthOfResponse,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 16.0),
+                    child: Card(
+                      color: Color(0xff323345),
+                      elevation: 2.0,
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          child: 
+                          CachedNetworkImage(imageUrl: _imageUrls[index]),
+                        ),
+                        title: Text(
+                          _barberNames[index],
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Date: ${_dates[index]}',
+                                style: TextStyle(color: Colors.white70)),
+                            Text('Time: ${_times[index]}',
+                                style: TextStyle(color: Colors.white70)),
+                            Text('Service: ${_serviceNames[index]}',
+                                style: TextStyle(color: Colors.white70)),
+                          ],
+                        ),
+                        trailing: isCompleted
+                            ? Icon(Icons.check_circle, color: Colors.green)
+                            : IconButton(
+                                icon: Icon(Icons.cancel),
+                                color: Colors.red,
+                                onPressed: () {
+                                  // Cancel appointment logic here
+                                },
+                              ),
+                      ),
                     ),
-            ),
-          ),
-        );
-      },
-    ));
+                  );
+                },
+              ));
   }
 }

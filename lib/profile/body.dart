@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
-import '/profile/changepassword.dart';
-import 'profile_menu.dart';
-import 'profile.dart';
-import 'helpcenterscreen.dart';
+import 'package:hamro_barber_mobile/core/auth/login.dart';
+import 'package:hamro_barber_mobile/core/auth/token.dart'; // Import your Token class
+import 'package:hamro_barber_mobile/profile/changepassword.dart';
+
 import 'Myaccount.dart';
+import 'helpcenterscreen.dart';
+import 'profile.dart';
+import 'profile_menu.dart';
+// Import your Login screen
 
 class Body extends StatelessWidget {
   const Body({Key? key}) : super(key: key);
@@ -16,7 +20,7 @@ class Body extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 20),
         child: Column(
           children: [
-            ProfilePage(),
+            const ProfilePage(),
             const SizedBox(height: 20),
             ProfileMenu(
               text: "My Account",
@@ -52,28 +56,27 @@ class Body extends StatelessWidget {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      content: const Text('Are you sure.'),
+                      content: const Text('Are you sure you want to log out?'),
                       actions: <Widget>[
                         ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all<Color>(Colors.white),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
                           ),
                           child: const Text(
                             'Yes',
                             style: TextStyle(color: Colors.grey),
                           ),
-                          onPressed: () {
-                            Navigator.of(context).pop();
+                          onPressed: () async {
+                            // Perform logout action
+                            await _logout(context);
                           },
                         ),
                         ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all<Color>(Colors.white),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
                           ),
                           child: const Text(
-                            'NO',
+                            'No',
                             style: TextStyle(color: Colors.grey),
                           ),
                           onPressed: () {
@@ -105,5 +108,17 @@ class Body extends StatelessWidget {
   void navigateTOMyaccount(BuildContext context) {
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => const MyAccountScreen()));
+  }
+
+  Future<void> _logout(BuildContext context) async {
+    // Clear the stored token
+    Token _token = Token();
+    await _token.clearBearerToken();
+
+    // Navigate to the Login screen
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const Login()),
+      (Route<dynamic> route) => false,
+    );
   }
 }

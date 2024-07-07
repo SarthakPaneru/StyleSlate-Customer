@@ -54,7 +54,7 @@ class _RegisterState extends State<Register> {
         email.isEmpty ||
         password.isEmpty ||
         confirmPassword.isEmpty) {
-      print('$email');
+      print(email);
       _showSnackbar('Registration failed. Please check your credentials.');
 
       return;
@@ -66,7 +66,7 @@ class _RegisterState extends State<Register> {
       return;
     }
     if (isValid == false) {
-      print('$email');
+      print(email);
 
       _showSnackbar('Registration failed. Please check your credentials.');
       return;
@@ -238,7 +238,7 @@ class _RegisterState extends State<Register> {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (BuildContext context) {
-                                return Login();
+                                return const Login();
                               },
                             ),
                           );
@@ -268,7 +268,7 @@ class _RegisterState extends State<Register> {
     scaffoldMessengerKey.currentState?.showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
     );
   }

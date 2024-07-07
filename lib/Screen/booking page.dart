@@ -1,12 +1,15 @@
-import 'package:hamro_barber_mobile/config/api_requests.dart';
-import 'package:hamro_barber_mobile/modules/screens/homepage.dart';
-import '../widgets/button.dart';
-import '../widgets/custom_appbar.dart';
-import '../widgets/config.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:hamro_barber_mobile/config/api_requests.dart';
+import 'package:hamro_barber_mobile/modules/screens/homepage.dart';
+import 'package:hamro_barber_mobile/utils/kalti.dart';
+import 'package:hamro_barber_mobile/utils/khaltihome.dart';
 import 'package:http/http.dart' as http;
+import 'package:table_calendar/table_calendar.dart';
+
+import '../widgets/button.dart';
+import '../widgets/config.dart';
+import '../widgets/custom_appbar.dart';
 
 class BookingPage extends StatefulWidget {
   final int barberId;
@@ -19,7 +22,6 @@ class BookingPage extends StatefulWidget {
 }
 
 class _BookingPageState extends State<BookingPage> {
-
   final ApiRequests _apiRequests = ApiRequests();
   //declaration
   CalendarFormat _format = CalendarFormat.month;
@@ -29,7 +31,7 @@ class _BookingPageState extends State<BookingPage> {
   bool _isWeekend = false;
   bool _dateSelected = false;
   bool _timeSelected = false;
-  int _serviceTime = 60;
+  final int _serviceTime = 60;
   // List<int> servicesIds = List.empty(growable: true);
 
   @override
@@ -37,10 +39,50 @@ class _BookingPageState extends State<BookingPage> {
     super.initState();
   }
 
-  void createAppointment(int bookingStart, int bookingEnd) async {
+  _createAppointment(int bookingStart, int bookingEnd) async {
     // servicesIds.add(serviceId);
+    print('Appointment Start: $bookingStart');
+    print('Appointment Start: $bookingEnd');
     http.Response response = await _apiRequests.createAppointment(
         bookingStart, bookingEnd, widget.barberId, widget.serviceId);
+
+    if (response.statusCode == 200) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Successfully Booked'),
+            content: Text('Barber has been reserved'),
+            actions: <Widget>[
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (BuildContext context) {
+                          return PaymentPage();
+                        },
+                      ),
+                    );
+                  },
+                  child: Text("payment")),
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (BuildContext context) {
+                        return HomePage();
+                      },
+                    ),
+                  );
+                  ;
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override
@@ -48,9 +90,14 @@ class _BookingPageState extends State<BookingPage> {
     Config().init(context);
 
     return Scaffold(
-      appBar: CustomAppBar(
+      appBar: const CustomAppBar(
         appTitle: 'Appointment',
-        icon: const FaIcon(Icons.arrow_back_ios),
+        icon: FaIcon(Icons.arrow_back_ios),
+        actions: [
+          Icon(
+            Icons.payment,
+          ),
+        ],
       ),
       body: CustomScrollView(
         slivers: <Widget>[
@@ -132,40 +179,33 @@ class _BookingPageState extends State<BookingPage> {
                 ),
           SliverToBoxAdapter(
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 80),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 80),
               child: Button(
                 width: double.infinity,
                 title: 'Make Appointment',
                 onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text('Successfully Booked'),
-                        content: Text('Barber has been reserved'),
-                        actions: <Widget>[
-                          TextButton(
-                            child: Text('OK'),
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (BuildContext context) {
-                                    return HomePage();
-                                  },
-                                ),
-                              );
-                              ;
-                            },
-                          ),
-                        ],
-                      );
-                    },
+                  // Define the desired time (11:00 AM)
+                  final desiredTime =
+                      TimeOfDay(hour: _currentIndex! + 9, minute: 0);
+
+                  // Create a DateTime object for the selected date (_focusDay) with the desired time
+                  final DateTime appointmentDateTime = DateTime(
+                    _focusDay.year,
+                    _focusDay.month,
+                    _focusDay.day,
+                    desiredTime.hour,
+                    desiredTime.minute,
                   );
-                  int appointment = _focusDay.toUtc().millisecondsSinceEpoch;
-                  createAppointment(
-                      appointment,
-                      appointment +
-                          Duration(minutes: _serviceTime).inMilliseconds);
+
+                  // Convert the appointmentDateTime to UTC timestamp
+                  int appointmentStart =
+                      appointmentDateTime.toUtc().millisecondsSinceEpoch;
+
+                  int appointmentEnd = appointmentStart +
+                      Duration(minutes: _serviceTime).inMilliseconds;
+
+                  _createAppointment((appointmentStart ~/ 1000) as int,
+                      (appointmentEnd ~/ 1000) as int);
                 },
                 disable: _timeSelected && _dateSelected ? false : true,
               ),
@@ -181,7 +221,7 @@ class _BookingPageState extends State<BookingPage> {
     return TableCalendar(
       focusedDay: _focusDay,
       firstDay: DateTime.now(),
-      lastDay: DateTime(2023, 12, 31),
+      lastDay: DateTime(2024, 12, 31),
       calendarFormat: _format,
       currentDay: _currentDay,
       rowHeight: 48,

@@ -18,8 +18,8 @@ class HelpCenterScreen extends StatelessWidget {
       backgroundColor: const Color(0xff323345), // Set the background color here
       body: ListView(
         children: <Widget>[
-          ListTile(
-            title: const Text(
+          const ListTile(
+            title: Text(
               'Contact Us',
               style: TextStyle(color: Colors.white), // Set text color to white
             ),

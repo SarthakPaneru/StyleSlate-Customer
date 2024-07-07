@@ -1,15 +1,11 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/constants/app_constants.dart';
 import 'package:hamro_barber_mobile/core/auth/customer.dart';
-import 'package:hamro_barber_mobile/core/auth/login.dart';
-import 'package:hamro_barber_mobile/modules/models/barber.dart';
+import 'package:http/http.dart' as http;
 
 import 'api_service.dart';
-import 'package:http/http.dart' as http;
 
 class ApiRequests {
   final ApiService _apiService = ApiService();
@@ -102,6 +98,11 @@ class ApiRequests {
     // .toString();
   }
 
+  String retrieveImageUrlFromUserId(int userId) {
+    return '${ApiConstants.baseUrl}${ApiConstants.usersEndpoint}/$userId/get-image';
+    // .toString();
+  }
+
   Future<http.Response> getNearestBarber(
       double latitude, double longitude) async {
     print('API REQUEST: $latitude');
@@ -113,5 +114,45 @@ class ApiRequests {
   Future<http.Response> getBarber(int barberId) async {
     return await _apiService
         .get('${ApiConstants.barbersEndpoint}/get/$barberId');
+  }
+
+  Future<http.Response> updatePassword(String currentPassword,
+      String newPassword, String confirmPassword) async {
+    String? email = await Customer().retrieveCustomerEmail();
+    final payload = {
+      'email': email!,
+      'currentPassword': currentPassword,
+      'newPassword': newPassword,
+      'confirmNewPassword': confirmPassword
+    };
+    final jsonPayload = jsonEncode(payload);
+    return await _apiService.put(
+        '${ApiConstants.usersEndpoint}/update-password', jsonPayload);
+  }
+
+  Future<http.Response> forgotPassword(String email) async {
+    final payload = {'email': email};
+    final jsonPayload = jsonEncode(payload);
+    return await _apiService.post(
+        '${ApiConstants.authEndpoint}/forgot-password?email=$email',
+        jsonPayload);
+  }
+
+  Future<http.Response> forgotChangePassword(String email, String newPassword,
+      String confirmPassword, String otp) async {
+    final payload = {
+      'email': email,
+      'newPassword': newPassword,
+      'confirmNewPassword': confirmPassword,
+      'otp': otp
+    };
+    final jsonPayload = jsonEncode(payload);
+    return await _apiService.put(
+        '${ApiConstants.authEndpoint}/confirm-forgot-password', jsonPayload);
+  }
+
+  
+  Future<http.Response> getData() async {
+    return await _apiService.get('/socket/receive-send');
   }
 }

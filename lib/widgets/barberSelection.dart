@@ -1,18 +1,10 @@
 import 'dart:convert';
-import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:hamro_barber_mobile/Screen/appointment.dart';
-import 'package:hamro_barber_mobile/Screen/booking%20page.dart';
 import 'package:hamro_barber_mobile/Screen/detailScreen.dart';
-import 'package:hamro_barber_mobile/Screen/homescreen.dart';
 import 'package:hamro_barber_mobile/config/api_requests.dart';
-import 'package:hamro_barber_mobile/core/auth/customer.dart';
-import 'package:hamro_barber_mobile/modules/models/barber.dart';
 import 'package:http/http.dart' as http;
-
-
 
 class BarberSelection extends StatefulWidget {
   final double latitude;
@@ -27,13 +19,14 @@ class BarberSelection extends StatefulWidget {
 class _BarberSelectionState extends State<BarberSelection> {
   final ApiRequests _apiRequests = ApiRequests();
   // List<Barber> barbershop = List.empty(growable: true);
-  List<int> _barberIds = List.empty(growable: true);
-  List<int> _userIds = List.empty(growable: true);
-  List<String> _names = List.empty(growable: true);
-  List<double> _distances = List.empty(growable: true);
+  final List<int> _barberIds = List.empty(growable: true);
+  final List<int> _userIds = List.empty(growable: true);
+  final List<String> _names = List.empty(growable: true);
+  final List<double> _distances = List.empty(growable: true);
   late int _lengthOfResponse;
   bool _isLoading = true;
-  String _imageUrl = '';
+  bool _isError = false;
+  List<String> _imageUrls = List.empty(growable: true);
 
   // bool _isLoading = true;
 
@@ -41,17 +34,20 @@ class _BarberSelectionState extends State<BarberSelection> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getImageUrl();
     getBarbers();
+    // getImageUrl();
   }
 
-  Future<void> getImageUrl() async {
-    String image = await _apiRequests.retrieveImageUrl();
+  void getImageUrl() {
+    for (int i = 0; i < _lengthOfResponse; i++) {
+      String image = _apiRequests.retrieveImageUrlFromUserId(_userIds[i]);
+      print('Image URL: $image');
+      _imageUrls.add(image);
+    }
     setState(() {
-      _imageUrl = image;
+      _isLoading = false;
     });
   }
-
 
   Future<void> getBarbers() async {
     try {
@@ -63,9 +59,9 @@ class _BarberSelectionState extends State<BarberSelection> {
       print(response.body);
 
       List<dynamic> jsonResponse = jsonDecode(response.body);
-      print("HERE 1");
 
       _lengthOfResponse = jsonResponse.length;
+
       print('Length: $_lengthOfResponse');
       for (int i = 0; i < _lengthOfResponse; i++) {
         getBarber(jsonResponse[i]);
@@ -73,9 +69,11 @@ class _BarberSelectionState extends State<BarberSelection> {
       print('COMPLETED');
       setState(() {
         _lengthOfResponse = jsonResponse.length;
-        _isLoading = false;
+        // _isLoading = false;
       });
+      getImageUrl();
     } catch (e) {
+      _isError = true;
       print(e);
     }
   }
@@ -85,6 +83,7 @@ class _BarberSelectionState extends State<BarberSelection> {
     int id = jsonResponseBarber['id'];
     _barberIds.add(id);
     Map<String, dynamic> user = jsonResponseBarber['user'];
+    _userIds.add(user['id']);
     Map<String, dynamic> jsonResponseUser = jsonDecode(jsonEncode(user));
     final barberName =
         '${jsonResponseUser['firstName']} ${jsonResponseUser['lastName']}';
@@ -101,11 +100,13 @@ class _BarberSelectionState extends State<BarberSelection> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xff323345),
+      backgroundColor: const Color(0xff323345),
       body: SingleChildScrollView(
         child: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
+            ? const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.yellow,
+                ),
               )
             : SizedBox(
                 height: 200, // Adjust this height as needed
@@ -114,7 +115,7 @@ class _BarberSelectionState extends State<BarberSelection> {
                   itemCount: _lengthOfResponse,
                   itemBuilder: (context, index) {
                     if (index >= _lengthOfResponse) {
-                      return Text('No data available');
+                      return const Text('No data available');
                     }
                     return Container(
                       width: 200,
@@ -126,35 +127,45 @@ class _BarberSelectionState extends State<BarberSelection> {
                             onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    DetailScreen(barberId: _barberIds[index],),
+                                builder: (context) => DetailScreen(
+                                  barberId: _barberIds[index],
+                                ),
                               ),
                             ),
                             child: FittedBox(
                               child: ClipRRect(
-                                borderRadius: BorderRadius.only(
+                                borderRadius: const BorderRadius.only(
                                   topLeft: Radius.circular(5),
                                   topRight: Radius.circular(5),
                                 ),
                                 clipBehavior: Clip.antiAlias,
                                 child: CachedNetworkImage(
-                                  imageUrl: '${_imageUrl}',
+                                  imageUrl: _imageUrls[index],
                                   placeholder: (context, url) => const Icon(
                                     Icons.person,
+                                    size: 80,
+                                  ),
+                                  fit: BoxFit.cover,
+                                  height: 100,
+                                  width: 100,
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(
+                                    Icons
+                                        .person, // You can use any widget as the error placeholder
                                     size: 80,
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                          SizedBox(height: 5),
+                          const SizedBox(height: 5),
                           Text(
-                            '${_names[index]}',
-                            style: TextStyle(color: Colors.yellow),
+                            _names[index],
+                            style: const TextStyle(color: Colors.yellow),
                           ),
                           Text(
                             'km : ${_distances[index]}',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 14,
                               color: Colors.green,
                             ),

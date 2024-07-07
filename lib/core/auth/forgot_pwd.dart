@@ -1,8 +1,11 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:hamro_barber_mobile/config/api_requests.dart';
+import 'package:hamro_barber_mobile/core/auth/forgot_password_update.dart';
 import 'package:hamro_barber_mobile/widgets/appbar.dart';
 import 'package:hamro_barber_mobile/widgets/buttons.dart';
 import 'package:hamro_barber_mobile/widgets/colors.dart';
-import 'package:email_validator/email_validator.dart';
+import 'package:http/http.dart' as http;
 
 class Forgetpassword extends StatefulWidget {
   const Forgetpassword({super.key});
@@ -13,6 +16,7 @@ class Forgetpassword extends StatefulWidget {
 
 class _ForgetpasswordState extends State<Forgetpassword> {
   final TextEditingController _emailController = TextEditingController();
+  ApiRequests _apiRequests = ApiRequests();
   @override
   void dispose() {
     _emailController
@@ -20,22 +24,22 @@ class _ForgetpasswordState extends State<Forgetpassword> {
     super.dispose();
   }
 
-  void _forgotpassword() {
+  void _forgotpassword() async {
     String email = _emailController.text;
     final bool isValid = EmailValidator.validate(_emailController.text.trim());
 
     if (email.isEmpty) {
-      print('$email');
+      print(email);
 
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Error'),
-            content: Text('Please fill  email address field .'),
+            title: const Text('Error'),
+            content: const Text('Please fill  email address field .'),
             actions: <Widget>[
               TextButton(
-                child: Text('OK'),
+                child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -47,17 +51,17 @@ class _ForgetpasswordState extends State<Forgetpassword> {
       return;
     }
     if (isValid == false) {
-      print('$email');
+      print(email);
 
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Error'),
-            content: Text('Please insert correct email address.'),
+            title: const Text('Error'),
+            content: const Text('Please insert correct email address.'),
             actions: <Widget>[
               TextButton(
-                child: Text('OK'),
+                child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -67,6 +71,16 @@ class _ForgetpasswordState extends State<Forgetpassword> {
         },
       );
       return;
+    }
+    http.Response response = await _apiRequests.forgotPassword(email);
+    if (response.statusCode == 200) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (BuildContext context) {
+            return const ForgotChangePasswordScreen();
+          },
+        ),
+      );
     }
   }
 

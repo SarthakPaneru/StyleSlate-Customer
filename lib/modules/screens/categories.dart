@@ -10,17 +10,17 @@ class Category extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Color(0xff867d6c),
+        color: const Color(0xff867d6c),
         borderRadius: BorderRadius.circular(12),
       ),
       
-      padding: EdgeInsets.all(5),
+      padding: const EdgeInsets.all(5),
+      width: 100,
       child: Center(
         child: Image.network(
             'https://c8.alamy.com/comp/KFEAFB/male-avatar-profile-icon-round-man-face-KFEAFB.jpg',
             ),
       ),
-      width: 100,
     );
   }
 }

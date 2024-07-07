@@ -1,14 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:ui';
-import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/constants/app_constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart';
 
 class ApiService {
-  ApiConstants _apiConstants = ApiConstants();
+  final ApiConstants _apiConstants = ApiConstants();
 
   void processData(String responseData) {
     final data = json.decode(responseData);
@@ -89,10 +87,11 @@ class ApiService {
     }
   }
 
-  Future<http.Response> put(String url, Map<String, dynamic> body) async {
+  Future<http.Response> put(String url, String body) async {
     try {
       Uri uri = Uri.parse(ApiConstants.baseUrl + url);
-      String bodyString = json.encode(body);
+      Map<String, dynamic> bodyMap = json.decode(body);
+      String bodyString = json.encode(bodyMap);
 
       ApiConstants apiConstants = ApiConstants();
       Map<String, String> headers = await apiConstants.postHeaders();
