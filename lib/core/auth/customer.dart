@@ -29,12 +29,12 @@ class Customer {
     }
   }
 
-  Future<String?> retrieveCustomerId() async {
+  Future<int?> retrieveCustomerId() async {
     try {
       final customerId = await _storage.read(key: 'customerId');
       // You can add additional validation here if needed.
       if (customerId != null) {
-        return customerId;
+        return int.parse(customerId);
       } else {
         // Handle the case where customerId is not found in storage.
         print('Customer Id not found in storage');

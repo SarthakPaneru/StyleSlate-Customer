@@ -5,6 +5,7 @@ import 'package:hamro_barber_mobile/modules/screens/user_book.dart';
 import 'package:hamro_barber_mobile/modules/screens/user_favorite.dart';
 import 'package:hamro_barber_mobile/modules/screens/user_home.dart';
 import 'package:hamro_barber_mobile/socket/user_search.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -30,14 +31,16 @@ class _HomePageState extends State<HomePage> {
   ];
 
   int _selectedIndex = 0;
-  late String id;
+  late int id;
   Customer customer = Customer();
+  late double longitude;
+  late double latitude;
 
   @override
   void initState() {
     getCustomerId();
+    loadLocation();
     super.initState();
-
   }
 
   void _navigateBottomNavBar(int index) {
@@ -59,10 +62,20 @@ class _HomePageState extends State<HomePage> {
   }
 
   void getCustomerId() async {
-    String tempid = (await customer.retrieveCustomerId())!;
+    int tempid = (await customer.retrieveCustomerId())!;
 
     setState(() {
       id = tempid;
+    });
+  }
+
+  void loadLocation() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      longitude = prefs.getDouble('longitude') ?? 0;
+      //fall back value
+      latitude = prefs.getDouble('latitude') ?? 0;
+      print('DAAAAAAAAAATAAAAAAAAAAAAAA: $longitude');
     });
   }
 
@@ -78,7 +91,7 @@ class _HomePageState extends State<HomePage> {
             context,
             MaterialPageRoute(
               builder: (context) {
-                return ChatPage(id);
+                return ChatPage(id, longitude, latitude);
               },
             ),
           );
