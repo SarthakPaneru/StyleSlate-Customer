@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/config/api_requests.dart';
-
-import 'package:hamro_barber_mobile/config/api_service.dart';
-import 'package:hamro_barber_mobile/constants/app_constants.dart';
 import 'package:hamro_barber_mobile/core/auth/login.dart';
 import 'package:http/http.dart' as http;
 
@@ -120,24 +117,21 @@ class _ForgotChangePasswordScreenState
         },
       );
       // Clear the text fields
-    _emailController.clear();
-    _newPasswordController.clear();
-    _confirmPasswordController.clear();
+      _emailController.clear();
+      _newPasswordController.clear();
+      _confirmPasswordController.clear();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xff323345),
       appBar: AppBar(
         centerTitle: true,
         elevation: 0.5,
         title: const Text(
           'Change Password',
-          style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.transparent,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -159,7 +153,7 @@ class _ForgotChangePasswordScreenState
                 labelText: 'Email',
                 hintStyle: TextStyle(color: Colors.white),
               ),
-              style: const TextStyle(color: Colors.white70),
+              style: const TextStyle(color: Colors.black),
             ),
             const SizedBox(
               height: 30,
@@ -180,7 +174,7 @@ class _ForgotChangePasswordScreenState
                 hintStyle: TextStyle(color: Colors.white),
                 labelText: 'New Password',
               ),
-              style: const TextStyle(color: Colors.white70),
+              style: const TextStyle(color: Colors.black),
             ),
             const SizedBox(
               height: 30,
@@ -201,12 +195,11 @@ class _ForgotChangePasswordScreenState
                 hintStyle: const TextStyle(color: Colors.white),
                 labelText: 'Confirm Password',
               ),
-              style: const TextStyle(color: Colors.white70),
+              style: const TextStyle(color: Colors.black),
             ),
             const SizedBox(height: 30.0),
             TextField(
               controller: _otpController,
-              obscureText: true,
               decoration: InputDecoration(
                 enabledBorder: const OutlineInputBorder(
                   borderSide:
@@ -220,7 +213,7 @@ class _ForgotChangePasswordScreenState
                 hintStyle: const TextStyle(color: Colors.white),
                 labelText: 'OTP',
               ),
-              style: const TextStyle(color: Colors.white70),
+              style: const TextStyle(color: Colors.black),
             ),
             const SizedBox(height: 30.0),
             ElevatedButton(

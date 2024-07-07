@@ -1,12 +1,15 @@
-import 'package:hamro_barber_mobile/config/api_requests.dart';
-import 'package:hamro_barber_mobile/modules/screens/homepage.dart';
-import '../widgets/button.dart';
-import '../widgets/custom_appbar.dart';
-import '../widgets/config.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:hamro_barber_mobile/config/api_requests.dart';
+import 'package:hamro_barber_mobile/modules/screens/homepage.dart';
+import 'package:hamro_barber_mobile/utils/kalti.dart';
+import 'package:hamro_barber_mobile/utils/khaltihome.dart';
 import 'package:http/http.dart' as http;
+import 'package:table_calendar/table_calendar.dart';
+
+import '../widgets/button.dart';
+import '../widgets/config.dart';
+import '../widgets/custom_appbar.dart';
 
 class BookingPage extends StatefulWidget {
   final int barberId;
@@ -52,6 +55,17 @@ class _BookingPageState extends State<BookingPage> {
             content: Text('Barber has been reserved'),
             actions: <Widget>[
               TextButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (BuildContext context) {
+                          return PaymentPage();
+                        },
+                      ),
+                    );
+                  },
+                  child: Text("payment")),
+              TextButton(
                 child: Text('OK'),
                 onPressed: () {
                   Navigator.of(context).push(
@@ -79,6 +93,11 @@ class _BookingPageState extends State<BookingPage> {
       appBar: const CustomAppBar(
         appTitle: 'Appointment',
         icon: FaIcon(Icons.arrow_back_ios),
+        actions: [
+          Icon(
+            Icons.payment,
+          ),
+        ],
       ),
       body: CustomScrollView(
         slivers: <Widget>[
@@ -166,7 +185,8 @@ class _BookingPageState extends State<BookingPage> {
                 title: 'Make Appointment',
                 onPressed: () {
                   // Define the desired time (11:00 AM)
-                  final desiredTime = TimeOfDay(hour: _currentIndex! + 9, minute: 0);
+                  final desiredTime =
+                      TimeOfDay(hour: _currentIndex! + 9, minute: 0);
 
                   // Create a DateTime object for the selected date (_focusDay) with the desired time
                   final DateTime appointmentDateTime = DateTime(
