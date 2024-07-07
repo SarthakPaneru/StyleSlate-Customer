@@ -25,6 +25,7 @@ class _BarberSelectionState extends State<BarberSelection> {
   final List<double> _distances = List.empty(growable: true);
   late int _lengthOfResponse;
   bool _isLoading = true;
+  bool _isError = false;
   List<String> _imageUrls = List.empty(growable: true);
 
   // bool _isLoading = true;
@@ -72,6 +73,7 @@ class _BarberSelectionState extends State<BarberSelection> {
       });
       getImageUrl();
     } catch (e) {
+      _isError = true;
       print(e);
     }
   }
@@ -102,7 +104,9 @@ class _BarberSelectionState extends State<BarberSelection> {
       body: SingleChildScrollView(
         child: _isLoading
             ? const Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  color: Colors.yellow,
+                ),
               )
             : SizedBox(
                 height: 200, // Adjust this height as needed
@@ -149,7 +153,6 @@ class _BarberSelectionState extends State<BarberSelection> {
                                     Icons
                                         .person, // You can use any widget as the error placeholder
                                     size: 80,
-                                    
                                   ),
                                 ),
                               ),

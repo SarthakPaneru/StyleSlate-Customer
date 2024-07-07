@@ -54,6 +54,8 @@ dependencies:
   firebase_messaging: ^15.0.0
   stomp_dart_client: ^2.0.0
   shared_preferences: ^2.2.3
+  khalti_flutter: ^3.0.0
+  khalti: ^2.0.0
 
 dev_dependencies:
   flutter_test:
