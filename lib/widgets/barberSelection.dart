@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/Screen/detailScreen.dart';
 import 'package:hamro_barber_mobile/config/api_requests.dart';
+import 'package:hamro_barber_mobile/maps/presentation/pages/my_home_page.dart';
 import 'package:http/http.dart' as http;
 
 class BarberSelection extends StatefulWidget {
@@ -46,6 +47,7 @@ class _BarberSelectionState extends State<BarberSelection> {
     }
     setState(() {
       _isLoading = false;
+      _isError = false;
     });
   }
 
@@ -108,74 +110,87 @@ class _BarberSelectionState extends State<BarberSelection> {
                   color: Colors.yellow,
                 ),
               )
-            : SizedBox(
-                height: 200, // Adjust this height as needed
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _lengthOfResponse,
-                  itemBuilder: (context, index) {
-                    if (index >= _lengthOfResponse) {
-                      return const Text('No data available');
-                    }
-                    return Container(
-                      width: 200,
-                      margin: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          InkWell(
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => DetailScreen(
-                                  barberId: _barberIds[index],
-                                ),
-                              ),
-                            ),
-                            child: FittedBox(
-                              child: ClipRRect(
-                                borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(5),
-                                  topRight: Radius.circular(5),
-                                ),
-                                clipBehavior: Clip.antiAlias,
-                                child: CachedNetworkImage(
-                                  imageUrl: _imageUrls[index],
-                                  placeholder: (context, url) => const Icon(
-                                    Icons.person,
-                                    size: 80,
-                                  ),
-                                  fit: BoxFit.cover,
-                                  height: 100,
-                                  width: 100,
-                                  errorWidget: (context, url, error) =>
-                                      const Icon(
-                                    Icons
-                                        .person, // You can use any widget as the error placeholder
-                                    size: 80,
+            : _isError
+                ? Center(child: Text("Error fetching data"))
+                : SizedBox(
+                    height: 200, // Adjust this height as needed
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _lengthOfResponse,
+                      itemBuilder: (context, index) {
+                        if (index >= _lengthOfResponse) {
+                          return const Text('No data available');
+                        }
+                        return Container(
+                          width: 200,
+                          margin: const EdgeInsets.symmetric(horizontal: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              InkWell(
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DetailScreen(
+                                      barberId: _barberIds[index],
+                                    ),
                                   ),
                                 ),
+                                child: FittedBox(
+                                  child: ClipRRect(
+                                    borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(5),
+                                      topRight: Radius.circular(5),
+                                    ),
+                                    clipBehavior: Clip.antiAlias,
+                                    child: CachedNetworkImage(
+                                      imageUrl: _imageUrls[index],
+                                      placeholder: (context, url) => const Icon(
+                                        Icons.person,
+                                        size: 80,
+                                      ),
+                                      fit: BoxFit.cover,
+                                      height: 100,
+                                      width: 100,
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(
+                                        Icons
+                                            .person, // You can use any widget as the error placeholder
+                                        size: 80,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
+                              const SizedBox(height: 5),
+                              Text(
+                                _names[index],
+                                style: const TextStyle(color: Colors.yellow),
+                              ),
+                              Text(
+                                'km : ${_distances[index]}',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.green,
+                                ),
+                              ),
+                              TextButton(
+                                child: Text('See Location'),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => MyHomePage(),
+                                    ),
+                                  );
+                                },
+                              )
+                            ],
                           ),
-                          const SizedBox(height: 5),
-                          Text(
-                            _names[index],
-                            style: const TextStyle(color: Colors.yellow),
-                          ),
-                          Text(
-                            'km : ${_distances[index]}',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.green,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
+                        );
+                      },
+                    ),
+                  ),
       ),
     );
   }

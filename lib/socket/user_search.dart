@@ -37,7 +37,7 @@ class _ChatPageState extends State<ChatPage> {
     // Initialize the StompClient
     stompClient = StompClient(
       config: StompConfig(
-        url: 'ws://192.168.1.101:8080/ws', // Ensure this URL is correct
+        url: 'ws://192.168.18.3:8080/ws', // Ensure this URL is correct
         onConnect: onConnect,
         beforeConnect: () async {
           print('Waiting to connect...');
@@ -106,6 +106,8 @@ class _ChatPageState extends State<ChatPage> {
     super.dispose();
   }
 
+  List<String> items = ["Breard", "Haircut"];
+  List<int> prices = [100, 200];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,51 +118,63 @@ class _ChatPageState extends State<ChatPage> {
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: msglist.length,
+              itemCount: items.length,
               itemBuilder: (context, index) {
-                final msg = msglist[index];
-                return ListTile(
-                  title: Text(msg.msgtext),
-                  subtitle: Text(msg.userid),
-                  trailing: msg.isme ? Icon(Icons.person) : null,
+                return Container(
+                  padding: EdgeInsets.all(16.0),
+                  margin: EdgeInsets.all(20.0),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(10.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        items[index],
+                        style: TextStyle(fontSize: 18.0),
+                      ),
+                      SizedBox(height: 15.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              print(" ${prices[index]}");
+                              stompClient.send(
+                                destination: '/app/customer/${widget.id}',
+                                body: json.encode(socketDto.asMap()),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Colors.green, // text color
+                            ),
+                            child: Text(prices[index].toString()),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 );
               },
             ),
           ),
           if (connected)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: msgtext,
-                      decoration:
-                          const InputDecoration(labelText: 'Send a message'),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.send),
-                    onPressed: () {
-                      if (msgtext.text.isNotEmpty) {
-                        print(msgtext.text);
-                        stompClient.send(
-                          destination: '/app/customer/${widget.id}',
-                          body: json
-                              .encode(socketDto.asMap()),
-                        );
-                        msgtext.clear();
-                      }
-                    },
-                  ),
-                ],
+            if (!connected)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text('Disconnected from WebSocket'),
               ),
-            ),
-          if (!connected)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text('Disconnected from WebSocket'),
-            ),
         ],
       ),
     );

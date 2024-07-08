@@ -4,8 +4,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/config/api_requests.dart';
 import 'package:heart_toggle/heart_toggle.dart';
-import 'booking page.dart';
 import 'package:http/http.dart' as http;
+
+import 'booking page.dart';
 
 var serviceList;
 
@@ -110,7 +111,9 @@ class _DetailScreenState extends State<DetailScreen> {
       body: SingleChildScrollView(
         child: _isLoading
             ? const Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  color: Colors.yellow,
+                ),
               )
             : SizedBox(
                 width: MediaQuery.of(context).size.width,

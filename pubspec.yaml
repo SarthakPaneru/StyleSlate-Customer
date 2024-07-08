@@ -46,7 +46,7 @@ dependencies:
   mime: ^1.0.4
   http_parser: ^4.0.2
   geolocator: ^12.0.0
-  google_maps_flutter: ^2.5.0
+  google_maps_flutter: ^2.7.0
   cached_network_image: ^3.3.0
   # intl: ^0.18.1
   dio: ^5.4.2+1
@@ -56,6 +56,7 @@ dependencies:
   shared_preferences: ^2.2.3
   khalti_flutter: ^3.0.0
   khalti: ^2.0.0
+  geocoding: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -83,6 +84,7 @@ flutter:
     - lib/assets/images/
     - lib/assets/images/categories/
     - lib/assets/icons/
+    - lib/assets/images/barber_marker.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
