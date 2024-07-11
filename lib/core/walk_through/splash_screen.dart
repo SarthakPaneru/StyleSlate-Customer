@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:hamro_barber_mobile/config/api_requests.dart';
 import 'package:hamro_barber_mobile/core/auth/login.dart';
 import 'package:hamro_barber_mobile/core/auth/token.dart';
 import 'package:hamro_barber_mobile/modules/screens/homepage.dart';
+import 'package:http/http.dart' as http;
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -11,6 +13,8 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  ApiRequests _apiRequests = ApiRequests();
+
   @override
   void initState() {
     super.initState();
@@ -24,7 +28,10 @@ class _SplashScreenState extends State<SplashScreen> {
   void _checkLoginStatus() async {
     String? token = await Token().retrieveBearerToken();
     if (token != null) {
-      openDashBoard();
+      http.Response response = await _apiRequests.getLoggedInUser();
+      if (response.statusCode == 200) {
+        openDashBoard();
+      }
     } else {
       openLogin();
     }

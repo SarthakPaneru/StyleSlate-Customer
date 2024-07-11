@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:hamro_barber_mobile/constants/app_constants.dart';
 import 'package:hamro_barber_mobile/socket/socket_dto.dart';
 // import 'package:stomp_dart_client/stomp.dart';
 // import 'package:stomp_dart_client/stomp_config.dart';
@@ -37,7 +38,7 @@ class _ChatPageState extends State<ChatPage> {
     // Initialize the StompClient
     stompClient = StompClient(
       config: StompConfig(
-        url: 'ws://192.168.1.101:8080/ws', // Ensure this URL is correct
+        url: 'ws://${ApiConstants.address}/ws', // Ensure this URL is correct
         onConnect: onConnect,
         beforeConnect: () async {
           print('Waiting to connect...');
@@ -146,8 +147,7 @@ class _ChatPageState extends State<ChatPage> {
                         print(msgtext.text);
                         stompClient.send(
                           destination: '/app/customer/${widget.id}',
-                          body: json
-                              .encode(socketDto.asMap()),
+                          body: json.encode(socketDto.asMap()),
                         );
                         msgtext.clear();
                       }
