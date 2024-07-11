@@ -40,7 +40,7 @@ dependencies:
   http: ^1.1.0
   flutter_secure_storage: ^9.2.2
   heart_toggle: ^0.0.3
-  table_calendar: ^3.0.1
+  table_calendar: ^3.0.9
   font_awesome_flutter: ^10.2.1
   image_picker: ^1.0.1
   mime: ^1.0.4
@@ -57,6 +57,11 @@ dependencies:
   khalti_flutter: ^3.0.0
   khalti: ^2.0.0
   geocoding: ^3.0.0
+  carousel_slider: ^4.2.1
+  url_launcher: ^6.3.0
+  animated_text_kit: ^4.2.2
+  google_fonts: ^6.2.1
+  nepali_utils: ^3.0.6
 
 dev_dependencies:
   flutter_test:

@@ -8,34 +8,24 @@ import 'package:http/http.dart' as http;
 
 import 'booking page.dart';
 
-var serviceList;
-
 class DetailScreen extends StatefulWidget {
   final int barberId;
 
   const DetailScreen({Key? key, required this.barberId}) : super(key: key);
 
   @override
-  State<DetailScreen> createState() => _DetailScreenState(barberId);
+  State<DetailScreen> createState() => _DetailScreenState();
 }
 
 class _DetailScreenState extends State<DetailScreen> {
-  late int barberId;
-
-  _DetailScreenState(this.barberId);
-
   final ApiRequests _apiRequests = ApiRequests();
-
-  // List<Barber> barbershop = List.empty(growable: true);
   String _panNo = '';
   String _name = '';
   String? _phone = '';
-
-  final List<int> _servicesId = List.empty(growable: true);
-  final List<String> _servicesName = List.empty(growable: true);
-  final List<String> _servicesFee = List.empty(growable: true);
-  final List<String> _servicesTimeInMinutes = List.empty(growable: true);
-
+  final List<int> _servicesId = [];
+  final List<String> _servicesName = [];
+  final List<String> _servicesFee = [];
+  final List<String> _servicesTimeInMinutes = [];
   late double _rating;
   late int _lengthOfResponse;
   String _imageUrl = '';
@@ -43,46 +33,36 @@ class _DetailScreenState extends State<DetailScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    getBarber(barberId);
-    // getBarberImage(barberId);
+    getBarber(widget.barberId);
     getImageUrl();
   }
 
-  void getBarberImage(int id) async {
-    await _apiRequests.retrieveImageUrl();
-  }
-
   Future<void> getBarber(int barberId) async {
-    // await Future.delayed(Duration(seconds: 2));
     try {
       http.Response response = await _apiRequests.getBarber(barberId);
-      print(response.body);
-
       final jsonResponse = jsonDecode(response.body);
 
       _panNo = jsonResponse['panNo'];
       _phone = jsonResponse['phone'];
       _name = jsonResponse['name'];
-      _rating = jsonResponse['rating'];
+      _rating = jsonResponse['rating'].toDouble();
 
       List<dynamic> services = jsonResponse['services'];
       _lengthOfResponse = services.length;
-
-      print('length of response: $_lengthOfResponse');
 
       for (int i = 0; i < _lengthOfResponse; i++) {
         getService(services[i]);
       }
 
       setState(() {
-        _lengthOfResponse = _lengthOfResponse;
-        print('LENGTH OF RESPONSE: $_lengthOfResponse');
         _isLoading = false;
       });
     } catch (e) {
       print(e);
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -94,225 +74,154 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   void getService(final service) {
-    Map<String, dynamic> jsonResponseservice = jsonDecode(jsonEncode(service));
-    int id = jsonResponseservice['id'];
+    Map<String, dynamic> jsonResponseService = jsonDecode(jsonEncode(service));
+    int id = jsonResponseService['id'];
     _servicesId.add(id);
-    String serviceName = jsonResponseservice['serviceName'];
+    String serviceName = jsonResponseService['serviceName'];
     _servicesName.add(serviceName);
-    String fee = jsonResponseservice['fee'];
+    String fee = jsonResponseService['fee'];
     _servicesFee.add(fee);
-    String duration = jsonResponseservice['serviceTimeInMinutes'];
+    String duration = jsonResponseService['serviceTimeInMinutes'];
     _servicesTimeInMinutes.add(duration);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(
-                  color: Colors.yellow,
-                ),
-              )
-            : SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: Stack(
-                  children: <Widget>[
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height / 3 + 10,
-                      width: MediaQuery.of(context).size.width,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: <Widget>[
-                          CachedNetworkImage(
-                            imageUrl: _imageUrl,
-                            placeholder: (context, url) => const Icon(
-                              Icons.person,
-                              size: 80,
+      backgroundColor: const Color(0xff323345),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(color: Color(0xffbfa58c)))
+          : CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  backgroundColor: const Color(0xff323345),
+                  expandedHeight: 300,
+                  floating: false,
+                  pinned: true,
+                  flexibleSpace: FlexibleSpaceBar(
+                    title: Text(_name,
+                        style: TextStyle(
+                          color: Color(0xffbfa58c),
+                          fontWeight: FontWeight.bold,
+                          shadows: [
+                            Shadow(
+                              blurRadius: 10.0,
+                              color: Colors.black.withOpacity(0.5),
+                              offset: Offset(2.0, 2.0),
                             ),
+                          ],
+                        )),
+                    background: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        CachedNetworkImage(
+                          imageUrl: _imageUrl,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => const Center(
+                            child: CircularProgressIndicator(
+                                color: Color(0xffbfa58c)),
                           ),
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height,
-                            color: Colors.purple.withOpacity(0.1),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      top: 50,
-                      left: 20,
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.arrow_back_ios,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ),
-                    Positioned(
-                      top: MediaQuery.of(context).size.height / 3 - 30,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(50),
+                          errorWidget: (context, url, error) => const Icon(
+                            Icons.error,
+                            size: 80,
+                            color: Color(0xffbfa58c),
                           ),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 30),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              const SizedBox(
-                                height: 140,
-                              ),
-                              const Text(
-                                'Service List',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 30,
-                              ),
-                              Column(
-                                children: [
-                                  ListView.builder(
-                                    itemCount: _lengthOfResponse,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      return Column(
-                                        children: [
-                                          ServiceTile(
-                                            _servicesId[index],
-                                            barberId,
-                                            _servicesName[index],
-                                            _servicesTimeInMinutes[index],
-                                            _servicesFee[index],
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                    shrinkWrap: true,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: MediaQuery.of(context).size.height / 3 - 90,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 30),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: <Widget>[
-                            Container(
-                              width: MediaQuery.of(context).size.width / 3 - 20,
-                              height:
-                                  MediaQuery.of(context).size.height / 6 + 20,
-                              decoration: BoxDecoration(
-                                color: const Color(0xffFFF0EB),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Stack(
-                                fit: StackFit.expand,
-                                children: <Widget>[
-                                  Positioned(
-                                    top: 5,
-                                    right: -25,
-                                    child: CachedNetworkImage(
-                                      imageUrl: _imageUrl,
-                                      placeholder: (context, url) => const Icon(
-                                        Icons.person,
-                                        size: 80,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Column(
-                                  children: <Widget>[
-                                    Text(
-                                      _name,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20,
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    Row(
-                                      children: <Widget>[
-                                        const Icon(
-                                          Icons.star,
-                                          size: 16,
-                                          color: Color(0xffFF8573),
-                                        ),
-                                        const SizedBox(width: 5),
-                                        Text(
-                                          _rating.toString(),
-                                          style: const TextStyle(
-                                            color: Color(0xffFF8573),
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          width: 5,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                )
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.transparent,
+                                Color(0xff323345).withOpacity(0.8),
                               ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  actions: [
+                    HeartToggle(
+                      props: HeartToggleProps(
+                        size: 35.0,
+                        passiveFillColor: Colors.white,
+                        activeFillColor: Color(0xffbfa58c),
+                        ballElevation: 4.0,
+                        heartElevation: 4.0,
+                        ballColor: Colors.white,
+                        onChanged: (toggled) => {},
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                  ],
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.star, color: Color(0xffbfa58c)),
+                            SizedBox(width: 8),
+                            Text(
+                              _rating.toStringAsFixed(1),
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
                           ],
                         ),
-                      ),
+                        SizedBox(height: 16),
+                        Text(
+                          'Contact: $_phone',
+                          style: TextStyle(fontSize: 16, color: Colors.white70),
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'Services',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xffbfa58c),
+                          ),
+                        ),
+                        SizedBox(height: 16),
+                      ],
                     ),
-                    Positioned(
-                      right: 10,
-                      top: MediaQuery.of(context).size.height / 3 - 55,
-                      child: MaterialButton(
-                          onPressed: () {},
-                          padding: const EdgeInsets.all(10),
-                          child: HeartToggle(
-                            props: HeartToggleProps(
-                              size: 35.0,
-                              passiveFillColor: Colors.grey[200]!,
-                              ballElevation: 4.0,
-                              heartElevation: 4.0,
-                              ballColor: Colors.white,
-                              onChanged: (toggled) => {},
-                            ),
-                          )),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-      ),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        child: ServiceTile(
+                          _servicesId[index],
+                          widget.barberId,
+                          _servicesName[index],
+                          _servicesTimeInMinutes[index],
+                          _servicesFee[index],
+                        ),
+                      );
+                    },
+                    childCount: _lengthOfResponse,
+                  ),
+                ),
+              ],
+            ),
     );
   }
 }
 
-class ServiceTile extends StatefulWidget {
+class ServiceTile extends StatelessWidget {
   final int serviceId;
   final int barberId;
   final String serviceName;
@@ -321,71 +230,76 @@ class ServiceTile extends StatefulWidget {
 
   const ServiceTile(this.serviceId, this.barberId, this.serviceName,
       this.serviceTimeInMinutes, this.price,
-      {super.key});
+      {Key? key})
+      : super(key: key);
 
-  @override
-  State<ServiceTile> createState() => _ServiceTileState();
-}
-
-class _ServiceTileState extends State<ServiceTile> {
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      // margin: const EdgeInsets.only(bottom: 30),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(
-                width: MediaQuery.of(context).size.width / 2 - 40,
-                child: Text(
-                  widget.serviceName,
-                  style: const TextStyle(
+    return Card(
+      elevation: 2,
+      color: Color(0xff424560),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    serviceName,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    '$serviceTimeInMinutes Min',
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  price,
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
+                    color: Color(0xffbfa58c),
                   ),
                 ),
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              Text(
-                '${widget.serviceTimeInMinutes} Min',
-                style: const TextStyle(
-                  color: Colors.grey,
+                SizedBox(height: 4),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BookingPage(
+                          barberId: barberId,
+                          serviceId: serviceId,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text('Book'),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Color(0xff323345),
+                    backgroundColor: Color(0xffbfa58c),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
                 ),
-              ),
-            ],
-          ),
-          Text(
-            widget.price,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
+              ],
             ),
-          ),
-          MaterialButton(
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => BookingPage(
-                            barberId: widget.barberId,
-                            serviceId: widget.serviceId,
-                          )));
-            },
-            color: const Color(0xffFF8573),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Text(
-              'Book',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

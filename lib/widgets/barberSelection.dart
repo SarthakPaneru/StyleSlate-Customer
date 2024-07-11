@@ -11,7 +11,8 @@ class BarberSelection extends StatefulWidget {
   final double latitude;
   final double longitude;
 
-  const BarberSelection(this.latitude, this.longitude, {super.key});
+  const BarberSelection(this.latitude, this.longitude, {Key? key})
+      : super(key: key);
 
   @override
   State<BarberSelection> createState() => _BarberSelectionState();
@@ -19,24 +20,19 @@ class BarberSelection extends StatefulWidget {
 
 class _BarberSelectionState extends State<BarberSelection> {
   final ApiRequests _apiRequests = ApiRequests();
-  // List<Barber> barbershop = List.empty(growable: true);
-  final List<int> _barberIds = List.empty(growable: true);
-  final List<int> _userIds = List.empty(growable: true);
-  final List<String> _names = List.empty(growable: true);
-  final List<double> _distances = List.empty(growable: true);
+  final List<int> _barberIds = [];
+  final List<int> _userIds = [];
+  final List<String> _names = [];
+  final List<double> _distances = [];
   late int _lengthOfResponse;
   bool _isLoading = true;
   bool _isError = false;
-  List<String> _imageUrls = List.empty(growable: true);
-
-  // bool _isLoading = true;
+  List<String> _imageUrls = [];
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getBarbers();
-    // getImageUrl();
   }
 
   void getImageUrl() {
@@ -53,9 +49,6 @@ class _BarberSelectionState extends State<BarberSelection> {
 
   Future<void> getBarbers() async {
     try {
-      // await Future.delayed(Duration(seconds: 2));
-
-      await _apiRequests.getNearestBarber(widget.latitude, widget.longitude);
       http.Response response = await _apiRequests.getNearestBarber(
           widget.latitude, widget.longitude);
       print(response.body);
@@ -71,11 +64,13 @@ class _BarberSelectionState extends State<BarberSelection> {
       print('COMPLETED');
       setState(() {
         _lengthOfResponse = jsonResponse.length;
-        // _isLoading = false;
       });
       getImageUrl();
     } catch (e) {
-      _isError = true;
+      setState(() {
+        _isError = true;
+        _isLoading = false;
+      });
       print(e);
     }
   }
@@ -92,8 +87,6 @@ class _BarberSelectionState extends State<BarberSelection> {
     _names.add(barberName);
 
     double dist = jsonResponseBarber['distance'];
-    // final d = jsonDecode(jsonEncode(dist));
-
     _distances.add(dist);
 
     print(barberName);
@@ -103,95 +96,132 @@ class _BarberSelectionState extends State<BarberSelection> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xff323345),
-      body: SingleChildScrollView(
-        child: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(
-                  color: Colors.yellow,
-                ),
-              )
-            : _isError
-                ? Center(child: Text("Error fetching data"))
-                : SizedBox(
-                    height: 200, // Adjust this height as needed
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _lengthOfResponse,
-                      itemBuilder: (context, index) {
-                        if (index >= _lengthOfResponse) {
-                          return const Text('No data available');
-                        }
-                        return Container(
-                          width: 200,
-                          margin: const EdgeInsets.symmetric(horizontal: 15),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              InkWell(
-                                onTap: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => DetailScreen(
-                                      barberId: _barberIds[index],
-                                    ),
-                                  ),
-                                ),
-                                child: FittedBox(
-                                  child: ClipRRect(
-                                    borderRadius: const BorderRadius.only(
-                                      topLeft: Radius.circular(5),
-                                      topRight: Radius.circular(5),
-                                    ),
-                                    clipBehavior: Clip.antiAlias,
-                                    child: CachedNetworkImage(
-                                      imageUrl: _imageUrls[index],
-                                      placeholder: (context, url) => const Icon(
-                                        Icons.person,
-                                        size: 80,
-                                      ),
-                                      fit: BoxFit.cover,
-                                      height: 100,
-                                      width: 100,
-                                      errorWidget: (context, url, error) =>
-                                          const Icon(
-                                        Icons
-                                            .person, // You can use any widget as the error placeholder
-                                        size: 80,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                _names[index],
-                                style: const TextStyle(color: Colors.yellow),
-                              ),
-                              Text(
-                                'km : ${_distances[index]}',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.green,
-                                ),
-                              ),
-                              TextButton(
-                                child: Text('See Location'),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => MyHomePage(),
-                                    ),
-                                  );
-                                },
-                              )
-                            ],
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: Colors.yellow,
+              ),
+            )
+          : _isError
+              ? Center(
+                  child: Text("Error fetching data",
+                      style: TextStyle(color: Colors.white)))
+              : ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _lengthOfResponse,
+                  itemBuilder: (context, index) {
+                    if (index >= _lengthOfResponse) {
+                      return const Text('No data available',
+                          style: TextStyle(color: Colors.white));
+                    }
+                    return Container(
+                      width: 220,
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 15),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: Offset(0, 5),
                           ),
-                        );
-                      },
-                    ),
-                  ),
-      ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          InkWell(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailScreen(
+                                  barberId: _barberIds[index],
+                                ),
+                              ),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(15),
+                                topRight: Radius.circular(15),
+                              ),
+                              child: CachedNetworkImage(
+                                imageUrl: _imageUrls[index],
+                                placeholder: (context, url) => Container(
+                                  height: 150,
+                                  color: Colors.grey[300],
+                                  child: Icon(Icons.person,
+                                      size: 80, color: Colors.grey[400]),
+                                ),
+                                fit: BoxFit.cover,
+                                height: 150,
+                                width: double.infinity,
+                                errorWidget: (context, url, error) => Container(
+                                  height: 150,
+                                  color: Colors.grey[300],
+                                  child: Icon(Icons.error,
+                                      size: 80, color: Colors.grey[400]),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _names[index],
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                SizedBox(height: 5),
+                                Row(
+                                  children: [
+                                    Icon(Icons.location_on,
+                                        size: 16, color: Colors.red),
+                                    SizedBox(width: 5),
+                                    Text(
+                                      '${_distances[index].toStringAsFixed(2)} km',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 10),
+                                ElevatedButton(
+                                  child: Text('See Location'),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => MyHomePage(),
+                                      ),
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Color(0xffbfa58c),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
     );
   }
 }

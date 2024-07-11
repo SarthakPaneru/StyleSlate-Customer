@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hamro_barber_mobile/core/auth/customer.dart';
 import 'package:hamro_barber_mobile/modules/screens/categories_bubble.dart';
+import 'package:hamro_barber_mobile/modules/screens/searchScreen.dart';
 import 'package:hamro_barber_mobile/widgets/barberSelection.dart';
+import 'package:hamro_barber_mobile/widgets/carousel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserHome extends StatefulWidget {
@@ -15,32 +17,11 @@ class UserHome extends StatefulWidget {
 class _UserHomeState extends State<UserHome> {
   final Customer _customer = Customer();
   bool _isLoading = true;
-
   String _firstName = '';
   double longitude = 0;
   double latitude = 0;
-
-  @override
-  void initState() {
-    super.initState();
-
-    // if (_firstName == null) {
-    getLocation();
-    getUserDetails();
-    loadLocation();
-    // }
-  }
-
-  void getUserDetails() async {
-    final firstName = await _customer.retrieveFirstName();
-    _firstName = firstName!;
-
-    print(_firstName);
-    setState(() {
-      _isLoading = false;
-    });
-    print(_isLoading);
-  }
+  final _textController = TextEditingController();
+  String userPost = '';
 
   final List<String> categories = [
     "Haircut",
@@ -55,6 +36,22 @@ class _UserHomeState extends State<UserHome> {
     ["Beard", false],
     ["colouring", false]
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    getLocation();
+    getUserDetails();
+    loadLocation();
+  }
+
+  void getUserDetails() async {
+    final firstName = await _customer.retrieveFirstName();
+    _firstName = firstName!;
+    setState(() {
+      _isLoading = false;
+    });
+  }
 
   void barberTypeSelected(int index) {
     setState(() {
@@ -74,26 +71,17 @@ class _UserHomeState extends State<UserHome> {
     setState(() {
       longitude = position.longitude;
       latitude = position.latitude;
-      print("Latitude: ${position.latitude}");
-      print("Longitude: ${position.longitude}");
     });
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-
     await prefs.setDouble('longitude', longitude);
     await prefs.setDouble('latitude', latitude);
-    print('longitude stored' + '$longitude');
-    print('latitude stored' + '$latitude');
   }
-
-  final _textController = TextEditingController();
-  String userPost = '';
 
   void loadLocation() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       longitude = prefs.getDouble('longitude') ?? 0;
-      //fall back value
       latitude = prefs.getDouble('latitude') ?? 0;
     });
   }
@@ -153,9 +141,7 @@ class _UserHomeState extends State<UserHome> {
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 25,
-              ),
+
               // search bar
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -173,13 +159,20 @@ class _UserHomeState extends State<UserHome> {
                             hintText: 'Find Your Barber',
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 15),
+                                horizontal: 20, vertical: 5),
                           ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SearchScreen(),
+                              ),
+                            );
+                          },
                         ),
                       ),
                       IconButton(
                         onPressed: () {
-                          // Clear the text that is typed
                           _textController.clear();
                         },
                         icon: const Icon(Icons.clear),
@@ -188,54 +181,53 @@ class _UserHomeState extends State<UserHome> {
                   ),
                 ),
               ),
+
+              // carousel slider
+              const ImageCarousel(),
+
               // how do you feel?
-              const Padding(
-                padding: EdgeInsets.only(left: 10, top: 5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Category',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Icon(
-                      Icons.more_horiz,
-                      color: Colors.white,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              // 4 different faces
-              Column(
-                children: [
-                  SizedBox(
-                    height: 130,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: categories.length,
-                      itemBuilder: (context, index) {
-                        return CategoriesBubble(
-                          text: categories[index],
-                          index: index,
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 2,
-              ),
+              // const Padding(
+              //   padding: EdgeInsets.only(left: 10),
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //     children: [
+              //       Text(
+              //         'Category',
+              //         style: TextStyle(
+              //           color: Colors.white,
+              //           fontSize: 18,
+              //           fontWeight: FontWeight.bold,
+              //         ),
+              //       ),
+              //       Icon(
+              //         Icons.more_horiz,
+              //         color: Colors.white,
+              //       ),
+              //     ],
+              //   ),
+              // ),
+
+              // // 4 different faces
+              // Column(
+              //   children: [
+              //     SizedBox(
+              //       height: 130,
+              //       child: ListView.builder(
+              //         scrollDirection: Axis.horizontal,
+              //         itemCount: categories.length,
+              //         itemBuilder: (context, index) {
+              //           return CategoriesBubble(
+              //             text: categories[index],
+              //             index: index,
+              //           );
+              //         },
+              //       ),
+              //     ),
+              //   ],
+              // ),
 
               const Padding(
-                padding: EdgeInsets.only(left: 10, top: 5, right: 5),
+                padding: EdgeInsets.only(left: 10, right: 5),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -248,7 +240,6 @@ class _UserHomeState extends State<UserHome> {
                   ),
                 ),
               ),
-              const SizedBox(height: 5),
               Expanded(
                 child: _isLoading
                     ? const Center(

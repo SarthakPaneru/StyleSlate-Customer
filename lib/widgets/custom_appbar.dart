@@ -1,9 +1,11 @@
-import 'config.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import 'config.dart';
+
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
-  const CustomAppBar({Key? key, this.appTitle, this.route, this.icon, this.actions})
+  const CustomAppBar(
+      {Key? key, this.appTitle, this.route, this.icon, this.actions})
       : super(key: key);
   @override
   Size get preferredSize => const Size.fromHeight(60);
@@ -22,13 +24,16 @@ class _CustomAppBarState extends State<CustomAppBar> {
   Widget build(BuildContext context) {
     return AppBar(
       automaticallyImplyLeading: true,
-      backgroundColor: Colors.white, //background color is white in this app
+      backgroundColor:
+          const Color(0xff323345), //background color is white in this app
       elevation: 0,
-      title: Text(
-        widget.appTitle!,
-        style: const TextStyle(
-          fontSize: 20,
-          color: Colors.black,
+      title: Center(
+        child: Text(
+          widget.appTitle!,
+          style: const TextStyle(
+            fontSize: 20,
+            color: Colors.black,
+          ),
         ),
       ),
       //if icon is not set, return null

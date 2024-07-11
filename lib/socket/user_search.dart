@@ -111,8 +111,14 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xff323345),
       appBar: AppBar(
-        title: Text('Chat with ${widget.id}'),
+        backgroundColor: const Color(0xff323345),
+        title: Center(
+            child: Text(
+          'Chat with ${widget.id}',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        )),
       ),
       body: Column(
         children: [

@@ -96,11 +96,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       ...stylistData1!.map((e) => StylistCard(e)).toList()
-                      
-                          // StylistCard(stylistData1?[1]),
-                          // StylistCard(stylistData1?[2]),
-                          // StylistCard(stylistData1?[3]),
-                          // StylistCard(stylistData1?[4]),
+
+                      // StylistCard(stylistData1?[1]),
+                      // StylistCard(stylistData1?[2]),
+                      // StylistCard(stylistData1?[3]),
+                      // StylistCard(stylistData1?[4]),
                     ],
                   ),
                 ),
@@ -193,7 +193,7 @@ class StylistCard extends StatelessWidget {
                     // Navigator.push(
                     //     context,
                     //     MaterialPageRoute(
-                    //         builder: (context) => 
+                    //         builder: (context) =>
                     //         DetailScreen(barberId: ,)));
                   },
                   color: const Color(0xff4E295B),
