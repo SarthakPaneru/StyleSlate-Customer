@@ -40,13 +40,13 @@ dependencies:
   http: ^1.1.0
   flutter_secure_storage: ^9.2.2
   heart_toggle: ^0.0.3
-  table_calendar: ^3.0.1
+  table_calendar: ^3.0.9
   font_awesome_flutter: ^10.2.1
   image_picker: ^1.0.1
   mime: ^1.0.4
   http_parser: ^4.0.2
   geolocator: ^12.0.0
-  google_maps_flutter: ^2.5.0
+  google_maps_flutter: ^2.7.0
   cached_network_image: ^3.3.0
   # intl: ^0.18.1
   dio: ^5.4.2+1
@@ -56,6 +56,12 @@ dependencies:
   shared_preferences: ^2.2.3
   khalti_flutter: ^3.0.0
   khalti: ^2.0.0
+  geocoding: ^3.0.0
+  carousel_slider: ^4.2.1
+  url_launcher: ^6.3.0
+  animated_text_kit: ^4.2.2
+  google_fonts: ^6.2.1
+  nepali_utils: ^3.0.6
 
 dev_dependencies:
   flutter_test:
@@ -83,6 +89,7 @@ flutter:
     - lib/assets/images/
     - lib/assets/images/categories/
     - lib/assets/icons/
+    - lib/assets/images/barber_marker.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

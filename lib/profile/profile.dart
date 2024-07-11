@@ -21,7 +21,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getImageUrl();
   }
@@ -30,20 +29,26 @@ class _ProfilePageState extends State<ProfilePage> {
     String image = await _apiRequests.retrieveImageUrl();
     setState(() {
       _imageUrl = image;
-      print(_imageUrl);
     });
   }
 
-  Future getImage() async {
+  Future<void> getImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-    setState(() {
-      if (pickedFile != null) {
+    if (pickedFile != null) {
+      setState(() {
         _image = File(pickedFile.path);
-        _apiRequests.uploadImage(_image!);
-      }
-    });
+        isLoading = true;
+      });
+
+      await _apiRequests.uploadImage(_image!);
+      await getImageUrl();
+
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -58,37 +63,41 @@ class _ProfilePageState extends State<ProfilePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               InkWell(
-                child: FittedBox(
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(5),
-                      topRight: Radius.circular(5),
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: CachedNetworkImage(
-                      imageUrl: _imageUrl,
-                      placeholder: (context, url) => const Icon(
-                        Icons.person,
-                        size: 80,
+                onTap: getImage,
+                child: isLoading
+                    ? const CircularProgressIndicator()
+                    : FittedBox(
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(5),
+                            topRight: Radius.circular(5),
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: CachedNetworkImage(
+                            imageUrl: _imageUrl,
+                            placeholder: (context, url) => const Icon(
+                              Icons.person,
+                              size: 80,
+                            ),
+                            fit: BoxFit.cover,
+                            height: 200,
+                            width: 150,
+                            errorWidget: (context, url, error) => const Icon(
+                              Icons.person,
+                              size: 80,
+                            ),
+                          ),
+                        ),
                       ),
-                      fit: BoxFit.cover,
-                      height: 200,
-                      width: 150,
-                      errorWidget: (context, url, error) => const Icon(
-                        Icons
-                            .person, // You can use any widget as the error placeholder
-                        size: 80,
-                      ),
-                    ),
-                  ),
-                ),
               ),
               ElevatedButton(
                 onPressed: getImage,
                 child: const Text('Edit Profile Picture'),
                 style: ButtonStyle(
-                    backgroundColor: MaterialStateColor.resolveWith(
-                        (states) => Colors.transparent)),
+                  backgroundColor: MaterialStateColor.resolveWith(
+                    (states) => Colors.transparent,
+                  ),
+                ),
               ),
             ],
           ),
