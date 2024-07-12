@@ -5,6 +5,8 @@ class SocketDto {
   double? latitude;
   double? distance;
   String? location;
+  String? serviceName;
+  int? price;
 
   SocketDto(
       {this.customerId,
@@ -12,7 +14,9 @@ class SocketDto {
       this.longitude,
       this.latitude,
       this.distance,
-      this.location});
+      this.location,
+      this.serviceName,
+      this.price});
 
   SocketDto.fromMap(Map map)
       : this(
@@ -21,7 +25,9 @@ class SocketDto {
             longitude: map['longitude'],
             latitude: map['latitude'],
             distance: map['distance'],
-            location: map['location']);
+            location: map['location'],
+            serviceName: map['serviceName'],
+            price: map['price']);
 
   Map<String, dynamic> asMap() => {
         'customerId': customerId,
@@ -29,6 +35,8 @@ class SocketDto {
         'longitude': longitude,
         'latitude': latitude,
         'distance': distance,
-        'location': location
+        'location': location,
+        'serviceName': serviceName,
+        'price': price
       };
 }

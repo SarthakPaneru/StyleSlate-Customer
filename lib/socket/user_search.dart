@@ -34,6 +34,7 @@ class _ChatPageState extends State<ChatPage> {
     socketDto.customerId = widget.id as int?;
     socketDto.latitude = widget.latitude;
     socketDto.longitude = widget.longitude;
+    socketDto.location = "KATHMANDU";
 
     // Initialize the StompClient
     stompClient = StompClient(
@@ -157,6 +158,7 @@ class _ChatPageState extends State<ChatPage> {
                           ElevatedButton(
                             onPressed: () {
                               print(" ${prices[index]}");
+                              socketDto.serviceName = items[index];
                               stompClient.send(
                                 destination: '/app/customer/${widget.id}',
                                 body: json.encode(socketDto.asMap()),
