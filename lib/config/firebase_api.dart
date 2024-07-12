@@ -1,19 +1,37 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:hamro_barber_mobile/config/api_requests.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FirebaseApi {
+  final ApiRequests _apiRequests = ApiRequests();
+
   //create an instance of firebase messaging
   final _firebaseMessaging = FirebaseMessaging.instance;
   //function to initialize notifications
 
+  void sendFcmTokenToServer(int userId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? fcmToken = prefs.getString("fcmToken");
+
+    if (fcmToken == null) {
+      //fetch the FCM token for the device
+      final fCMToken = await _firebaseMessaging.getToken();
+
+      //print the token(notmally you would sent this to your server)
+      // print('Firebase FCM Token: $fCMToken');
+
+      _apiRequests.updateFcmToken(userId, fcmToken!);
+
+      //save the token to shared preferences
+      prefs.setString("fcmToken", fCMToken!);
+    }
+
+    print('Firebase FCM Token: $fcmToken');
+  }
+
   Future<void> initializeNotifications() async {
     //request permission to receive notifications
     await _firebaseMessaging.requestPermission();
-
-    //fetch the FCM token for the device
-    final fCMToken = await _firebaseMessaging.getToken();
-
-    //print the token(notmally you would sent this to your server)
-    print('Firebase FCM Token: $fCMToken');
 
     //initialize further settings for pushNotification
     initPushNotification();

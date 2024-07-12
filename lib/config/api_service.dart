@@ -120,6 +120,5 @@ class ApiService {
 
   Future<Uri> fetchProtectedImage(String imageUrl) async {
     return Uri.parse(imageUrl);
-       
   }
 }

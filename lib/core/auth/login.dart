@@ -4,6 +4,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/config/api_requests.dart';
 import 'package:hamro_barber_mobile/config/api_service.dart';
+import 'package:hamro_barber_mobile/config/firebase_api.dart';
 import 'package:hamro_barber_mobile/constants/app_constants.dart';
 import 'package:hamro_barber_mobile/core/auth/customer.dart';
 import 'package:hamro_barber_mobile/core/auth/forgot_pwd.dart';
@@ -119,6 +120,8 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
         http.Response response1 = await _apiRequests.getLoggedInUser();
         Map<String, dynamic> jsonResponse1 = jsonDecode(response1.body);
         _customer.storeCustomerDetails(jsonResponse1);
+        int userId = int.parse(_customer.retrieveUserId() as String);
+        FirebaseApi().sendFcmTokenToServer(userId);
 
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
