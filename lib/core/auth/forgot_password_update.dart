@@ -19,216 +19,230 @@ class _ForgotChangePasswordScreenState
       TextEditingController();
   final TextEditingController _otpController = TextEditingController();
 
+  final ApiRequests _apiRequests = ApiRequests();
+
+  bool _isEmailValid = false;
+  bool _isNewPasswordValid = false;
+  bool _isConfirmPasswordValid = false;
+  bool _isOtpValid = false;
+
+  static const Color backgroundColor = Color(0xFF323345);
+  static const Color accentColor = Color(0xFFE1BEE7);
+  static const Color textColor = Colors.white;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(_validateEmail);
+    _newPasswordController.addListener(_validateNewPassword);
+    _confirmPasswordController.addListener(_validateConfirmPassword);
+    _otpController.addListener(_validateOtp);
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
     _newPasswordController.dispose();
     _confirmPasswordController.dispose();
+    _otpController.dispose();
     super.dispose();
   }
 
-  final ApiRequests _apiRequests = ApiRequests();
+  void _validateEmail() {
+    setState(() {
+      _isEmailValid = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+          .hasMatch(_emailController.text);
+    });
+  }
 
-  @override
-  void initState() {
-    super.initState();
-    // _apiService.get('/test');
+  void _validateNewPassword() {
+    setState(() {
+      _isNewPasswordValid = _newPasswordController.text.length >= 8;
+    });
+  }
+
+  void _validateConfirmPassword() {
+    setState(() {
+      _isConfirmPasswordValid =
+          _confirmPasswordController.text == _newPasswordController.text;
+    });
+  }
+
+  void _validateOtp() {
+    setState(() {
+      _isOtpValid = _otpController.text.length == 6;
+    });
+  }
+
+  void _showSnackBar(String message, {bool isError = true}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: TextStyle(color: textColor)),
+        backgroundColor: isError ? Colors.red : Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
   }
 
   void _changePassword() async {
-    String email = _emailController.text;
-    String newPassword = _newPasswordController.text;
-    String confirmPassword = _confirmPasswordController.text;
-    String otp = _otpController.text;
-
-    // Perform validation
-    if (email.isEmpty || newPassword.isEmpty || confirmPassword.isEmpty) {
-      // Show an error message if any field is empty
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: const Text('Please fill in all fields.'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
+    if (!_isEmailValid ||
+        !_isNewPasswordValid ||
+        !_isConfirmPasswordValid ||
+        !_isOtpValid) {
+      _showSnackBar('Please fill in all fields correctly.');
       return;
     }
 
-    if (newPassword != confirmPassword) {
-      // Show an error message if new password and confirm password don't match
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content:
-                const Text('New password and confirm password must match.'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
+    try {
+      http.Response response = await _apiRequests.forgotChangePassword(
+          _emailController.text,
+          _newPasswordController.text,
+          _confirmPasswordController.text,
+          _otpController.text);
 
-    // TODO: Perform the password change logic here
-    http.Response response = await _apiRequests.forgotChangePassword(
-        email, newPassword, confirmPassword, otp);
-    // print('done');
-
-    if (response.statusCode == 200) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Success'),
-            content: const Text('Password changed successfully.'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (BuildContext context) {
-                        return const Login();
-                      },
-                    ),
-                  );
-                },
-              ),
-            ],
+      if (response.statusCode == 200) {
+        _showSnackBar('Password changed successfully.', isError: false);
+        Future.delayed(Duration(seconds: 2), () {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (BuildContext context) => const Login(),
+            ),
           );
-        },
-      );
-      // Clear the text fields
-      _emailController.clear();
-      _newPasswordController.clear();
-      _confirmPasswordController.clear();
+        });
+      } else {
+        _showSnackBar('Error: ${response.body}');
+      }
+    } catch (e) {
+      _showSnackBar('An error occurred. Please try again.');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         centerTitle: true,
-        elevation: 0.5,
+        elevation: 0,
         title: const Text(
           'Change Password',
+          style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
+        ),
+        backgroundColor: Colors.transparent,
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                const SizedBox(height: 20),
+                _buildTextField(
+                  controller: _emailController,
+                  label: 'Email',
+                  isValid: _isEmailValid,
+                  errorText: 'Enter a valid email address',
+                  icon: Icons.email,
+                ),
+                const SizedBox(height: 20),
+                _buildTextField(
+                  controller: _newPasswordController,
+                  label: 'New Password',
+                  isValid: _isNewPasswordValid,
+                  errorText: 'Password must be at least 8 characters long',
+                  obscureText: true,
+                  icon: Icons.lock,
+                ),
+                const SizedBox(height: 20),
+                _buildTextField(
+                  controller: _confirmPasswordController,
+                  label: 'Confirm Password',
+                  isValid: _isConfirmPasswordValid,
+                  errorText: 'Passwords do not match',
+                  obscureText: true,
+                  icon: Icons.lock_outline,
+                ),
+                const SizedBox(height: 20),
+                _buildTextField(
+                  controller: _otpController,
+                  label: 'OTP',
+                  isValid: _isOtpValid,
+                  errorText: 'OTP must be 6 digits',
+                  keyboardType: TextInputType.number,
+                  icon: Icons.security,
+                ),
+                const SizedBox(height: 40),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: accentColor,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    elevation: 5,
+                  ),
+                  onPressed: _changePassword,
+                  child: Text(
+                    'Change Password',
+                    style: TextStyle(
+                      color: backgroundColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: <Widget>[
-            TextField(
-              controller: _emailController,
-              obscureText: false,
-              decoration: InputDecoration(
-                enabledBorder: const OutlineInputBorder(
-                  borderSide:
-                      BorderSide(color: Color.fromARGB(255, 66, 62, 62)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey.shade400),
-                ),
-                fillColor: Colors.transparent,
-                filled: true,
-                labelText: 'Email',
-                hintStyle: TextStyle(color: Colors.white),
-              ),
-              style: const TextStyle(color: Colors.black),
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            TextField(
-              controller: _newPasswordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                enabledBorder: const OutlineInputBorder(
-                  borderSide:
-                      BorderSide(color: Color.fromARGB(255, 66, 62, 62)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey.shade400),
-                ),
-                fillColor: Colors.transparent,
-                filled: true,
-                hintStyle: TextStyle(color: Colors.white),
-                labelText: 'New Password',
-              ),
-              style: const TextStyle(color: Colors.black),
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            TextField(
-              controller: _confirmPasswordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                enabledBorder: const OutlineInputBorder(
-                  borderSide:
-                      BorderSide(color: Color.fromARGB(255, 66, 62, 62)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey.shade400),
-                ),
-                fillColor: Colors.transparent,
-                filled: true,
-                hintStyle: const TextStyle(color: Colors.white),
-                labelText: 'Confirm Password',
-              ),
-              style: const TextStyle(color: Colors.black),
-            ),
-            const SizedBox(height: 30.0),
-            TextField(
-              controller: _otpController,
-              decoration: InputDecoration(
-                enabledBorder: const OutlineInputBorder(
-                  borderSide:
-                      BorderSide(color: Color.fromARGB(255, 66, 62, 62)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey.shade400),
-                ),
-                fillColor: Colors.transparent,
-                filled: true,
-                hintStyle: const TextStyle(color: Colors.white),
-                labelText: 'OTP',
-              ),
-              style: const TextStyle(color: Colors.black),
-            ),
-            const SizedBox(height: 30.0),
-            ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(
-                  Color.fromARGB(255, 34, 34, 46),
-                ),
-              ),
-              onPressed: _changePassword,
-              child: const Text(
-                'Change Password',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required bool isValid,
+    required String errorText,
+    bool obscureText = false,
+    TextInputType? keyboardType,
+    IconData? icon,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: backgroundColor.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        obscureText: obscureText,
+        keyboardType: keyboardType,
+        style: TextStyle(color: textColor),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(color: accentColor.withOpacity(0.8)),
+          prefixIcon: Icon(icon, color: accentColor),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.transparent),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: accentColor, width: 2),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          errorText: controller.text.isNotEmpty && !isValid ? errorText : null,
+          errorStyle: TextStyle(color: Colors.red[300]),
+          filled: true,
+          fillColor: Colors.transparent,
         ),
       ),
     );

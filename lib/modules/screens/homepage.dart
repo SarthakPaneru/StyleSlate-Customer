@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hamro_barber_mobile/constants/app_constants.dart';
 import 'package:hamro_barber_mobile/core/auth/customer.dart';
 import 'package:hamro_barber_mobile/modules/screens/user_account.dart';
 import 'package:hamro_barber_mobile/modules/screens/user_book.dart';
@@ -22,7 +23,7 @@ class _HomePageState extends State<HomePage> {
   ];
 
   int _selectedIndex = 0;
-  late int id;
+  late int customerId;
   Customer customer = Customer();
   late double longitude;
   late double latitude;
@@ -40,9 +41,11 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  final List<Widget> _children = [
+  List<Widget> _children = [
     const UserHome(),
-    const UserFavorite(),
+    UserFavorite(
+      customerId: ApiConstants.maxRetryCount,
+    ),
     const UserBook(),
     const UserAccount(),
   ];
@@ -50,7 +53,7 @@ class _HomePageState extends State<HomePage> {
   void getCustomerId() async {
     int tempid = (await customer.retrieveCustomerId())!;
     setState(() {
-      id = tempid;
+      customerId = tempid;
     });
   }
 
@@ -82,7 +85,7 @@ class _HomePageState extends State<HomePage> {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return ChatPage(id, longitude, latitude);
+                    return ChatPage(customerId, longitude, latitude);
                   },
                 ),
               );

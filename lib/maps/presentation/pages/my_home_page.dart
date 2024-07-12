@@ -134,11 +134,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _startLocationUpdates() {
-    _positionStream = Geolocator.getPositionStream(
-//desiredAccuracy: LocationAccuracy.high,
-            //    distanceFilter: 10, // meters
-            )
-        .listen((Position position) {
+    _positionStream =
+        Geolocator.getPositionStream().listen((Position position) {
       setState(() {
         _currentPosition = LatLng(position.latitude, position.longitude);
       });
@@ -183,13 +180,16 @@ class _MyHomePageState extends State<MyHomePage> {
       backgroundColor: const Color(0xff323345),
       appBar: AppBar(
         backgroundColor: const Color(0xff323345),
-        title: const Text("Maps"),
+        elevation: 0,
+        title: const Text("Barber Locator",
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
       ),
       body: Stack(
         children: [
           if (_mapLoaded)
             GoogleMap(
-              mapType: MapType.hybrid,
+              mapType: MapType.normal,
               initialCameraPosition: _currentPosition != null
                   ? CameraPosition(target: _currentPosition!, zoom: 14.0)
                   : _kGooglePlex,
@@ -220,6 +220,15 @@ class _MyHomePageState extends State<MyHomePage> {
             currentAddress: _currentAddress,
             barberAddress: _barberAddress,
             remainingDistance: _remainingDistance,
+          ),
+          Positioned(
+            top: 16,
+            right: 16,
+            child: FloatingActionButton(
+              onPressed: _loadCurrentLocation,
+              backgroundColor: const Color(0xff323345),
+              child: const Icon(Icons.my_location),
+            ),
           ),
         ],
       ),

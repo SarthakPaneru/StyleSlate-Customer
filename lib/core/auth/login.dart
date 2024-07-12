@@ -10,7 +10,6 @@ import 'package:hamro_barber_mobile/core/auth/forgot_pwd.dart';
 import 'package:hamro_barber_mobile/core/auth/register.dart';
 import 'package:hamro_barber_mobile/core/auth/token.dart';
 import 'package:hamro_barber_mobile/modules/screens/homepage.dart';
-import 'package:hamro_barber_mobile/widgets/colors.dart';
 import 'package:http/http.dart' as http;
 
 class Login extends StatefulWidget {
@@ -20,7 +19,7 @@ class Login extends StatefulWidget {
   State<Login> createState() => _LoginState();
 }
 
-class _LoginState extends State<Login> {
+class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
   bool passwordVisible = false;
@@ -28,24 +27,40 @@ class _LoginState extends State<Login> {
   final TextEditingController _passwordController = TextEditingController();
   bool isEmailValid = true;
   bool isPasswordValid = true;
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+
+  final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _passwordFocusNode = FocusNode();
+
+  final ApiService _apiService = ApiService();
+  final Token _token = Token();
+  final ApiRequests _apiRequests = ApiRequests();
+  final Customer _customer = Customer();
 
   @override
   void initState() {
     super.initState();
     passwordVisible = true;
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
+    _animationController.forward();
   }
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _animationController.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
     super.dispose();
   }
-
-  final ApiService _apiService = ApiService();
-  final Token _token = Token();
-  final ApiRequests _apiRequests = ApiRequests();
-  final Customer _customer = Customer();
 
   void _validateEmail() {
     String email = _emailController.text.trim();
@@ -62,23 +77,25 @@ class _LoginState extends State<Login> {
   }
 
   bool _validatePasswordStrength(String password) {
-    // Password validation logic goes here
-    // Return true if password meets the criteria, otherwise false
-    return password.isNotEmpty ||
-        password.contains(RegExp(r'[A-Z]')) ||
-        password.contains(RegExp(r'[0-9]')) ||
-        password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
+    return password.length >= 1 ||
+        password.contains(RegExp(r'[A-Z]')) &&
+            password.contains(RegExp(r'[0-9]')) &&
+            password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
   }
 
   Future<void> _login() async {
+    FocusScope.of(context).unfocus();
+
     String email = _emailController.text.trim();
     String password = _passwordController.text;
 
-    if (email.isEmpty ||
-        password.isEmpty ||
-        !isEmailValid ||
-        !isPasswordValid) {
-      _showSnackbar('Login failed. Please check your credentials.');
+    if (email.isEmpty || password.isEmpty) {
+      _showSnackbar('Please enter both email and password.');
+      return;
+    }
+
+    if (!isEmailValid || !isPasswordValid) {
+      _showSnackbar('Please correct the errors in the form.');
       return;
     }
 
@@ -89,33 +106,30 @@ class _LoginState extends State<Login> {
     };
     final jsonPayload = jsonEncode(payload);
 
-    http.Response response = await _apiService.post(
-        '${ApiConstants.authEndpoint}/login', jsonPayload);
+    try {
+      http.Response response = await _apiService.post(
+          '${ApiConstants.authEndpoint}/login', jsonPayload);
 
-    if (response.statusCode == 200) {
-      // Successful login
-      Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-      String token = jsonResponse['accessToken'];
+      if (response.statusCode == 200) {
+        Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        String token = jsonResponse['accessToken'];
 
-      // Store the token
-      await _token.storeBearerToken(token);
+        await _token.storeBearerToken(token);
 
-      // Retrieve and store customer details
-      http.Response response1 = await _apiRequests.getLoggedInUser();
-      Map<String, dynamic> jsonResponse1 = jsonDecode(response1.body);
-      _customer.storeCustomerDetails(jsonResponse1);
+        http.Response response1 = await _apiRequests.getLoggedInUser();
+        Map<String, dynamic> jsonResponse1 = jsonDecode(response1.body);
+        _customer.storeCustomerDetails(jsonResponse1);
 
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (BuildContext context) {
-            return const HomePage();
-          },
-        ),
-      );
-    } else {
-      // Handle login failure
-      _showSnackbar('Login failed. Please check your credentials.');
-      print('Login failed with status code: ${response.statusCode}');
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (BuildContext context) => const HomePage(),
+          ),
+        );
+      } else {
+        _showSnackbar('Login failed. Please check your credentials.');
+      }
+    } catch (e) {
+      _showSnackbar('An error occurred. Please try again later.');
     }
   }
 
@@ -123,186 +137,203 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primaryColor: const Color(0xFF323345),
+        colorScheme: ColorScheme.fromSwatch()
+            .copyWith(secondary: const Color(0xFFFF6F00)),
+      ),
       home: ScaffoldMessenger(
-          key: scaffoldMessengerKey,
-          child: Scaffold(
-            appBar: PreferredSize(
-              preferredSize: const Size.fromHeight(kToolbarHeight),
-              child: AppBar(
-                backgroundColor: PrimaryColors.primarybrown,
-                title: const Text('LoginSection'),
-                automaticallyImplyLeading: false,
+        key: scaffoldMessengerKey,
+        child: Scaffold(
+          body: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Theme.of(context).primaryColor,
+                  Theme.of(context).colorScheme.secondary,
+                ],
               ),
             ),
-            body: SingleChildScrollView(
-              child: Container(
-                margin: const EdgeInsets.only(left: 20, right: 20),
-                child: Center(
-                  child: Column(
-                    children: <Widget>[
-                      const SizedBox(height: 25),
-                      Container(
-                        padding: const EdgeInsets.all(2),
-                        height: 150,
-                        width: 150,
-                        child: Image.asset('lib/assets/images/barberlogo.png'),
-                      ),
-                      Text(
-                        'Login',
-                        style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          color: PrimaryColors.primarybrown,
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      TextField(
-                        controller: _emailController,
-                        obscureText: false,
-                        onChanged: (_) => _validateEmail(),
-                        decoration: InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: isEmailValid
-                                  ? Colors.grey.shade400
-                                  : Colors.red,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey.shade400),
-                          ),
-                          fillColor: Colors.grey.shade200,
-                          filled: true,
-                          hintStyle: TextStyle(color: Colors.grey[500]),
-                          labelText: 'Email',
-                          prefixIcon: const Icon(Icons.mail),
-                          helperText: isEmailValid ? null : 'Invalid email',
-                          helperStyle: TextStyle(
-                            color: isEmailValid ? Colors.grey[500] : Colors.red,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      TextField(
-                        controller: _passwordController,
-                        obscureText: passwordVisible,
-                        onChanged: (_) => _validatePassword(),
-                        decoration: InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: isPasswordValid
-                                  ? Colors.grey.shade400
-                                  : Colors.red,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey.shade400),
-                          ),
-                          fillColor: Colors.grey.shade200,
-                          filled: true,
-                          hintStyle: TextStyle(color: Colors.grey[500]),
-                          labelText: 'Password',
-                          prefixIcon: const Icon(Icons.lock),
-                          helperText: isPasswordValid
-                              ? 'Password must contain at least 8 characters, a capital letter, a number, and a special character.'
-                              : 'Invalid password',
-                          helperStyle: TextStyle(
-                            color:
-                                isPasswordValid ? Colors.grey[500] : Colors.red,
-                          ),
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              setState(() {
-                                passwordVisible = !passwordVisible;
-                              });
-                            },
-                            icon: Icon(passwordVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      const SizedBox(height: 15),
-                      SizedBox(
-                        height: 45,
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _login,
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            elevation: 0,
-                            backgroundColor: PrimaryColors.primarybrown,
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Log in',
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  color: Colors.white,
+            child: SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Hero(
+                            tag: 'logo',
+                            child: Container(
+                              height: 150,
+                              width: 150,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border:
+                                    Border.all(color: Colors.white, width: 2),
+                              ),
+                              child: ClipOval(
+                                child: Image.asset(
+                                  'assets/images/barber_logos.png',
+                                  fit: BoxFit.cover,
                                 ),
                               ),
-                              SizedBox(width: 10),
-                              Icon(Icons.restart_alt),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (BuildContext context) {
-                                return const Forgetpassword();
-                              },
                             ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                        ),
-                        child: Text(
-                          'Forgot Password?',
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: PrimaryColors.primarybrown,
                           ),
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (BuildContext context) {
-                                return const Register();
-                              },
+                          const SizedBox(height: 30),
+                          Text(
+                            'Welcome Back',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                        ),
-                        child: Text(
-                          "Don't have an Account? Register Here",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: PrimaryColors.primarybrown,
                           ),
-                        ),
+                          const SizedBox(height: 40),
+                          _buildTextField(
+                            controller: _emailController,
+                            hint: 'Email',
+                            icon: Icons.email,
+                            isPassword: false,
+                            validator: _validateEmail,
+                            isValid: isEmailValid,
+                            focusNode: _emailFocusNode,
+                            nextFocusNode: _passwordFocusNode,
+                          ),
+                          const SizedBox(height: 20),
+                          _buildTextField(
+                            controller: _passwordController,
+                            hint: 'Password',
+                            icon: Icons.lock,
+                            isPassword: true,
+                            validator: _validatePassword,
+                            isValid: isPasswordValid,
+                            focusNode: _passwordFocusNode,
+                            nextFocusNode: null,
+                            onSubmitted: _login,
+                          ),
+                          const SizedBox(height: 30),
+                          ElevatedButton(
+                            onPressed: _login,
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Theme.of(context).primaryColor,
+                              backgroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 15, horizontal: 40),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                            child: const Text(
+                              'Log In',
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const Forgetpassword()),
+                              );
+                            },
+                            child: const Text(
+                              'Forgot Password?',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (context) => const Register()),
+                              );
+                            },
+                            child: const Text(
+                              "Don't have an Account? Register Here",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
-          )),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    required bool isPassword,
+    required Function() validator,
+    required bool isValid,
+    required FocusNode focusNode,
+    FocusNode? nextFocusNode,
+    Function()? onSubmitted,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(
+          color: controller.text.isNotEmpty
+              ? (isValid ? Colors.green : Colors.red)
+              : Colors.transparent,
+          width: 2,
+        ),
+      ),
+      child: TextField(
+        controller: controller,
+        obscureText: isPassword ? passwordVisible : false,
+        style: const TextStyle(color: Colors.white),
+        focusNode: focusNode,
+        textInputAction:
+            nextFocusNode != null ? TextInputAction.next : TextInputAction.done,
+        onSubmitted: (_) {
+          if (nextFocusNode != null) {
+            FocusScope.of(context).requestFocus(nextFocusNode);
+          } else if (onSubmitted != null) {
+            onSubmitted();
+          }
+        },
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+          prefixIcon: Icon(icon, color: Colors.white),
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon(
+                    passwordVisible ? Icons.visibility : Icons.visibility_off,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      passwordVisible = !passwordVisible;
+                    });
+                  },
+                )
+              : null,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 15),
+        ),
+        onChanged: (_) {
+          validator();
+          setState(() {});
+        },
+      ),
     );
   }
 
@@ -310,7 +341,19 @@ class _LoginState extends State<Login> {
     scaffoldMessengerKey.currentState?.showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: const Duration(seconds: 1),
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        backgroundColor: Colors.red.shade800,
+        action: SnackBarAction(
+          label: 'OK',
+          textColor: Colors.white,
+          onPressed: () {
+            scaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+          },
+        ),
       ),
     );
   }
