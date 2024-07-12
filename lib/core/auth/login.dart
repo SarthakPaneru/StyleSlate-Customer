@@ -120,8 +120,11 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
         http.Response response1 = await _apiRequests.getLoggedInUser();
         Map<String, dynamic> jsonResponse1 = jsonDecode(response1.body);
         _customer.storeCustomerDetails(jsonResponse1);
-        int userId = int.parse(_customer.retrieveUserId() as String);
-        FirebaseApi().sendFcmTokenToServer(userId);
+        final userIdFinal = await _customer.retrieveUserId();
+        print('USER id final: $userIdFinal');
+        int userId = int.parse(userIdFinal.toString());
+        print('USER id: $userId');
+        await FirebaseApi().sendFcmTokenToServer(userId);
 
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(

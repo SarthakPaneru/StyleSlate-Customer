@@ -25,6 +25,7 @@ class Token {
     await _secureStorage.delete(key: 'bearerToken');
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove("Token");
+    await prefs.remove("fcmToken");
     print("Bearer Token Cleared");
   }
 }

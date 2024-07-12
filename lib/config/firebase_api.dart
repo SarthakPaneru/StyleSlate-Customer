@@ -9,21 +9,22 @@ class FirebaseApi {
   final _firebaseMessaging = FirebaseMessaging.instance;
   //function to initialize notifications
 
-  void sendFcmTokenToServer(int userId) async {
+  Future<void> sendFcmTokenToServer(int userId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? fcmToken = prefs.getString("fcmToken");
+    String? fcmToken;
+    fcmToken = prefs.getString("fcmToken");
 
     if (fcmToken == null) {
       //fetch the FCM token for the device
-      final fCMToken = await _firebaseMessaging.getToken();
+      fcmToken = await _firebaseMessaging.getToken();
 
       //print the token(notmally you would sent this to your server)
-      // print('Firebase FCM Token: $fCMToken');
+      print('Firebase FCM Token new: $fcmToken');
 
-      _apiRequests.updateFcmToken(userId, fcmToken!);
+      await _apiRequests.updateFcmToken(userId, fcmToken!);
 
       //save the token to shared preferences
-      prefs.setString("fcmToken", fCMToken!);
+      prefs.setString("fcmToken", fcmToken!);
     }
 
     print('Firebase FCM Token: $fcmToken');
