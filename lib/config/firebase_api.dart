@@ -13,7 +13,7 @@ class FirebaseApi {
     final fCMToken = await _firebaseMessaging.getToken();
 
     //print the token(notmally you would sent this to your server)
-    print('Token: $fCMToken');
+    print('Firebase FCM Token: $fCMToken');
 
     //initialize further settings for pushNotification
     initPushNotification();

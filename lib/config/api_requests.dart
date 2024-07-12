@@ -161,4 +161,10 @@ class ApiRequests {
     return await _apiService.post(
         '/favourite/barber/add/$barberId', jsonPayload);
   }
+
+  Future<http.Response> updateFcmToken(int userId, String fcmToken) async {
+    final jsonPayload = fcmToken;
+    return await _apiService.put(
+        '/{userId}/update-registration-token', jsonPayload);
+  }
 }
