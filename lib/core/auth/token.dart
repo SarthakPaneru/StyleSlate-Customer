@@ -6,15 +6,17 @@ class Token {
 
   // Store the token securely using flutter_secure_storage and shared_preferences
   Future<void> storeBearerToken(String token) async {
-    await _secureStorage.write(key: 'bearerToken', value: token);
+    // await _secureStorage.write(key: 'bearerToken', value: token);
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString("Token", token);
-    print("Bearer Token Stored: $token");
+    // print("Bearer Token Stored: $token");
   }
 
   // Retrieve the token securely using flutter_secure_storage
   Future<String?> retrieveBearerToken() async {
-    final String? token = await _secureStorage.read(key: 'bearerToken');
+    // final String? token = await _secureStorage.read(key: 'bearerToken');
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString("Token");
     return token;
   }
 

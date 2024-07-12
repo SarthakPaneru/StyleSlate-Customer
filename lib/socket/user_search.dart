@@ -34,6 +34,7 @@ class _ChatPageState extends State<ChatPage> {
     socketDto.customerId = widget.id as int?;
     socketDto.latitude = widget.latitude;
     socketDto.longitude = widget.longitude;
+    socketDto.location = "KATHMANDU";
 
     // Initialize the StompClient
     stompClient = StompClient(
@@ -107,7 +108,7 @@ class _ChatPageState extends State<ChatPage> {
     super.dispose();
   }
 
-  List<String> items = ["Breard", "Haircut"];
+  List<String> items = ["Beard", "Haircut"];
   List<int> prices = [100, 200];
   @override
   Widget build(BuildContext context) {
@@ -157,6 +158,7 @@ class _ChatPageState extends State<ChatPage> {
                           ElevatedButton(
                             onPressed: () {
                               print(" ${prices[index]}");
+                              socketDto.serviceName = items[index];
                               stompClient.send(
                                 destination: '/app/customer/${widget.id}',
                                 body: json.encode(socketDto.asMap()),
@@ -176,34 +178,6 @@ class _ChatPageState extends State<ChatPage> {
               },
             ),
           ),
-          if (connected)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: msgtext,
-                      decoration:
-                          const InputDecoration(labelText: 'Send a message'),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.send),
-                    onPressed: () {
-                      if (msgtext.text.isNotEmpty) {
-                        print(msgtext.text);
-                        stompClient.send(
-                          destination: '/app/customer/${widget.id}',
-                          body: json.encode(socketDto.asMap()),
-                        );
-                        msgtext.clear();
-                      }
-                    },
-                  ),
-                ],
-              ),
-            )
         ],
       ),
     );
