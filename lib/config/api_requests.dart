@@ -152,8 +152,13 @@ class ApiRequests {
         '${ApiConstants.authEndpoint}/confirm-forgot-password', jsonPayload);
   }
 
-  
   Future<http.Response> getData() async {
     return await _apiService.get('/socket/receive-send');
+  }
+
+  Future<http.Response> addFavBarber(int barberId) async {
+    final jsonPayload = null;
+    return await _apiService.post(
+        '/favourite/barber/add/$barberId', jsonPayload);
   }
 }

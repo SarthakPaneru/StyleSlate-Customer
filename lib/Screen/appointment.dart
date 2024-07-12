@@ -112,6 +112,7 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
 
   Future<void> cancelAppointment(int index) async {
     // Implement your cancel logic here
+    getAppointment("CANCELLED");
     setState(() {
       _barberNames.removeAt(index);
       _userIds.removeAt(index);

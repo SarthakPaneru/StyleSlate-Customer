@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hamro_barber_mobile/core/auth/customer.dart';
-import 'package:hamro_barber_mobile/modules/screens/categories_bubble.dart';
 import 'package:hamro_barber_mobile/modules/screens/searchScreen.dart';
 import 'package:hamro_barber_mobile/widgets/barberSelection.dart';
 import 'package:hamro_barber_mobile/widgets/carousel.dart';
@@ -20,22 +21,7 @@ class _UserHomeState extends State<UserHome> {
   String _firstName = '';
   double longitude = 0;
   double latitude = 0;
-  final _textController = TextEditingController();
-  String userPost = '';
-
-  final List<String> categories = [
-    "Haircut",
-    "Hair Style",
-    "Beard",
-    "Treatment",
-    "Beauty Saloon"
-  ];
-
-  final List barberType = [
-    ["Hair style", true],
-    ["Beard", false],
-    ["colouring", false]
-  ];
+  String _locationName = 'Loading...';
 
   @override
   void initState() {
@@ -53,20 +39,10 @@ class _UserHomeState extends State<UserHome> {
     });
   }
 
-  void barberTypeSelected(int index) {
-    setState(() {
-      for (int i = 0; i < barberType.length; i++) {
-        barberType[i][1] = false;
-      }
-      barberType[index][1] = true;
-    });
-  }
-
   void getLocation() async {
-    Future.delayed(const Duration(seconds: 2), () {});
     LocationPermission permission = await Geolocator.requestPermission();
     Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.low,
+      desiredAccuracy: LocationAccuracy.high,
     );
     setState(() {
       longitude = position.longitude;
@@ -76,6 +52,20 @@ class _UserHomeState extends State<UserHome> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('longitude', longitude);
     await prefs.setDouble('latitude', latitude);
+
+    getAddressFromLatLng(latitude, longitude);
+  }
+
+  void getAddressFromLatLng(double lat, double lng) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+      Placemark place = placemarks[0];
+      setState(() {
+        _locationName = "${place.locality}, ${place.country}";
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   void loadLocation() async {
@@ -84,6 +74,7 @@ class _UserHomeState extends State<UserHome> {
       longitude = prefs.getDouble('longitude') ?? 0;
       latitude = prefs.getDouble('latitude') ?? 0;
     });
+    getAddressFromLatLng(latitude, longitude);
   }
 
   @override
@@ -97,157 +88,104 @@ class _UserHomeState extends State<UserHome> {
           loadLocation();
         },
         child: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: Column(
-                  children: [
-                    // greetings row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Hi, $_firstName",
-                              style: const TextStyle(
-                                color: Color(0xffbfa58c),
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
+                              "Welcome, $_firstName",
+                              style: GoogleFonts.poppins(
+                                textStyle: const TextStyle(
+                                  color: Color(0xffbfa58c),
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                            const SizedBox(
-                              height: 8,
+                            const SizedBox(height: 5),
+                            Row(
+                              children: [
+                                const Icon(Icons.location_on,
+                                    color: Color(0xff616274), size: 16),
+                                const SizedBox(width: 5),
+                                Expanded(
+                                  child: Text(
+                                    _locationName,
+                                    style: GoogleFonts.poppins(
+                                      textStyle: const TextStyle(
+                                          color: Color(0xff616274)),
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              'Your location: $longitude, $latitude',
-                              style: const TextStyle(color: Color(0xff616274)),
-                            )
                           ],
                         ),
-                        // Notification
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.all(12),
-                          child: const Icon(Icons.notifications,
-                              color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              // search bar
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _textController,
-                          decoration: const InputDecoration(
-                            hintText: 'Find Your Barber',
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 5),
-                          ),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const SearchScreen(),
-                              ),
-                            );
-                          },
-                        ),
                       ),
-                      IconButton(
-                        onPressed: () {
-                          _textController.clear();
-                        },
-                        icon: const Icon(Icons.clear),
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.search, color: Colors.white),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const SearchScreen(),
+                                ),
+                              );
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.notifications,
+                                color: Colors.white),
+                            onPressed: () {
+                              // Handle notifications
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-              ),
-
-              // carousel slider
-              const ImageCarousel(),
-
-              // how do you feel?
-              // const Padding(
-              //   padding: EdgeInsets.only(left: 10),
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //     children: [
-              //       Text(
-              //         'Category',
-              //         style: TextStyle(
-              //           color: Colors.white,
-              //           fontSize: 18,
-              //           fontWeight: FontWeight.bold,
-              //         ),
-              //       ),
-              //       Icon(
-              //         Icons.more_horiz,
-              //         color: Colors.white,
-              //       ),
-              //     ],
-              //   ),
-              // ),
-
-              // // 4 different faces
-              // Column(
-              //   children: [
-              //     SizedBox(
-              //       height: 130,
-              //       child: ListView.builder(
-              //         scrollDirection: Axis.horizontal,
-              //         itemCount: categories.length,
-              //         itemBuilder: (context, index) {
-              //           return CategoriesBubble(
-              //             text: categories[index],
-              //             index: index,
-              //           );
-              //         },
-              //       ),
-              //     ),
-              //   ],
-              // ),
-
-              const Padding(
-                padding: EdgeInsets.only(left: 10, right: 5),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Recommended Barbers',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                const ImageCarousel(),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Recommended Barbers',
+                      style: GoogleFonts.poppins(
+                        textStyle: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Expanded(
-                child: _isLoading
+                const SizedBox(height: 10),
+                _isLoading
                     ? const Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : BarberSelection(latitude, longitude),
-              ),
-            ],
+                        child:
+                            CircularProgressIndicator(color: Color(0xffbfa58c)))
+                    : SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.5,
+                        child: BarberSelection(latitude, longitude),
+                      ),
+              ],
+            ),
           ),
         ),
       ),
