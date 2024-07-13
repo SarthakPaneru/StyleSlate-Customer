@@ -283,6 +283,8 @@ class ServiceTile extends StatelessWidget {
                         builder: (context) => BookingPage(
                           barberId: barberId,
                           serviceId: serviceId,
+                          serviceName: serviceName,
+                          price: price,
                         ),
                       ),
                     );

@@ -2,16 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/modules/screens/homepage.dart';
 import 'package:khalti_flutter/khalti_flutter.dart';
 
-class PaymentPage extends StatelessWidget {
-  final PaymentConfig config = PaymentConfig(
-    amount: 10000, // Amount in paisa
-    productIdentity: 'dell-g5-g5510-2021',
-    productName: 'Dell G5 G5510 2021',
-    productUrl: 'https://www.example.com',
-    additionalData: {
-      'vendor': 'Khalti Bazaar',
-    },
-  );
+class PaymentPage extends StatefulWidget {
+  int amount, appointmentId;
+  String serviceName;
+  PaymentPage(
+      {super.key,
+      required this.amount,
+      required this.appointmentId,
+      required this.serviceName});
+
+  @override
+  State<PaymentPage> createState() => _PaymentPageState();
+}
+
+class _PaymentPageState extends State<PaymentPage> {
+  late PaymentConfig config;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    config = PaymentConfig(
+      amount: widget.amount, // Amount in paisa
+      productIdentity: widget.appointmentId.toString(),
+      productName: widget.serviceName,
+      productUrl: 'https://www.example.com',
+      additionalData: {
+        'vendor': 'Khalti Bazaar',
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

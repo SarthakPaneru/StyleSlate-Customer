@@ -15,7 +15,9 @@ import '../widgets/custom_appbar.dart';
 class BookingPage extends StatefulWidget {
   final int barberId;
   final int serviceId;
-  const BookingPage({Key? key, required this.barberId, required this.serviceId})
+  final String serviceName;
+  final int price;
+  const BookingPage({Key? key, required this.barberId, required this.serviceId, required this.serviceName, required this.price})
       : super(key: key);
 
   @override
@@ -196,7 +198,10 @@ class _BookingPageState extends State<BookingPage> {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (BuildContext context) {
-                            return PaymentPage();
+                            return PaymentPage(
+                                amount: 10000,
+                                appointmentId: 123,
+                                serviceName: 'hi');
                           },
                         ),
                       );
