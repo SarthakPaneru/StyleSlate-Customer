@@ -11,9 +11,9 @@ class ImageCarousel extends StatefulWidget {
 class _ImageCarouselState extends State<ImageCarousel> {
   int _currentIndex = 0;
   final List<String> imgList = [
-    'https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg',
-    'https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg',
-    'https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_bT2o5-AMBsFvMBvxxD-BcGVI0m-jNJhZuw&s',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKAsFi7ZZFy334239AbNqiQPtWUfwrpDjI2w&s',
+    'https://haircation.com/wp-content/uploads/2022/09/Screenshot-2022-09-20-133606-1024x574.jpg',
   ];
 
   @override
