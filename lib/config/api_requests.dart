@@ -167,8 +167,16 @@ class ApiRequests {
     final jsonPayload = jsonEncode(payload);
     print('fcm token paylaod $jsonPayload');
 
-
     return await _apiService.put(
         '/user/$userId/update-registration-token', jsonPayload);
+  }
+
+  Future<http.Response> updateAppointmentStatus(
+      int appointmentId, String status) async {
+    final payload = {'test': 'test'};
+    final jsonPayload = jsonEncode(payload);
+
+    return await _apiService.put(
+        '/appointment/update/$appointmentId?status=$status', jsonPayload);
   }
 }

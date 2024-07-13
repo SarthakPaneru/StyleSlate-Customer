@@ -41,7 +41,7 @@ dependencies:
   flutter_secure_storage: ^9.2.2
   heart_toggle: ^0.0.3
   table_calendar: ^3.0.9
-  font_awesome_flutter: ^10.2.1
+  font_awesome_flutter: ^10.7.0
   image_picker: ^1.0.1
   mime: ^1.0.4
   http_parser: ^4.0.2

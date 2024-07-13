@@ -284,7 +284,7 @@ class ServiceTile extends StatelessWidget {
                           barberId: barberId,
                           serviceId: serviceId,
                           serviceName: serviceName,
-                          price: price,
+                          price: int.parse(price),
                         ),
                       ),
                     );
