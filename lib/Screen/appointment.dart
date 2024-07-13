@@ -27,6 +27,11 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
   int _lengthOfResponse = 0;
   bool isLoading = true;
 
+  // New lists for each tab
+  List<Map<String, dynamic>> upcomingAppointments = [];
+  List<Map<String, dynamic>> completedAppointments = [];
+  List<Map<String, dynamic>> cancelledAppointments = [];
+
   @override
   void initState() {
     super.initState();
@@ -71,7 +76,32 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
         await getAppointment(appointment);
       }
       getImageUrl();
+
+      // Populate the appropriate list based on the status
+      List<Map<String, dynamic>> appointmentList = [];
+      for (int i = 0; i < _lengthOfResponse; i++) {
+        appointmentList.add({
+          'barberName': _barberNames[i],
+          'userId': _userIds[i],
+          'imageUrl': _imageUrls[i],
+          'date': _dates[i],
+          'time': _times[i],
+          'serviceName': _serviceNames[i],
+        });
+      }
+
       setState(() {
+        switch (status) {
+          case "upcoming":
+            upcomingAppointments = appointmentList;
+            break;
+          case "completed":
+            completedAppointments = appointmentList;
+            break;
+          case "cancelled":
+            cancelledAppointments = appointmentList;
+            break;
+        }
         isLoading = false;
       });
     } catch (e) {
@@ -111,17 +141,49 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
   }
 
   Future<void> cancelAppointment(int index) async {
-    // Implement your cancel logic here
-    getAppointment("CANCELLED");
     setState(() {
-      _barberNames.removeAt(index);
-      _userIds.removeAt(index);
-      _imageUrls.removeAt(index);
-      _dates.removeAt(index);
-      _times.removeAt(index);
-      _serviceNames.removeAt(index);
-      _lengthOfResponse--;
+      Map<String, dynamic> appointmentToCancel =
+          upcomingAppointments.removeAt(index);
+      cancelledAppointments.add(appointmentToCancel);
     });
+
+    // TODO: Implement API call to update the appointment status in the database
+    // await _apiRequests.updateAppointmentStatus(appointmentId, "CANCELLED");
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Appointment cancelled successfully'),
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height - 100,
+          left: 20,
+          right: 20,
+        ),
+      ),
+    );
+  }
+
+  Future<void> completeAppointment(int index) async {
+    setState(() {
+      Map<String, dynamic> appointmentToComplete =
+          upcomingAppointments.removeAt(index);
+      completedAppointments.add(appointmentToComplete);
+    });
+
+    // TODO: Implement API call to update the appointment status in the database
+    // await _apiRequests.updateAppointmentStatus(appointmentId, "COMPLETED");
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Appointment completed successfully'),
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height - 100,
+          left: 20,
+          right: 20,
+        ),
+      ),
+    );
   }
 
   @override
@@ -156,15 +218,15 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildAppointmentList(),
-          _buildAppointmentList(),
-          _buildAppointmentList(),
+          _buildAppointmentList(upcomingAppointments),
+          _buildAppointmentList(completedAppointments),
+          _buildAppointmentList(cancelledAppointments),
         ],
       ),
     );
   }
 
-  Widget _buildAppointmentList() {
+  Widget _buildAppointmentList(List<Map<String, dynamic>> appointments) {
     return RefreshIndicator(
       onRefresh: () async {
         await getAppointments(_getStatusForCurrentTab());
@@ -172,7 +234,7 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
       child: isLoading
           ? const Center(
               child: CircularProgressIndicator(color: Colors.deepPurpleAccent))
-          : _lengthOfResponse == 0
+          : appointments.isEmpty
               ? Center(
                   child: Text(
                     'No appointments',
@@ -180,9 +242,9 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
                   ),
                 )
               : ListView.builder(
-                  itemCount: _lengthOfResponse,
+                  itemCount: appointments.length,
                   itemBuilder: (context, index) {
-                    return _buildAppointmentCard(index);
+                    return _buildAppointmentCard(appointments[index], index);
                   },
                 ),
     );
@@ -201,13 +263,25 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
     }
   }
 
-  Widget _buildAppointmentCard(int index) {
+  Widget _buildAppointmentCard(Map<String, dynamic> appointment, int index) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        color: const Color(0xff2A2D3E),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xff2A2D3E), Color(0xff3E4259)],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -218,7 +292,7 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
                   CircleAvatar(
                     radius: 30,
                     backgroundImage:
-                        CachedNetworkImageProvider(_imageUrls[index]),
+                        CachedNetworkImageProvider(appointment['imageUrl']),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -226,7 +300,7 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _barberNames[index],
+                          appointment['barberName'],
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -235,9 +309,11 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          _serviceNames[index],
-                          style:
-                              const TextStyle(color: Colors.deepPurpleAccent),
+                          appointment['serviceName'],
+                          style: const TextStyle(
+                            color: Colors.deepPurpleAccent,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ],
                     ),
@@ -248,23 +324,39 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildInfoChip(Icons.calendar_today, _dates[index]),
-                  _buildInfoChip(Icons.access_time, _times[index]),
-                  if (_tabController.index == 0)
-                    ElevatedButton(
-                      onPressed: () => cancelAppointment(index),
-                      child: Text('Cancel'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                      ),
-                    )
-                  else if (_tabController.index == 1)
-                    _buildInfoChip(Icons.check_circle, 'Completed',
-                        color: Colors.green)
+                  _buildInfoChip(Icons.calendar_today, appointment['date']),
+                  _buildInfoChip(Icons.access_time, appointment['time']),
                 ],
               ),
+              const SizedBox(height: 16),
+              if (_tabController.index == 0)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildActionButton(
+                      icon: Icons.check_circle,
+                      label: 'Complete',
+                      color: Colors.green,
+                      onPressed: () => completeAppointment(index),
+                    ),
+                    _buildActionButton(
+                      icon: Icons.cancel,
+                      label: 'Cancel',
+                      color: Colors.red,
+                      onPressed: () => cancelAppointment(index),
+                    ),
+                  ],
+                )
+              else if (_tabController.index == 1)
+                Center(
+                  child: _buildInfoChip(Icons.check_circle, 'Completed',
+                      color: Colors.green),
+                )
+              else
+                Center(
+                  child: _buildInfoChip(Icons.cancel, 'Cancelled',
+                      color: Colors.red),
+                ),
             ],
           ),
         ),
@@ -274,10 +366,41 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
 
   Widget _buildInfoChip(IconData icon, String label,
       {Color color = Colors.white70}) {
-    return Chip(
-      avatar: Icon(icon, size: 16, color: color),
-      label: Text(label, style: TextStyle(color: color)),
-      backgroundColor: Colors.black12,
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.black12,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: color),
+          SizedBox(width: 6),
+          Text(label, style: TextStyle(color: color)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
+    return ElevatedButton.icon(
+      icon: Icon(icon, color: Colors.white),
+      label: Text(label),
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      ),
     );
   }
 }
