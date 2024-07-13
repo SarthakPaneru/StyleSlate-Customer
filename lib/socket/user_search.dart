@@ -108,8 +108,8 @@ class _ChatPageState extends State<ChatPage> {
     super.dispose();
   }
 
-  List<String> items = ["Beard", "Haircut"];
-  List<int> prices = [100, 200];
+  List<String> items = ["Haircut", "Beard"];
+  List<int> prices = [200, 100];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -159,6 +159,7 @@ class _ChatPageState extends State<ChatPage> {
                             onPressed: () {
                               print(" ${prices[index]}");
                               socketDto.serviceName = items[index];
+                              socketDto.defaultId = index + 1;
                               stompClient.send(
                                 destination: '/app/customer/${widget.id}',
                                 body: json.encode(socketDto.asMap()),
