@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class HelpCenterScreen extends StatelessWidget {
-  const HelpCenterScreen({Key? key}) : super(key: key);
+  const HelpCenterScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

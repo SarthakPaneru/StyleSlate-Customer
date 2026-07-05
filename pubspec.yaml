@@ -19,7 +19,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.0.5 <4.0.0"
+  sdk: ">=3.8.0 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -49,13 +49,18 @@ dependencies:
   google_maps_flutter: ^2.5.0
   cached_network_image: ^3.3.0
   # intl: ^0.18.1
-  dio: ^5.4.2+1
+  dio: ^5.10.0
   firebase_core: ^3.0.0
   firebase_messaging: ^15.0.0
   stomp_dart_client: ^2.0.0
   shared_preferences: ^2.2.3
   khalti_flutter: ^3.0.0
   khalti: ^2.0.0
+  retrofit: ^4.9.2
+  json_annotation: ^4.12.0
+  get_it: ^8.3.0
+  stacked: ^3.5.0
+  stacked_services: ^1.6.0
 
 dev_dependencies:
   flutter_test:
@@ -67,6 +72,10 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
+  retrofit_generator: ^10.2.7
+  json_serializable: ^6.14.0
+  build_runner: ^2.15.0
+  stacked_generator: ^2.0.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

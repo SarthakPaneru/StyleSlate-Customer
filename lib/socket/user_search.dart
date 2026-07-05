@@ -13,7 +13,7 @@ class ChatPage extends StatefulWidget {
   final double longitude;
   final double latitude;
 
-  ChatPage(this.id, this.longitude, this.latitude);
+  const ChatPage(this.id, this.longitude, this.latitude, {super.key});
 
   @override
   _ChatPageState createState() => _ChatPageState();
@@ -122,7 +122,7 @@ class _ChatPageState extends State<ChatPage> {
                 return ListTile(
                   title: Text(msg.msgtext),
                   subtitle: Text(msg.userid),
-                  trailing: msg.isme ? Icon(Icons.person) : null,
+                  trailing: msg.isme ? const Icon(Icons.person) : null,
                 );
               },
             ),
@@ -157,8 +157,8 @@ class _ChatPageState extends State<ChatPage> {
               ),
             ),
           if (!connected)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
+            const Padding(
+              padding: EdgeInsets.all(8.0),
               child: Text('Disconnected from WebSocket'),
             ),
         ],

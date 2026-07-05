@@ -3,7 +3,7 @@ import 'package:hamro_barber_mobile/config/api_requests.dart';
 import 'package:hamro_barber_mobile/core/auth/customer.dart';
 
 class MyAccountScreen extends StatefulWidget {
-  const MyAccountScreen({Key? key}) : super(key: key);
+  const MyAccountScreen({super.key});
 
   @override
   State<MyAccountScreen> createState() => _MyAccountScreenState();
@@ -16,7 +16,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
 
   String _username = '';
 
-  ApiRequests _apiRequests = ApiRequests();
+  final ApiRequests _apiRequests = ApiRequests();
 
   @override
   void initState() {
@@ -61,9 +61,9 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
           ListTile(
             title: Text(
               _phone,
-              style: TextStyle(color: Colors.white), // Set text color to orange
+              style: const TextStyle(color: Colors.white), // Set text color to orange
             ),
-            leading: Icon(
+            leading: const Icon(
               Icons.phone,
               color: Colors.white, // Set icon color to orange
             ),
@@ -71,7 +71,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
           ListTile(
             title: Text(
               _email,
-              style: TextStyle(color: Colors.white), // Set text color to orange
+              style: const TextStyle(color: Colors.white), // Set text color to orange
             ),
             leading: const Icon(
               Icons.email,
@@ -85,7 +85,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
           ListTile(
             title: Text(
               _username,
-              style: TextStyle(color: Colors.white), // Set text color to orange
+              style: const TextStyle(color: Colors.white), // Set text color to orange
             ),
             leading: const Icon(
               Icons.person,

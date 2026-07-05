@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hamro_barber_mobile/core/auth/login.dart';
 import 'package:hamro_barber_mobile/core/auth/token.dart'; // Import your Token class
+import 'package:hamro_barber_mobile/features/auth/login_view.dart';
 import 'package:hamro_barber_mobile/profile/changepassword.dart';
 
 import 'Myaccount.dart';
@@ -10,7 +10,7 @@ import 'profile_menu.dart';
 // Import your Login screen
 
 class Body extends StatelessWidget {
-  const Body({Key? key}) : super(key: key);
+  const Body({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -112,12 +112,12 @@ class Body extends StatelessWidget {
 
   Future<void> _logout(BuildContext context) async {
     // Clear the stored token
-    Token _token = Token();
-    await _token.clearBearerToken();
+    Token token = Token();
+    await token.clearBearerToken();
 
     // Navigate to the Login screen
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => const Login()),
+      MaterialPageRoute(builder: (context) => const LoginView()),
       (Route<dynamic> route) => false,
     );
   }

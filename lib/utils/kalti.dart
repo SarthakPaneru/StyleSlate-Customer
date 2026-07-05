@@ -4,7 +4,7 @@ import 'package:khalti_flutter/khalti_flutter.dart';
 class KhaltiInitializer extends StatelessWidget {
   final Widget child;
 
-  KhaltiInitializer({required this.child});
+  const KhaltiInitializer({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

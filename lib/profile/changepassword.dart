@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hamro_barber_mobile/config/api_requests.dart';
 
-import 'package:hamro_barber_mobile/config/api_service.dart';
-import 'package:hamro_barber_mobile/constants/app_constants.dart';
 import 'package:http/http.dart' as http;
 
 class ChangePasswordScreen extends StatefulWidget {
@@ -187,7 +185,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 ),
                 fillColor: Colors.transparent,
                 filled: true,
-                hintStyle: TextStyle(color: Colors.white),
+                hintStyle: const TextStyle(color: Colors.white),
                 labelText: 'New Password',
                 suffixIcon: IconButton(
                   onPressed: () {
@@ -236,8 +234,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             const SizedBox(height: 30.0),
             ElevatedButton(
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(
-                  Color.fromARGB(255, 34, 34, 46),
+                backgroundColor: WidgetStateProperty.all<Color>(
+                  const Color.fromARGB(255, 34, 34, 46),
                 ),
               ),
               onPressed: _changePassword,

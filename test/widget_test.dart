@@ -1,30 +1,22 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:hamro_barber_mobile/main.dart';
+import 'package:hamro_barber_mobile/app/app.locator.dart';
+import 'package:hamro_barber_mobile/app/app_dependencies.dart';
+import 'package:hamro_barber_mobile/features/auth/login_view.dart';
+import 'package:hamro_barber_mobile/ui_toolkit/app_theme.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const Mainpage());
+  setUp(() async {
+    await setupLocator();
+    registerAppDependencies();
+  });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  tearDown(() => locator.reset());
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  testWidgets('LoginView renders the login form', (WidgetTester tester) async {
+    await tester.pumpWidget(MaterialApp(theme: AppTheme.light, home: const LoginView()));
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('Login'), findsWidgets);
+    expect(find.text('Log in'), findsOneWidget);
   });
 }

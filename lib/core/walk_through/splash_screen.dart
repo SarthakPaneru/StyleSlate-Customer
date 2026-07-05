@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hamro_barber_mobile/core/auth/login.dart';
-import 'package:hamro_barber_mobile/core/auth/token.dart';
-import 'package:hamro_barber_mobile/modules/screens/homepage.dart';
+import 'package:hamro_barber_mobile/features/auth/login_view.dart';
+import 'package:hamro_barber_mobile/features/home/home_shell_view.dart';
+import 'package:hamro_barber_mobile/services/token_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -22,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _checkLoginStatus() async {
-    String? token = await Token().retrieveBearerToken();
+    String? token = await TokenService().retrieveBearerToken();
     if (token != null) {
       openDashBoard();
     } else {
@@ -32,12 +32,12 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void openDashBoard() {
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => const HomePage()));
+        context, MaterialPageRoute(builder: (context) => const HomeShellView()));
   }
 
   void openLogin() {
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => const Login()));
+        context, MaterialPageRoute(builder: (context) => const LoginView()));
   }
 
   @override

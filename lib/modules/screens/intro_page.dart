@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hamro_barber_mobile/core/auth/login.dart';
+import 'package:hamro_barber_mobile/features/auth/login_view.dart';
 import 'package:hamro_barber_mobile/widgets/colors.dart';
 
 class IntroPage extends StatelessWidget {
@@ -34,7 +34,7 @@ class IntroPage extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
                   builder: (BuildContext context) {
-                    return const Login();
+                    return const LoginView();
                   },
                 ));
               },

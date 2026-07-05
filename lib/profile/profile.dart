@@ -85,10 +85,10 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               ElevatedButton(
                 onPressed: getImage,
-                child: const Text('Edit Profile Picture'),
                 style: ButtonStyle(
-                    backgroundColor: MaterialStateColor.resolveWith(
+                    backgroundColor: WidgetStateColor.resolveWith(
                         (states) => Colors.transparent)),
+                child: const Text('Edit Profile Picture'),
               ),
             ],
           ),

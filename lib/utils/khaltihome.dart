@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hamro_barber_mobile/modules/screens/homepage.dart';
+import 'package:hamro_barber_mobile/features/home/home_shell_view.dart';
 import 'package:khalti_flutter/khalti_flutter.dart';
 
 class PaymentPage extends StatelessWidget {
@@ -13,11 +13,13 @@ class PaymentPage extends StatelessWidget {
     },
   );
 
+  PaymentPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Khalti Payment'),
+        title: const Text('Khalti Payment'),
       ),
       body: Center(
         child: InkWell(
@@ -32,7 +34,7 @@ class PaymentPage extends StatelessWidget {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (BuildContext context) {
-                      return HomePage();
+                      return const HomeShellView();
                     },
                   ),
                 );
@@ -50,15 +52,15 @@ class PaymentPage extends StatelessWidget {
               },
               onCancel: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Payment Cancelled')),
+                  const SnackBar(content: Text('Payment Cancelled')),
                 );
               },
             );
           },
           child: Container(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             color: Colors.blue,
-            child: Text(
+            child: const Text(
               'Pay with Khalti',
               style: TextStyle(color: Colors.white),
             ),
