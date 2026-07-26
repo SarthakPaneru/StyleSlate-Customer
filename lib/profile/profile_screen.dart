@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hamro_barber_mobile/constants/app_strings.dart';
 
 import '/profile/body.dart';
 
@@ -9,13 +10,8 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0.0,
-        backgroundColor: const Color(0xff323345),
         centerTitle: true,
-        title: const Text(
-          "Profile",
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text(AppStrings.profileTitle),
       ),
       body: const Body(),
     );

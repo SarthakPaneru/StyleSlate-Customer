@@ -1,99 +1,61 @@
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:hamro_barber_mobile/config/api_requests.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:hamro_barber_mobile/constants/app_strings.dart';
+import 'package:hamro_barber_mobile/data/profile/profile_repository_factory.dart';
+import 'package:hamro_barber_mobile/features/profile/viewmodel/profile_avatar_view_model.dart';
+import 'package:hamro_barber_mobile/ui_kit/feedback/app_snackbar.dart';
+import 'package:hamro_barber_mobile/ui_kit/surfaces/app_avatar_image.dart';
 
-class ProfilePage extends StatefulWidget {
+class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   @override
-  _ProfilePageState createState() => _ProfilePageState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => ProfileAvatarViewModel(createProfileRepository())..loadImageUrl(),
+      child: const _ProfileAvatarView(),
+    );
+  }
 }
 
-class _ProfilePageState extends State<ProfilePage> {
-  final ApiRequests _apiRequests = ApiRequests();
-  File? _image;
+class _ProfileAvatarView extends StatelessWidget {
+  const _ProfileAvatarView();
 
-  String _imageUrl = '';
-  bool isLoading = false;
+  Future<void> _pickAndUpload(BuildContext context, ProfileAvatarViewModel viewModel) async {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile == null) return;
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    getImageUrl();
-  }
+    final success = await viewModel.uploadImage(File(pickedFile.path));
+    if (!context.mounted) return;
 
-  Future<void> getImageUrl() async {
-    String image = await _apiRequests.retrieveImageUrl();
-    setState(() {
-      _imageUrl = image;
-      print(_imageUrl);
-    });
-  }
-
-  Future getImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
-        _apiRequests.uploadImage(_image!);
-      }
-    });
+    if (success) {
+      AppSnackbar.showSuccess(context, AppStrings.profilePictureUpdated);
+      await viewModel.loadImageUrl();
+    } else {
+      AppSnackbar.showError(
+        context,
+        viewModel.errorMessage ?? AppStrings.profilePictureUploadFailed,
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 250,
-      width: 170,
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              InkWell(
-                child: FittedBox(
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(5),
-                      topRight: Radius.circular(5),
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: CachedNetworkImage(
-                      imageUrl: _imageUrl,
-                      placeholder: (context, url) => const Icon(
-                        Icons.person,
-                        size: 80,
-                      ),
-                      fit: BoxFit.cover,
-                      height: 200,
-                      width: 150,
-                      errorWidget: (context, url, error) => const Icon(
-                        Icons
-                            .person, // You can use any widget as the error placeholder
-                        size: 80,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: getImage,
-                child: const Text('Edit Profile Picture'),
-                style: ButtonStyle(
-                    backgroundColor: MaterialStateColor.resolveWith(
-                        (states) => Colors.transparent)),
-              ),
-            ],
-          ),
+    final viewModel = context.watch<ProfileAvatarViewModel>();
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        AppAvatarImage(imageUrl: viewModel.imageUrl, size: 120),
+        const SizedBox(height: 12),
+        TextButton(
+          onPressed: () => _pickAndUpload(context, viewModel),
+          child: const Text(AppStrings.editProfilePicture),
         ),
-      ),
+      ],
     );
   }
 }

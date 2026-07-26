@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hamro_barber_mobile/core/auth/login.dart';
+import 'package:hamro_barber_mobile/constants/app_strings.dart';
+import 'package:hamro_barber_mobile/features/auth/view/login_screen.dart';
 import 'package:hamro_barber_mobile/core/auth/token.dart'; // Import your Token class
 import 'package:hamro_barber_mobile/profile/changepassword.dart';
 
@@ -14,8 +15,8 @@ class Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: const Color(0xff323345), // Set the background color here
+    return ColoredBox(
+      color: Theme.of(context).colorScheme.surface,
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(vertical: 20),
         child: Column(
@@ -23,65 +24,52 @@ class Body extends StatelessWidget {
             const ProfilePage(),
             const SizedBox(height: 20),
             ProfileMenu(
-              text: "My Account",
+              text: AppStrings.menuMyAccount,
               icon: "lib/assets/images/User Icon.svg",
               press: () {
                 navigateTOMyaccount(context);
               },
             ),
             ProfileMenu(
-              text: "Notifications",
+              text: AppStrings.menuNotifications,
               icon: "lib/assets/images/Bell.svg",
               press: () {},
             ),
             ProfileMenu(
-              text: "Settings",
+              text: AppStrings.menuSettings,
               icon: "lib/assets/images/Settings.svg",
               press: () {
                 navigateTOChangePassword(context);
               },
             ),
             ProfileMenu(
-              text: "Help Center",
+              text: AppStrings.menuHelpCenter,
               icon: "lib/assets/images/Question mark.svg",
               press: () {
                 navigateTOHelpcenter(context);
               },
             ),
             ProfileMenu(
-              text: "Log Out",
+              text: AppStrings.menuLogOut,
               icon: "lib/assets/images/Log out.svg",
               press: () {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      content: const Text('Are you sure you want to log out?'),
+                      content: const Text(AppStrings.logOutConfirmMessage),
                       actions: <Widget>[
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                          ),
-                          child: const Text(
-                            'Yes',
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                          onPressed: () async {
-                            // Perform logout action
-                            await _logout(context);
-                          },
-                        ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                          ),
-                          child: const Text(
-                            'No',
-                            style: TextStyle(color: Colors.grey),
-                          ),
+                        TextButton(
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
+                          child: const Text(AppStrings.no),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            await _logout(context);
+                          },
+                          child: const Text(AppStrings.yes),
                         ),
                       ],
                     );
@@ -117,7 +105,7 @@ class Body extends StatelessWidget {
 
     // Navigate to the Login screen
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => const Login()),
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
       (Route<dynamic> route) => false,
     );
   }
