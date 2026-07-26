@@ -1,257 +1,195 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:hamro_barber_mobile/core/auth/customer.dart';
+import 'package:provider/provider.dart';
+import 'package:hamro_barber_mobile/Screen/detailScreen.dart';
+import 'package:hamro_barber_mobile/constants/app_strings.dart';
+import 'package:hamro_barber_mobile/core/mvvm/view_status.dart';
+import 'package:hamro_barber_mobile/data/barbers/barber_repository_factory.dart';
+import 'package:hamro_barber_mobile/features/home/view/barber_card.dart';
+import 'package:hamro_barber_mobile/features/home/view/barber_card_shimmer.dart';
+import 'package:hamro_barber_mobile/features/home/view/barber_search_screen.dart';
+import 'package:hamro_barber_mobile/features/home/viewmodel/home_view_model.dart';
 import 'package:hamro_barber_mobile/modules/screens/categories_bubble.dart';
-import 'package:hamro_barber_mobile/widgets/barberSelection.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hamro_barber_mobile/ui_kit/feedback/app_empty_state.dart';
+import 'package:hamro_barber_mobile/ui_kit/navigation/app_section_header.dart';
 
-class UserHome extends StatefulWidget {
-  const UserHome({Key? key}) : super(key: key);
-
-  @override
-  State<UserHome> createState() => _UserHomeState();
-}
-
-class _UserHomeState extends State<UserHome> {
-  final Customer _customer = Customer();
-  bool _isLoading = true;
-
-  String _firstName = '';
-  double longitude = 0;
-  double latitude = 0;
-
-  @override
-  void initState() {
-    super.initState();
-
-    // if (_firstName == null) {
-    getLocation();
-    getUserDetails();
-    loadLocation();
-    // }
-  }
-
-  void getUserDetails() async {
-    final firstName = await _customer.retrieveFirstName();
-    _firstName = firstName!;
-
-    print(_firstName);
-    setState(() {
-      _isLoading = false;
-    });
-    print(_isLoading);
-  }
-
-  final List<String> categories = [
-    "Haircut",
-    "Hair Style",
-    "Beard",
-    "Treatment",
-    "Beauty Saloon"
-  ];
-
-  final List barberType = [
-    ["Hair style", true],
-    ["Beard", false],
-    ["colouring", false]
-  ];
-
-  void barberTypeSelected(int index) {
-    setState(() {
-      for (int i = 0; i < barberType.length; i++) {
-        barberType[i][1] = false;
-      }
-      barberType[index][1] = true;
-    });
-  }
-
-  void getLocation() async {
-    Future.delayed(const Duration(seconds: 2), () {});
-    LocationPermission permission = await Geolocator.requestPermission();
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.low,
-    );
-    setState(() {
-      longitude = position.longitude;
-      latitude = position.latitude;
-      print("Latitude: ${position.latitude}");
-      print("Longitude: ${position.longitude}");
-    });
-
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    await prefs.setDouble('longitude', longitude);
-    await prefs.setDouble('latitude', latitude);
-    print('longitude stored' + '$longitude');
-    print('latitude stored' + '$latitude');
-  }
-
-  final _textController = TextEditingController();
-  String userPost = '';
-
-  void loadLocation() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      longitude = prefs.getDouble('longitude') ?? 0;
-      //fall back value
-      latitude = prefs.getDouble('latitude') ?? 0;
-    });
-  }
+class UserHome extends StatelessWidget {
+  const UserHome({super.key});
 
   @override
   Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => HomeViewModel(createBarberRepository())..initialize(),
+      child: const _UserHomeView(),
+    );
+  }
+}
+
+class _UserHomeView extends StatefulWidget {
+  const _UserHomeView();
+
+  @override
+  State<_UserHomeView> createState() => _UserHomeViewState();
+}
+
+class _UserHomeViewState extends State<_UserHomeView> {
+  static const _categories = [
+    AppStrings.categoryHaircut,
+    AppStrings.categoryHairStyle,
+    AppStrings.categoryBeard,
+    AppStrings.categoryTreatment,
+    AppStrings.categoryBeautySaloon,
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final viewModel = context.watch<HomeViewModel>();
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xff323345),
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25.0),
-              child: Column(
-                children: [
-                  // greetings row
-                  Row(
+        child: RefreshIndicator(
+          onRefresh: viewModel.loadBarbers,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Hi, $_firstName",
-                            style: const TextStyle(
-                              color: Color(0xffbfa58c),
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            AppStrings.homeGreeting(viewModel.firstName),
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                  color: colorScheme.secondary,
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
-                          const SizedBox(
-                            height: 8,
-                          ),
+                          const SizedBox(height: 8),
                           Text(
-                            'Your location: $longitude, $latitude',
-                            style: const TextStyle(color: Color(0xff616274)),
-                          )
+                            AppStrings.homeLocation(
+                              viewModel.latitude.toStringAsFixed(4),
+                              viewModel.longitude.toStringAsFixed(4),
+                            ),
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
                         ],
                       ),
-                      // Notification
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.all(12),
-                        child: const Icon(Icons.notifications,
-                            color: Colors.white),
-                      ),
+                      Icon(Icons.notifications, color: colorScheme.onSurface),
                     ],
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 25,
-            ),
-            // search bar
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
                 ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _textController,
-                        decoration: const InputDecoration(
-                          hintText: 'Find Your Barber',
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 15),
+                const SizedBox(height: 25),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 17),
+                  child: Material(
+                    color: colorScheme.onSurface.withValues(alpha: 0.06),
+                    borderRadius: BorderRadius.circular(15),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(15),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              BarberSearchScreen(barbers: viewModel.barbers),
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 15),
+                        child: Row(
+                          children: [
+                            Icon(Icons.search,
+                                color: colorScheme.onSurface.withValues(alpha: 0.6)),
+                            const SizedBox(width: 12),
+                            Text(
+                              AppStrings.homeFindYourBarber,
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: colorScheme.onSurface.withValues(alpha: 0.6),
+                                  ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                    IconButton(
-                      onPressed: () {
-                        // Clear the text that is typed
-                        _textController.clear();
-                      },
-                      icon: const Icon(Icons.clear),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-            // how do you feel?
-            const Padding(
-              padding: EdgeInsets.only(left: 10, top: 5),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Category',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Icon(
-                    Icons.more_horiz,
-                    color: Colors.white,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            // 4 different faces
-            Column(
-              children: [
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: const AppSectionHeader(title: AppStrings.homeCategorySectionTitle),
+                ),
+                const SizedBox(height: 12),
                 SizedBox(
                   height: 130,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    itemCount: categories.length,
-                    itemBuilder: (context, index) {
-                      return CategoriesBubble(
-                        text: categories[index],
-                        index: index,
-                      );
-                    },
+                    itemCount: _categories.length,
+                    itemBuilder: (context, index) => CategoriesBubble(
+                      text: _categories[index],
+                      index: index,
+                    ),
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: const AppSectionHeader(title: AppStrings.homeRecommendedBarbersTitle),
+                ),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: _buildBarberList(viewModel),
+                ),
+                const SizedBox(height: 20),
               ],
             ),
-            const SizedBox(
-              height: 2,
-            ),
+          ),
+        ),
+      ),
+    );
+  }
 
-            const Padding(
-              padding: EdgeInsets.only(left: 10, top: 5, right: 5),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Recommended Barbers',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+  Widget _buildBarberList(HomeViewModel viewModel) {
+    if (viewModel.status == ViewStatus.loading) {
+      return SizedBox(
+        height: 190,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: 3,
+          itemBuilder: (context, index) => const BarberCardShimmer(),
+        ),
+      );
+    }
+    if (viewModel.status == ViewStatus.error) {
+      return AppEmptyState(
+        icon: Icons.wifi_off,
+        message: viewModel.errorMessage ?? AppStrings.homeBarbersLoadFailed,
+        onRetry: viewModel.loadBarbers,
+      );
+    }
+    if (viewModel.barbers.isEmpty) {
+      return const AppEmptyState(message: AppStrings.homeNoBarbersNearby);
+    }
+    return SizedBox(
+      height: 190,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: viewModel.barbers.length,
+        itemBuilder: (context, index) {
+          final barber = viewModel.barbers[index];
+          return BarberCard(
+            barber: barber,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => DetailScreen(barberId: barber.id),
               ),
             ),
-            const SizedBox(height: 5),
-            Expanded(
-              child: _isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : BarberSelection(latitude, longitude),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

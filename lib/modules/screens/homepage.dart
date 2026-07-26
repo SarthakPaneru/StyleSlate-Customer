@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hamro_barber_mobile/constants/app_strings.dart';
 import 'package:hamro_barber_mobile/core/auth/customer.dart';
 import 'package:hamro_barber_mobile/modules/screens/user_account.dart';
 import 'package:hamro_barber_mobile/modules/screens/user_book.dart';
@@ -15,32 +16,17 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final List barberType = [
-    [
-      "Hair style",
-      true,
-    ],
-    [
-      "Beard",
-      false,
-    ],
-    [
-      "colouring",
-      false,
-    ]
-  ];
-
   int _selectedIndex = 0;
-  late int id;
-  Customer customer = Customer();
-  late double longitude;
-  late double latitude;
+  final Customer _customer = Customer();
+  int? _customerId;
+  double _longitude = 0;
+  double _latitude = 0;
 
   @override
   void initState() {
-    getCustomerId();
-    loadLocation();
     super.initState();
+    _loadCustomerId();
+    _loadLocation();
   }
 
   void _navigateBottomNavBar(int index) {
@@ -49,76 +35,69 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  final List<Widget> _children = [
-    const UserHome(),
-    const UserFavorite(),
-    const UserBook(),
-    const UserAccount(),
+  final List<Widget> _children = const [
+    UserHome(),
+    UserFavorite(),
+    UserBook(),
+    UserAccount(),
   ];
 
-  void _onAddButtonPressed() {
-    // Handle the floating action button press here
-    print('Floating action button pressed');
-  }
-
-  void getCustomerId() async {
-    int tempid = (await customer.retrieveCustomerId())!;
-
+  Future<void> _loadCustomerId() async {
+    final customerId = await _customer.retrieveCustomerId();
+    if (!mounted || customerId == null) return;
     setState(() {
-      id = tempid;
+      _customerId = customerId;
     });
   }
 
-  void loadLocation() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
+  Future<void> _loadLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
     setState(() {
-      longitude = prefs.getDouble('longitude') ?? 0;
-      //fall back value
-      latitude = prefs.getDouble('latitude') ?? 0;
-      print('DAAAAAAAAAATAAAAAAAAAAAAAA: $longitude');
+      _longitude = prefs.getDouble('longitude') ?? 0;
+      _latitude = prefs.getDouble('latitude') ?? 0;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: _children[_selectedIndex],
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       extendBody: true,
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return ChatPage(id, longitude, latitude);
+        onPressed: _customerId == null
+            ? null
+            : () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ChatPage(_customerId!, _longitude, _latitude),
+                  ),
+                );
               },
-            ),
-          );
-        },
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        tooltip: AppStrings.chatTooltip,
+        child: const Icon(Icons.chat_bubble_outline),
       ),
-      bottomNavigationBar: Stack(
-        children: [
-          BottomNavigationBar(
-            currentIndex: _selectedIndex,
-            onTap: _navigateBottomNavBar,
-            type: BottomNavigationBarType.fixed,
-            selectedItemColor: Colors.white,
-            unselectedItemColor: Colors.grey,
-            backgroundColor: const Color(0xff323345),
-            elevation: 10,
-            items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.favorite), label: 'Favorite'),
-              BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Book'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.person), label: 'Account'),
-            ],
-          ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _navigateBottomNavBar,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: colorScheme.secondary,
+        unselectedItemColor: colorScheme.onSurface.withValues(alpha: 0.5),
+        backgroundColor: colorScheme.surface,
+        elevation: 10,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: AppStrings.navHome),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.favorite), label: AppStrings.navFavorite),
+          BottomNavigationBarItem(icon: Icon(Icons.book), label: AppStrings.navBook),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.person), label: AppStrings.navAccount),
         ],
       ),
     );
