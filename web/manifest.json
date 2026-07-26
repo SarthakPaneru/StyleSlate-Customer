@@ -1,6 +1,6 @@
 {
-    "name": "hamro_barber_mobile",
-    "short_name": "hamro_barber_mobile",
+    "name": "hamro_barber",
+    "short_name": "hamro_barber",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
