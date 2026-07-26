@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:khalti_flutter/khalti_flutter.dart';
+import 'package:hamro_barber_mobile/theme/app_theme.dart';
 
+/// This owns the app's single MaterialApp (KhaltiScope's builder is where
+/// khalti_flutter expects the navigatorKey to be attached). Do not wrap
+/// [child] in a second MaterialApp — nested MaterialApps means anything
+/// that defaults to the root navigator (e.g. showDialog's useRootNavigator)
+/// escapes into an untheemed app instance.
 class KhaltiInitializer extends StatelessWidget {
-  final Widget child;
+  const KhaltiInitializer({super.key, required this.child});
 
-  KhaltiInitializer({required this.child});
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
@@ -14,6 +20,8 @@ class KhaltiInitializer extends StatelessWidget {
       builder: (context, navigatorKey) {
         return MaterialApp(
           navigatorKey: navigatorKey,
+          theme: AppTheme.dark(),
+          debugShowCheckedModeBanner: false,
           supportedLocales: const [
             Locale('en', 'US'),
             Locale('ne', 'NP'),

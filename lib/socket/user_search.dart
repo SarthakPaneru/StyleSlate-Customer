@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:hamro_barber_mobile/constants/app_strings.dart';
 import 'package:hamro_barber_mobile/socket/socket_dto.dart';
 // import 'package:stomp_dart_client/stomp.dart';
 // import 'package:stomp_dart_client/stomp_config.dart';
@@ -110,7 +111,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat with ${widget.id}'),
+        title: Text(AppStrings.chatWithTitle(widget.id.toString())),
       ),
       body: Column(
         children: [
@@ -136,7 +137,7 @@ class _ChatPageState extends State<ChatPage> {
                     child: TextField(
                       controller: msgtext,
                       decoration:
-                          const InputDecoration(labelText: 'Send a message'),
+                          const InputDecoration(labelText: AppStrings.chatMessageHint),
                     ),
                   ),
                   IconButton(
@@ -159,7 +160,7 @@ class _ChatPageState extends State<ChatPage> {
           if (!connected)
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text('Disconnected from WebSocket'),
+              child: Text(AppStrings.chatDisconnected),
             ),
         ],
       ),

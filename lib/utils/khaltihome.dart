@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hamro_barber_mobile/constants/app_strings.dart';
 import 'package:hamro_barber_mobile/modules/screens/homepage.dart';
 import 'package:khalti_flutter/khalti_flutter.dart';
 
@@ -17,7 +18,7 @@ class PaymentPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Khalti Payment'),
+        title: Text(AppStrings.khaltiPaymentTitle),
       ),
       body: Center(
         child: InkWell(
@@ -38,19 +39,20 @@ class PaymentPage extends StatelessWidget {
                 );
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                      content:
-                          Text('Payment Successful: ${successModel.token}')),
+                      content: Text(AppStrings.khaltiPaymentSuccessful(
+                          successModel.token))),
                 );
               },
               onFailure: (failureModel) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                      content: Text('Payment Failed: ${failureModel.message}')),
+                      content: Text(AppStrings.khaltiPaymentFailed(
+                          failureModel.message))),
                 );
               },
               onCancel: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Payment Cancelled')),
+                  const SnackBar(content: Text(AppStrings.khaltiPaymentCancelled)),
                 );
               },
             );
@@ -59,7 +61,7 @@ class PaymentPage extends StatelessWidget {
             padding: EdgeInsets.all(16.0),
             color: Colors.blue,
             child: Text(
-              'Pay with Khalti',
+              AppStrings.khaltiPayWithKhalti,
               style: TextStyle(color: Colors.white),
             ),
           ),

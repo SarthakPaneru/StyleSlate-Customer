@@ -4,16 +4,16 @@ import 'package:hamro_barber_mobile/config/firebase_api.dart';
 import 'package:hamro_barber_mobile/core/walk_through/splash_screen.dart';
 import 'package:hamro_barber_mobile/firebase_options.dart';
 import 'package:hamro_barber_mobile/utils/kalti.dart';
-// Import the Khalti initializer
+
+import 'modules/screens/homepage.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await FirebaseApi().initializeNotifications();
-  runApp(
-    const MyApp(), // Use MyApp instead of Mainpage
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -21,24 +21,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return KhaltiInitializer(
-      child: Mainpage(), // Pass the Mainpage to KhaltiInitializer
-    );
-  }
-}
-
-class Mainpage extends StatelessWidget {
-  const Mainpage({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData.light(useMaterial3: true),
-      debugShowCheckedModeBanner:
-          false, // Set debugShowCheckedModeBanner to false
-      home: SplashScreen(),
-    );
+    return const KhaltiInitializer(child: HomePage());
   }
 }
