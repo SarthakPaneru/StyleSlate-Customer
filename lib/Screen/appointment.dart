@@ -1,100 +1,27 @@
-import 'dart:convert';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:hamro_barber_mobile/config/api_requests.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:hamro_barber_mobile/constants/app_strings.dart';
+import 'package:hamro_barber_mobile/core/mvvm/view_status.dart';
+import 'package:hamro_barber_mobile/core/utils/image_url_builder.dart';
+import 'package:hamro_barber_mobile/data/appointments/appointment_repository_factory.dart';
+import 'package:hamro_barber_mobile/features/appointments/viewmodel/appointments_view_model.dart';
+import 'package:hamro_barber_mobile/theme/app_colors.dart';
+import 'package:hamro_barber_mobile/ui_kit/feedback/app_empty_state.dart';
+import 'package:hamro_barber_mobile/ui_kit/feedback/app_shimmer.dart';
+import 'package:hamro_barber_mobile/ui_kit/surfaces/app_avatar_image.dart';
 
 class ScheduledAppointmentPage extends StatefulWidget {
   const ScheduledAppointmentPage({super.key});
 
   @override
-  _ScheduledAppointmentPageState createState() =>
+  State<ScheduledAppointmentPage> createState() =>
       _ScheduledAppointmentPageState();
 }
 
 class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
     with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  final ApiRequests _apiRequests = ApiRequests();
-  bool isCompleted = false;
-  List<String> _barberNames = List.empty(growable: true);
-  List<int> _userIds = List.empty(growable: true);
-  List<String> _imageUrls = List.empty(growable: true);
-  List<String> _dates = List.empty(growable: true);
-  List<String> _times = List.empty(growable: true);
-  List<String> _serviceNames = List.empty(growable: true);
-  int _lengthOfResponse = 0;
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    getAppointments("upcoming");
-    _tabController = TabController(length: 3, vsync: this);
-  }
-
-  void getImageUrl() {
-    for (int i = 0; i < _lengthOfResponse; i++) {
-      String image = _apiRequests.retrieveImageUrlFromUserId(_userIds[i]);
-      print('Image URL: $image');
-      _imageUrls.add(image);
-    }
-    // setState(() {
-    //   isLoading = false;
-    // });
-  }
-
-  Future<void> getAppointments(String status) async {
-    try {
-      http.Response response = await _apiRequests.getAppointments(status);
-      List<dynamic> jsonResponse = jsonDecode(response.body);
-      _lengthOfResponse = jsonResponse.length;
-      print('Length of response: $_lengthOfResponse');
-      for (int i = 0; i < _lengthOfResponse; i++) {
-        getAppointment(jsonResponse[i]);
-      }
-      getImageUrl();
-      setState(() {
-        isLoading = false;
-      });
-    } catch (e) {
-      print('Error decoding JSON: $e');
-    }
-  }
-
-  Future<void> getAppointment(final response) async {
-    Map<String, dynamic> jsonResponseAppointment =
-        jsonDecode(jsonEncode(response));
-    final bookingStart = jsonResponseAppointment['bookingStart'];
-    print('Booking start: $bookingStart');
-    final DateTime dateTime =
-        DateTime.fromMillisecondsSinceEpoch(bookingStart * 1000);
-    print('DateTime: ${dateTime.toLocal()}');
-    print('DateTime: ${dateTime}');
-
-    final date = DateFormat('yyyy-MM-dd').format(dateTime);
-    _dates.add(date);
-    final time = DateFormat('HH:mm').format(dateTime);
-    _times.add(time);
-
-    Map<String, dynamic> barber = jsonResponseAppointment['barber'];
-    Map<String, dynamic> jsonResponseBarber = jsonDecode(jsonEncode(barber));
-
-    Map<String, dynamic> user = jsonResponseBarber['user'];
-    _userIds.add(user['id']);
-
-    Map<String, dynamic> jsonResponseUser = jsonDecode(jsonEncode(user));
-
-    final barberName =
-        '${jsonResponseUser['firstName']} ${jsonResponseUser['lastName']}';
-    _barberNames.add(barberName);
-
-    Map<String, dynamic> service = jsonResponseAppointment['services'][0];
-    final serviceName = service['serviceName'];
-    _serviceNames.add(serviceName);
-  }
+  late final TabController _tabController =
+      TabController(length: 3, vsync: this);
 
   @override
   void dispose() {
@@ -105,107 +32,136 @@ class _ScheduledAppointmentPageState extends State<ScheduledAppointmentPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xff323345),
       appBar: AppBar(
-        title: const Text(
-          'Scheduled Appointments',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: const Color(0xff323345),
+        title: const Text(AppStrings.appointmentsTitle),
         bottom: TabBar(
-          labelColor: Colors.white,
           controller: _tabController,
           tabs: const [
-            Tab(text: 'Upcoming'),
-            Tab(text: 'Completed'),
-            Tab(text: 'Cancelled'),
+            Tab(text: AppStrings.appointmentsTabUpcoming),
+            Tab(text: AppStrings.appointmentsTabCompleted),
+            Tab(text: AppStrings.appointmentsTabCancelled),
           ],
-          onTap: (value) => setState(() async {
-            switch (value) {
-              case 0:
-                isCompleted = false;
-                await getAppointments("upcoming");
-                break;
-
-              case 1:
-                isCompleted = true;
-                await getAppointments("completed");
-                break;
-
-              case 2:
-                isCompleted = true;
-                await getAppointments("cancelled");
-                break;
-
-              default:
-                break;
-            }
-          }),
         ),
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
-          _buildAppointmentList(false), // Upcoming Appointments
-          _buildAppointmentList(true), // Completed Appointments
-          _buildAppointmentList(false)
+        children: const [
+          _AppointmentTab(status: 'upcoming'),
+          _AppointmentTab(status: 'completed'),
+          _AppointmentTab(status: 'cancelled'),
         ],
       ),
     );
   }
+}
 
-  Widget _buildAppointmentList(bool isCompleted) {
-    return Scaffold(
-        backgroundColor: const Color(0xff323345),
-        body: isLoading
-            ? const Center(
-                child: CircularProgressIndicator(),
-              )
-            : ListView.builder(
-                itemCount: _lengthOfResponse,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 8.0, horizontal: 16.0),
-                    child: Card(
-                      color: Color(0xff323345),
-                      elevation: 2.0,
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          child: 
-                          CachedNetworkImage(imageUrl: _imageUrls[index]),
-                        ),
-                        title: Text(
-                          _barberNames[index],
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Date: ${_dates[index]}',
-                                style: TextStyle(color: Colors.white70)),
-                            Text('Time: ${_times[index]}',
-                                style: TextStyle(color: Colors.white70)),
-                            Text('Service: ${_serviceNames[index]}',
-                                style: TextStyle(color: Colors.white70)),
-                          ],
-                        ),
-                        trailing: isCompleted
-                            ? Icon(Icons.check_circle, color: Colors.green)
-                            : IconButton(
-                                icon: Icon(Icons.cancel),
-                                color: Colors.red,
-                                onPressed: () {
-                                  // Cancel appointment logic here
-                                },
-                              ),
-                      ),
-                    ),
-                  );
-                },
-              ));
+class _AppointmentTab extends StatefulWidget {
+  const _AppointmentTab({required this.status});
+
+  final String status;
+
+  @override
+  State<_AppointmentTab> createState() => _AppointmentTabState();
+}
+
+class _AppointmentTabState extends State<_AppointmentTab> {
+  late final AppointmentsViewModel _viewModel =
+      AppointmentsViewModel(createAppointmentRepository());
+
+  @override
+  void initState() {
+    super.initState();
+    _viewModel.addListener(_onChanged);
+    _viewModel.load(widget.status);
+  }
+
+  void _onChanged() => setState(() {});
+
+  @override
+  void dispose() {
+    _viewModel.removeListener(_onChanged);
+    super.dispose();
+  }
+
+  Future<void> _refresh() => _viewModel.load(widget.status);
+
+  @override
+  Widget build(BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      child: _buildContent(),
+    );
+  }
+
+  Widget _buildContent() {
+    if (_viewModel.status == ViewStatus.loading) {
+      return ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: 5,
+        itemBuilder: (context, index) => const ShimmerListTile(),
+      );
+    }
+    if (_viewModel.status == ViewStatus.error) {
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          const SizedBox(height: 80),
+          AppEmptyState(
+            icon: Icons.wifi_off,
+            message: _viewModel.errorMessage ?? AppStrings.appointmentsLoadFailed,
+            onRetry: _refresh,
+          ),
+        ],
+      );
+    }
+    if (_viewModel.appointments.isEmpty) {
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: const [
+          SizedBox(height: 80),
+          AppEmptyState(message: AppStrings.appointmentsEmpty),
+        ],
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: _viewModel.appointments.length,
+      itemBuilder: (context, index) {
+        final appointment = _viewModel.appointments[index];
+        final dateTime = DateTime.fromMillisecondsSinceEpoch(
+          appointment.bookingStart * 1000,
+        );
+
+        return Card(
+          color: AppColors.surfaceElevated,
+          margin: const EdgeInsets.only(bottom: 12),
+          child: ListTile(
+            leading: AppAvatarImage(
+              imageUrl: ImageUrlBuilder.forUser(appointment.barberUserId),
+            ),
+            title: Text(
+              appointment.barberName,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(AppStrings.appointmentDate(
+                    DateFormat('yyyy-MM-dd').format(dateTime))),
+                Text(AppStrings.appointmentTime(
+                    DateFormat('HH:mm').format(dateTime))),
+                Text(AppStrings.appointmentService(appointment.serviceName)),
+              ],
+            ),
+            trailing: widget.status == 'completed'
+                ? const Icon(Icons.check_circle, color: AppColors.success)
+                : widget.status == 'cancelled'
+                    ? const Icon(Icons.cancel, color: AppColors.error)
+                    : null,
+          ),
+        );
+      },
+    );
   }
 }

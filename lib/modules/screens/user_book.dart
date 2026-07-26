@@ -6,7 +6,6 @@ class UserBook extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Scaffold(backgroundColor: Color(0xff323345));
     return const ScheduledAppointmentPage();
   }
 }

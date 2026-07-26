@@ -1,29 +1,42 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:hamro_barber_mobile/config/api_requests.dart';
-import 'package:hamro_barber_mobile/modules/screens/homepage.dart';
-import 'package:hamro_barber_mobile/utils/kalti.dart';
-import 'package:hamro_barber_mobile/utils/khaltihome.dart';
-import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:hamro_barber_mobile/constants/app_strings.dart';
+import 'package:hamro_barber_mobile/core/mvvm/view_status.dart';
+import 'package:hamro_barber_mobile/data/appointments/appointment_repository_factory.dart';
+import 'package:hamro_barber_mobile/features/booking/viewmodel/booking_view_model.dart';
+import 'package:hamro_barber_mobile/modules/screens/homepage.dart';
+import 'package:hamro_barber_mobile/ui_kit/buttons/app_primary_button.dart';
+import 'package:hamro_barber_mobile/ui_kit/feedback/app_snackbar.dart';
+import 'package:hamro_barber_mobile/ui_kit/navigation/app_top_bar.dart';
+import 'package:hamro_barber_mobile/utils/khaltihome.dart';
 
-import '../widgets/button.dart';
-import '../widgets/config.dart';
-import '../widgets/custom_appbar.dart';
+class BookingPage extends StatelessWidget {
+  const BookingPage({super.key, required this.barberId, required this.serviceId});
 
-class BookingPage extends StatefulWidget {
   final int barberId;
   final int serviceId;
-  const BookingPage({Key? key, required this.barberId, required this.serviceId})
-      : super(key: key);
 
   @override
-  State<BookingPage> createState() => _BookingPageState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => BookingViewModel(createAppointmentRepository()),
+      child: _BookingView(barberId: barberId, serviceId: serviceId),
+    );
+  }
 }
 
-class _BookingPageState extends State<BookingPage> {
-  final ApiRequests _apiRequests = ApiRequests();
-  //declaration
+class _BookingView extends StatefulWidget {
+  const _BookingView({required this.barberId, required this.serviceId});
+
+  final int barberId;
+  final int serviceId;
+
+  @override
+  State<_BookingView> createState() => _BookingViewState();
+}
+
+class _BookingViewState extends State<_BookingView> {
   CalendarFormat _format = CalendarFormat.month;
   DateTime _focusDay = DateTime.now();
   DateTime _currentDay = DateTime.now();
@@ -31,107 +44,97 @@ class _BookingPageState extends State<BookingPage> {
   bool _isWeekend = false;
   bool _dateSelected = false;
   bool _timeSelected = false;
-  final int _serviceTime = 60;
-  // List<int> servicesIds = List.empty(growable: true);
+  static const _serviceTimeMinutes = 60;
 
-  @override
-  void initState() {
-    super.initState();
-  }
+  Future<void> _submit(BookingViewModel viewModel) async {
+    final desiredTime = TimeOfDay(hour: _currentIndex! + 9, minute: 0);
+    final appointmentDateTime = DateTime(
+      _focusDay.year,
+      _focusDay.month,
+      _focusDay.day,
+      desiredTime.hour,
+      desiredTime.minute,
+    );
 
-  _createAppointment(int bookingStart, int bookingEnd) async {
-    // servicesIds.add(serviceId);
-    print('Appointment Start: $bookingStart');
-    print('Appointment Start: $bookingEnd');
-    http.Response response = await _apiRequests.createAppointment(
-        bookingStart, bookingEnd, widget.barberId, widget.serviceId);
+    final startMillis = appointmentDateTime.toUtc().millisecondsSinceEpoch;
+    final endMillis = startMillis +
+        const Duration(minutes: _serviceTimeMinutes).inMilliseconds;
 
-    if (response.statusCode == 200) {
+    final success = await viewModel.createAppointment(
+      bookingStart: startMillis ~/ 1000,
+      bookingEnd: endMillis ~/ 1000,
+      barberId: widget.barberId,
+      serviceId: widget.serviceId,
+    );
+
+    if (!mounted) return;
+    if (success) {
       showDialog(
         context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Successfully Booked'),
-            content: Text('Barber has been reserved'),
-            actions: <Widget>[
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (BuildContext context) {
-                          return PaymentPage();
-                        },
-                      ),
-                    );
-                  },
-                  child: Text("payment")),
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (BuildContext context) {
-                        return HomePage();
-                      },
-                    ),
-                  );
-                  ;
-                },
+        builder: (context) => AlertDialog(
+          title: const Text(AppStrings.bookingSuccessTitle),
+          content: const Text(AppStrings.bookingSuccessBody),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => PaymentPage()),
               ),
-            ],
-          );
-        },
+              child: const Text(AppStrings.bookingPaymentAction),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const HomePage()),
+                (route) => false,
+              ),
+              child: const Text(AppStrings.ok),
+            ),
+          ],
+        ),
+      );
+    } else {
+      AppSnackbar.showError(
+        context,
+        viewModel.errorMessage ?? AppStrings.bookingFailedGeneric,
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    Config().init(context);
+    final viewModel = context.watch<BookingViewModel>();
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: const CustomAppBar(
-        appTitle: 'Appointment',
-        icon: FaIcon(Icons.arrow_back_ios),
-        actions: [
-          Icon(
-            Icons.payment,
-          ),
-        ],
-      ),
+      appBar: const AppTopBar(title: AppStrings.bookingAppBarTitle),
       body: CustomScrollView(
         slivers: <Widget>[
           SliverToBoxAdapter(
             child: Column(
               children: <Widget>[
-                _tableCalendar(),
+                _tableCalendar(colorScheme),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 25),
                   child: Center(
                     child: Text(
-                      'Select Consultation Time',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
+                      AppStrings.bookingSelectConsultationTime,
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),
           _isWeekend
               ? SliverToBoxAdapter(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 30),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
                     alignment: Alignment.center,
-                    child: const Text(
-                      'Tuesday is not available, please select another date',
+                    child: Text(
+                      AppStrings.bookingTuesdayUnavailable,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.grey,
+                        color: colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ),
@@ -139,6 +142,7 @@ class _BookingPageState extends State<BookingPage> {
               : SliverGrid(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
+                      final isSelected = _currentIndex == index;
                       return InkWell(
                         splashColor: Colors.transparent,
                         onTap: () {
@@ -151,22 +155,19 @@ class _BookingPageState extends State<BookingPage> {
                           margin: const EdgeInsets.all(5),
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: _currentIndex == index
-                                  ? Colors.white
-                                  : Colors.black,
+                              color: isSelected
+                                  ? colorScheme.primary
+                                  : colorScheme.onSurface.withValues(alpha: 0.3),
                             ),
                             borderRadius: BorderRadius.circular(15),
-                            color: _currentIndex == index
-                                ? Config.primaryColor
-                                : null,
+                            color: isSelected ? colorScheme.primary : null,
                           ),
                           alignment: Alignment.center,
                           child: Text(
                             '${index + 9}:00 ${index + 9 > 11 ? "PM" : "AM"}',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color:
-                                  _currentIndex == index ? Colors.white : null,
+                              color: isSelected ? Colors.white : null,
                             ),
                           ),
                         ),
@@ -178,36 +179,14 @@ class _BookingPageState extends State<BookingPage> {
                       crossAxisCount: 4, childAspectRatio: 1.5),
                 ),
           SliverToBoxAdapter(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 80),
-              child: Button(
-                width: double.infinity,
-                title: 'Make Appointment',
-                onPressed: () {
-                  // Define the desired time (11:00 AM)
-                  final desiredTime =
-                      TimeOfDay(hour: _currentIndex! + 9, minute: 0);
-
-                  // Create a DateTime object for the selected date (_focusDay) with the desired time
-                  final DateTime appointmentDateTime = DateTime(
-                    _focusDay.year,
-                    _focusDay.month,
-                    _focusDay.day,
-                    desiredTime.hour,
-                    desiredTime.minute,
-                  );
-
-                  // Convert the appointmentDateTime to UTC timestamp
-                  int appointmentStart =
-                      appointmentDateTime.toUtc().millisecondsSinceEpoch;
-
-                  int appointmentEnd = appointmentStart +
-                      Duration(minutes: _serviceTime).inMilliseconds;
-
-                  _createAppointment((appointmentStart ~/ 1000) as int,
-                      (appointmentEnd ~/ 1000) as int);
-                },
-                disable: _timeSelected && _dateSelected ? false : true,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+              child: AppPrimaryButton(
+                label: AppStrings.bookingMakeAppointment,
+                isLoading: viewModel.status == ViewStatus.loading,
+                onPressed: (_timeSelected && _dateSelected)
+                    ? () => _submit(viewModel)
+                    : null,
               ),
             ),
           ),
@@ -216,37 +195,27 @@ class _BookingPageState extends State<BookingPage> {
     );
   }
 
-  //table calendar
-  Widget _tableCalendar() {
+  Widget _tableCalendar(ColorScheme colorScheme) {
     return TableCalendar(
       focusedDay: _focusDay,
       firstDay: DateTime.now(),
-      lastDay: DateTime(2024, 12, 31),
+      lastDay: DateTime(DateTime.now().year + 1, 12, 31),
       calendarFormat: _format,
       currentDay: _currentDay,
       rowHeight: 48,
-      calendarStyle: const CalendarStyle(
-        todayDecoration:
-            BoxDecoration(color: Config.primaryColor, shape: BoxShape.circle),
+      calendarStyle: CalendarStyle(
+        todayDecoration: BoxDecoration(color: colorScheme.primary, shape: BoxShape.circle),
+        selectedDecoration: BoxDecoration(color: colorScheme.secondary, shape: BoxShape.circle),
       ),
-      availableCalendarFormats: const {
-        CalendarFormat.month: 'Month',
-      },
-      onPageChanged: (focusedDay) {
-        _focusDay = focusedDay;
-      },
-      onFormatChanged: (format) {
-        setState(() {
-          _format = format;
-        });
-      },
-      onDaySelected: ((selectedDay, focusedDay) {
+      availableCalendarFormats: const {CalendarFormat.month: 'Month'},
+      onPageChanged: (focusedDay) => _focusDay = focusedDay,
+      onFormatChanged: (format) => setState(() => _format = format),
+      onDaySelected: (selectedDay, focusedDay) {
         setState(() {
           _currentDay = selectedDay;
           _focusDay = focusedDay;
           _dateSelected = true;
 
-          //check if weekend is selected
           if (selectedDay.weekday == 2) {
             _isWeekend = true;
             _timeSelected = false;
@@ -255,7 +224,7 @@ class _BookingPageState extends State<BookingPage> {
             _isWeekend = false;
           }
         });
-      }),
+      },
     );
   }
 }
