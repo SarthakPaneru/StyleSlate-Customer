@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart' hide Headers;
 import 'package:hamro_barber_mobile/data/auth/models/logged_in_user_response.dart';
 import 'package:retrofit/retrofit.dart';
@@ -14,9 +12,9 @@ abstract class ProfileApi {
   @PUT('/user/update-password')
   Future<void> updatePassword(@Body() UpdatePasswordRequest request);
 
-  @PUT('/user/image/save')
-  @MultiPart()
-  Future<void> uploadImage(@Part(name: 'file') File file);
+  // Avatar upload is not declared here: it needs a per-file, dynamically
+  // detected multipart Content-Type (see ProfileRepositoryImpl), which
+  // Retrofit's @Part only supports as a fixed string.
 
   @GET('/customer/get-logged-in-user')
   Future<LoggedInUserResponse> getLoggedInUser();
