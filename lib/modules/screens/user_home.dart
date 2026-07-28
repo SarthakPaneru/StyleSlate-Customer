@@ -4,6 +4,7 @@ import 'package:hamro_barber_mobile/Screen/detailScreen.dart';
 import 'package:hamro_barber_mobile/constants/app_strings.dart';
 import 'package:hamro_barber_mobile/core/mvvm/view_status.dart';
 import 'package:hamro_barber_mobile/data/barbers/barber_repository_factory.dart';
+import 'package:hamro_barber_mobile/data/profile/profile_repository_factory.dart';
 import 'package:hamro_barber_mobile/features/home/view/barber_card.dart';
 import 'package:hamro_barber_mobile/features/home/view/barber_card_shimmer.dart';
 import 'package:hamro_barber_mobile/features/home/view/barber_search_screen.dart';
@@ -18,7 +19,10 @@ class UserHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => HomeViewModel(createBarberRepository())..initialize(),
+      create: (_) => HomeViewModel(
+        createBarberRepository(),
+        createProfileRepository(),
+      )..initialize(),
       child: const _UserHomeView(),
     );
   }

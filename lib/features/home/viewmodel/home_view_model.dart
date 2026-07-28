@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -7,11 +9,13 @@ import 'package:hamro_barber_mobile/core/mvvm/view_status.dart';
 import 'package:hamro_barber_mobile/core/network/api_exception.dart';
 import 'package:hamro_barber_mobile/data/barbers/barber_repository.dart';
 import 'package:hamro_barber_mobile/data/barbers/models/nearest_barber_model.dart';
+import 'package:hamro_barber_mobile/data/profile/profile_repository.dart';
 
 class HomeViewModel extends ChangeNotifier {
-  HomeViewModel(this._repository);
+  HomeViewModel(this._repository, this._profileRepository);
 
   final BarberRepository _repository;
+  final ProfileRepository _profileRepository;
 
   ViewStatus status = ViewStatus.loading;
   String? errorMessage;
@@ -26,8 +30,11 @@ class HomeViewModel extends ChangeNotifier {
   List<NearestBarberModel> barbers = const [];
 
   Future<void> initialize() async {
+    // Show the cached name immediately so the greeting isn't blank while
+    // the live fetch below is in flight, then refresh it from the backend.
     firstName = await Customer().retrieveFirstName() ?? '';
     notifyListeners();
+    unawaited(_refreshFirstName());
 
     final prefs = await SharedPreferences.getInstance();
     latitude = prefs.getDouble('latitude') ?? 0;
@@ -37,6 +44,16 @@ class HomeViewModel extends ChangeNotifier {
     await _refreshLocation(prefs);
     await _resolvePlaceName();
     await loadBarbers();
+  }
+
+  Future<void> _refreshFirstName() async {
+    try {
+      final account = await _profileRepository.getAccountDetails();
+      firstName = account.firstName;
+      notifyListeners();
+    } on AppException {
+      // Keep whatever was already loaded from the local cache above.
+    }
   }
 
   Future<void> _refreshLocation(SharedPreferences prefs) async {
