@@ -186,6 +186,7 @@ class AppStrings {
   // Profile / My Account
   // ---------------------------------------------------------------------
   static const myAccountTitle = 'My Account';
+  static const myAccountLoadFailed = 'Could not load your account details.';
   static const myAccountNoPhone = 'No phone number';
   static const myAccountNoEmail = 'No email';
   static const myAccountNoName = 'No name';
