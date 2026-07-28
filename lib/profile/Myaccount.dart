@@ -1,36 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hamro_barber_mobile/constants/app_strings.dart';
+import 'package:hamro_barber_mobile/core/auth/current_user_state.dart';
 import 'package:hamro_barber_mobile/core/mvvm/view_status.dart';
 import 'package:hamro_barber_mobile/core/services/app_preferences.dart';
 import 'package:hamro_barber_mobile/core/services/biometric_service.dart';
-import 'package:hamro_barber_mobile/data/profile/profile_repository_factory.dart';
-import 'package:hamro_barber_mobile/features/profile/viewmodel/my_account_view_model.dart';
 import 'package:hamro_barber_mobile/ui_kit/feedback/app_empty_state.dart';
 import 'package:hamro_barber_mobile/ui_kit/feedback/app_shimmer.dart';
 import 'package:hamro_barber_mobile/ui_kit/feedback/app_snackbar.dart';
 import 'package:hamro_barber_mobile/ui_kit/navigation/app_top_bar.dart';
 
-class MyAccountScreen extends StatelessWidget {
+class MyAccountScreen extends StatefulWidget {
   const MyAccountScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => MyAccountViewModel(createProfileRepository())..load(),
-      child: const _MyAccountView(),
-    );
-  }
+  State<MyAccountScreen> createState() => _MyAccountScreenState();
 }
 
-class _MyAccountView extends StatefulWidget {
-  const _MyAccountView();
-
-  @override
-  State<_MyAccountView> createState() => _MyAccountViewState();
-}
-
-class _MyAccountViewState extends State<_MyAccountView> {
+class _MyAccountScreenState extends State<MyAccountScreen> {
   final _preferences = AppPreferences();
   bool _biometricSupported = false;
   bool _biometricEnabled = false;
@@ -38,6 +25,10 @@ class _MyAccountViewState extends State<_MyAccountView> {
   @override
   void initState() {
     super.initState();
+    // Reuses the shared CurrentUserState (populated once at app root) --
+    // a no-op if Home already loaded it, so this never fires a duplicate
+    // GET /customer/get-logged-in-user call.
+    context.read<CurrentUserState>().ensureLoaded();
     _loadBiometricState();
   }
 
@@ -80,16 +71,17 @@ class _MyAccountViewState extends State<_MyAccountView> {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<MyAccountViewModel>();
+    final currentUser = context.watch<CurrentUserState>();
 
     return Scaffold(
       appBar: const AppTopBar(title: AppStrings.myAccountTitle),
-      body: _buildBody(viewModel),
+      body: _buildBody(currentUser),
     );
   }
 
-  Widget _buildBody(MyAccountViewModel viewModel) {
-    if (viewModel.status == ViewStatus.loading) {
+  Widget _buildBody(CurrentUserState currentUser) {
+    if (currentUser.status == ViewStatus.loading ||
+        currentUser.status == ViewStatus.idle) {
       return const AppShimmer(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -104,21 +96,21 @@ class _MyAccountViewState extends State<_MyAccountView> {
       );
     }
 
-    if (viewModel.status == ViewStatus.error) {
+    if (currentUser.status == ViewStatus.error) {
       return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
           const SizedBox(height: 80),
           AppEmptyState(
             icon: Icons.wifi_off,
-            message: viewModel.errorMessage ?? AppStrings.myAccountLoadFailed,
-            onRetry: viewModel.load,
+            message: currentUser.errorMessage ?? AppStrings.myAccountLoadFailed,
+            onRetry: currentUser.refresh,
           ),
         ],
       );
     }
 
-    final account = viewModel.account;
+    final account = currentUser.user;
     final username = account == null
         ? ''
         : '${account.firstName} ${account.lastName}'.trim();

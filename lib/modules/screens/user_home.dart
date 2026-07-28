@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hamro_barber_mobile/Screen/detailScreen.dart';
 import 'package:hamro_barber_mobile/constants/app_strings.dart';
+import 'package:hamro_barber_mobile/core/auth/current_user_state.dart';
 import 'package:hamro_barber_mobile/core/mvvm/view_status.dart';
 import 'package:hamro_barber_mobile/data/barbers/barber_repository_factory.dart';
-import 'package:hamro_barber_mobile/data/profile/profile_repository_factory.dart';
 import 'package:hamro_barber_mobile/features/home/view/barber_card.dart';
 import 'package:hamro_barber_mobile/features/home/view/barber_card_shimmer.dart';
 import 'package:hamro_barber_mobile/features/home/view/barber_search_screen.dart';
@@ -19,10 +19,7 @@ class UserHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => HomeViewModel(
-        createBarberRepository(),
-        createProfileRepository(),
-      )..initialize(),
+      create: (_) => HomeViewModel(createBarberRepository())..initialize(),
       child: const _UserHomeView(),
     );
   }
@@ -47,6 +44,7 @@ class _UserHomeViewState extends State<_UserHomeView> {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<HomeViewModel>();
+    final currentUser = context.watch<CurrentUserState>();
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
@@ -66,7 +64,8 @@ class _UserHomeViewState extends State<_UserHomeView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            AppStrings.homeGreeting(viewModel.firstName),
+                            AppStrings.homeGreeting(
+                                currentUser.user?.firstName ?? ''),
                             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                   color: colorScheme.secondary,
                                   fontWeight: FontWeight.bold,

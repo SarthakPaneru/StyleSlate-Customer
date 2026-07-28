@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:hamro_barber_mobile/constants/app_strings.dart';
 import 'package:hamro_barber_mobile/features/auth/view/login_screen.dart';
+import 'package:hamro_barber_mobile/core/auth/current_user_state.dart';
 import 'package:hamro_barber_mobile/core/auth/token.dart'; // Import your Token class
 import 'package:hamro_barber_mobile/profile/changepassword.dart';
 
@@ -102,6 +104,11 @@ class Body extends StatelessWidget {
     // Clear the stored token
     Token _token = Token();
     await _token.clearBearerToken();
+
+    if (!context.mounted) return;
+    // Reset the shared user profile so the next login never briefly
+    // shows this account's cached name/email.
+    context.read<CurrentUserState>().clear();
 
     // Navigate to the Login screen
     Navigator.of(context).pushAndRemoveUntil(

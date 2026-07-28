@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:hamro_barber_mobile/constants/app_strings.dart';
+import 'package:hamro_barber_mobile/core/auth/current_user_state.dart';
 import 'package:hamro_barber_mobile/core/auth/customer.dart';
 import 'package:hamro_barber_mobile/modules/screens/user_account.dart';
 import 'package:hamro_barber_mobile/modules/screens/user_book.dart';
@@ -27,6 +29,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _loadCustomerId();
     _loadLocation();
+    context.read<CurrentUserState>().ensureLoaded();
   }
 
   void _navigateBottomNavBar(int index) {
