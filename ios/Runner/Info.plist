@@ -32,6 +32,10 @@
 		<string>This app uses your location to find nearby barbers.</string>
 		<key>NSFaceIDUsageDescription</key>
 		<string>Use Face ID to log in to Hamro Barber quickly and securely.</string>
+		<key>NSCameraUsageDescription</key>
+		<string>Hamro Barber uses your camera to take a new profile photo.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Hamro Barber needs access to your photos to set your profile picture.</string>
 		<key>UIApplicationSceneManifest</key>
 		<dict>
 			<key>UIApplicationSupportsMultipleScenes</key>

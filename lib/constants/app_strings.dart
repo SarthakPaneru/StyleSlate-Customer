@@ -193,6 +193,10 @@ class AppStrings {
   static const editProfilePicture = 'Edit Profile Picture';
   static const profilePictureUpdated = 'Profile picture updated.';
   static const profilePictureUploadFailed = 'Could not upload your photo.';
+  static const imageSourceSheetTitle = 'Update profile photo';
+  static const imageSourceCamera = 'Take Photo';
+  static const imageSourceGallery = 'Choose from Gallery';
+  static const imageSourcePickFailed = 'Could not open the picker.';
   static const profileTitle = 'Profile';
   static const logOutConfirmMessage = 'Are you sure you want to log out?';
   static const menuMyAccount = 'My Account';
