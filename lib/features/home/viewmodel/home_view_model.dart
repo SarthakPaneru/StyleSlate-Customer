@@ -1,62 +1,55 @@
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:hamro_barber_mobile/core/auth/customer.dart';
 import 'package:hamro_barber_mobile/core/mvvm/view_status.dart';
 import 'package:hamro_barber_mobile/core/network/api_exception.dart';
 import 'package:hamro_barber_mobile/data/barbers/barber_repository.dart';
 import 'package:hamro_barber_mobile/data/barbers/models/nearest_barber_model.dart';
-import 'package:hamro_barber_mobile/data/profile/profile_repository.dart';
 
 class HomeViewModel extends ChangeNotifier {
-  HomeViewModel(this._repository, this._profileRepository);
+  HomeViewModel(this._repository);
 
   final BarberRepository _repository;
-  final ProfileRepository _profileRepository;
 
   ViewStatus status = ViewStatus.loading;
   String? errorMessage;
-  String firstName = '';
   double latitude = 0;
   double longitude = 0;
 
   /// Human-readable "City, Region" for [latitude]/[longitude], resolved via
-  /// reverse geocoding. Empty until resolved, so the view can show a
-  /// friendly placeholder instead of raw coordinates in the meantime.
+  /// reverse geocoding and cached across launches so it can show instantly
+  /// next time instead of raw coordinates or a "Locating..." placeholder.
   String placeName = '';
   List<NearestBarberModel> barbers = const [];
 
   Future<void> initialize() async {
-    // Show the cached name immediately so the greeting isn't blank while
-    // the live fetch below is in flight, then refresh it from the backend.
-    firstName = await Customer().retrieveFirstName() ?? '';
-    notifyListeners();
-    unawaited(_refreshFirstName());
-
     final prefs = await SharedPreferences.getInstance();
     latitude = prefs.getDouble('latitude') ?? 0;
     longitude = prefs.getDouble('longitude') ?? 0;
+    placeName = prefs.getString('placeName') ?? '';
     notifyListeners();
 
     await _refreshLocation(prefs);
-    await _resolvePlaceName();
+    await _resolvePlaceName(prefs);
     await loadBarbers();
   }
 
-  Future<void> _refreshFirstName() async {
-    try {
-      final account = await _profileRepository.getAccountDetails();
-      firstName = account.firstName;
-      notifyListeners();
-    } on AppException {
-      // Keep whatever was already loaded from the local cache above.
-    }
-  }
-
   Future<void> _refreshLocation(SharedPreferences prefs) async {
+    // Instant, no-GPS-wait position the OS already has cached -- shows up
+    // sooner than waiting on the fresh fix requested below, and often
+    // sooner than our own SharedPreferences cache on a cold start.
+    try {
+      final lastKnown = await Geolocator.getLastKnownPosition();
+      if (lastKnown != null) {
+        latitude = lastKnown.latitude;
+        longitude = lastKnown.longitude;
+        notifyListeners();
+      }
+    } catch (_) {
+      // Fall through to requesting a fresh fix below.
+    }
+
     try {
       await Geolocator.requestPermission();
       final position = await Geolocator.getCurrentPosition(
@@ -68,11 +61,11 @@ class HomeViewModel extends ChangeNotifier {
       await prefs.setDouble('longitude', longitude);
       notifyListeners();
     } catch (_) {
-      // Fall back to the cached location already loaded above.
+      // Fall back to whatever was already loaded above.
     }
   }
 
-  Future<void> _resolvePlaceName() async {
+  Future<void> _resolvePlaceName(SharedPreferences prefs) async {
     if (latitude == 0 && longitude == 0) return;
 
     try {
@@ -83,12 +76,15 @@ class HomeViewModel extends ChangeNotifier {
       final parts = [placemark.locality, placemark.administrativeArea]
           .where((part) => part != null && part.trim().isNotEmpty)
           .toList();
-      placeName = parts.isNotEmpty
-          ? parts.join(', ')
-          : (placemark.country ?? '');
+      final resolved =
+          parts.isNotEmpty ? parts.join(', ') : (placemark.country ?? '');
+      if (resolved.isEmpty) return;
+
+      placeName = resolved;
+      await prefs.setString('placeName', placeName);
       notifyListeners();
     } catch (_) {
-      // Leave placeName empty; the view falls back to a generic label
+      // Keep whichever cached placeName was already loaded above (if any)
       // rather than showing raw coordinates or crashing.
     }
   }
