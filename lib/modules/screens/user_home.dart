@@ -69,12 +69,19 @@ class _UserHomeViewState extends State<_UserHomeView> {
                                 ),
                           ),
                           const SizedBox(height: 8),
-                          Text(
-                            AppStrings.homeLocation(
-                              viewModel.latitude.toStringAsFixed(4),
-                              viewModel.longitude.toStringAsFixed(4),
-                            ),
-                            style: Theme.of(context).textTheme.bodySmall,
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.location_on_outlined,
+                                size: 14,
+                                color: colorScheme.onSurface.withValues(alpha: 0.6),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                _locationLabel(viewModel),
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -150,6 +157,14 @@ class _UserHomeViewState extends State<_UserHomeView> {
         ),
       ),
     );
+  }
+
+  String _locationLabel(HomeViewModel viewModel) {
+    if (viewModel.placeName.isNotEmpty) return viewModel.placeName;
+    final hasCoordinates = viewModel.latitude != 0 || viewModel.longitude != 0;
+    return hasCoordinates
+        ? AppStrings.homeLocationUnavailable
+        : AppStrings.homeLocating;
   }
 
   Widget _buildBarberList(HomeViewModel viewModel) {

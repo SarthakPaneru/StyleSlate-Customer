@@ -114,9 +114,10 @@ class AppStrings {
   // ---------------------------------------------------------------------
   // Home
   // ---------------------------------------------------------------------
-  static String homeGreeting(String firstName) => 'Hi, $firstName';
-  static String homeLocation(String latitude, String longitude) =>
-      'Your location: $latitude, $longitude';
+  static String homeGreeting(String firstName) =>
+      firstName.trim().isEmpty ? 'Hi there' : 'Hi, $firstName';
+  static const homeLocating = 'Locating you...';
+  static const homeLocationUnavailable = 'Location unavailable';
   static const homeFindYourBarber = 'Find your barber';
   static const homeCategorySectionTitle = 'Category';
   static const homeRecommendedBarbersTitle = 'Recommended Barbers';

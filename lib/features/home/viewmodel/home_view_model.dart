@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hamro_barber_mobile/core/auth/customer.dart';
@@ -17,6 +18,11 @@ class HomeViewModel extends ChangeNotifier {
   String firstName = '';
   double latitude = 0;
   double longitude = 0;
+
+  /// Human-readable "City, Region" for [latitude]/[longitude], resolved via
+  /// reverse geocoding. Empty until resolved, so the view can show a
+  /// friendly placeholder instead of raw coordinates in the meantime.
+  String placeName = '';
   List<NearestBarberModel> barbers = const [];
 
   Future<void> initialize() async {
@@ -29,6 +35,7 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
 
     await _refreshLocation(prefs);
+    await _resolvePlaceName();
     await loadBarbers();
   }
 
@@ -45,6 +52,27 @@ class HomeViewModel extends ChangeNotifier {
       notifyListeners();
     } catch (_) {
       // Fall back to the cached location already loaded above.
+    }
+  }
+
+  Future<void> _resolvePlaceName() async {
+    if (latitude == 0 && longitude == 0) return;
+
+    try {
+      final placemarks = await placemarkFromCoordinates(latitude, longitude);
+      if (placemarks.isEmpty) return;
+
+      final placemark = placemarks.first;
+      final parts = [placemark.locality, placemark.administrativeArea]
+          .where((part) => part != null && part.trim().isNotEmpty)
+          .toList();
+      placeName = parts.isNotEmpty
+          ? parts.join(', ')
+          : (placemark.country ?? '');
+      notifyListeners();
+    } catch (_) {
+      // Leave placeName empty; the view falls back to a generic label
+      // rather than showing raw coordinates or crashing.
     }
   }
 
