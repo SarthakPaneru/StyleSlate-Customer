@@ -10,6 +10,7 @@ class RegisterRequest {
     required this.confirmPassword,
     required this.firstName,
     required this.lastName,
+    required this.phone,
   });
 
   final String email;
@@ -17,6 +18,7 @@ class RegisterRequest {
   final String confirmPassword;
   final String firstName;
   final String lastName;
+  final String phone;
 
   Map<String, dynamic> toJson() => _$RegisterRequestToJson(this);
 }

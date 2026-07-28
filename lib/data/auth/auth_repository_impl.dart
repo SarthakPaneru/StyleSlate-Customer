@@ -35,6 +35,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required String confirmPassword,
     required String firstName,
     required String lastName,
+    required String phone,
   }) async {
     try {
       await _authApi.register(
@@ -44,6 +45,7 @@ class AuthRepositoryImpl implements AuthRepository {
           confirmPassword: confirmPassword,
           firstName: firstName,
           lastName: lastName,
+          phone: phone,
         ),
       );
     } on DioException catch (e) {

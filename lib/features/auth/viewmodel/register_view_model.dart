@@ -38,12 +38,24 @@ class RegisterViewModel extends ChangeNotifier {
     return null;
   }
 
+  String? validatePhone(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return AppStrings.validationPhoneRequired;
+    }
+    final digitsOnly = value.trim().replaceAll(RegExp(r'[\s-]'), '');
+    if (!RegExp(r'^\+?\d{7,15}$').hasMatch(digitsOnly)) {
+      return AppStrings.validationPhoneInvalid;
+    }
+    return null;
+  }
+
   Future<bool> register({
     required String email,
     required String password,
     required String confirmPassword,
     required String firstName,
     required String lastName,
+    required String phone,
   }) async {
     status = ViewStatus.loading;
     errorMessage = null;
@@ -56,6 +68,7 @@ class RegisterViewModel extends ChangeNotifier {
         confirmPassword: confirmPassword,
         firstName: firstName,
         lastName: lastName,
+        phone: phone,
       );
       status = ViewStatus.success;
       notifyListeners();

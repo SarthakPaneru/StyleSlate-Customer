@@ -7,6 +7,7 @@ abstract class AuthRepository {
     required String confirmPassword,
     required String firstName,
     required String lastName,
+    required String phone,
   });
 
   Future<void> forgotPassword({required String email});

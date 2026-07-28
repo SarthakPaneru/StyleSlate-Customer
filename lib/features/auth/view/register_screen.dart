@@ -34,6 +34,7 @@ class _RegisterViewState extends State<_RegisterView> {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
@@ -42,6 +43,7 @@ class _RegisterViewState extends State<_RegisterView> {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -56,6 +58,7 @@ class _RegisterViewState extends State<_RegisterView> {
       confirmPassword: _confirmPasswordController.text,
       firstName: _firstNameController.text.trim(),
       lastName: _lastNameController.text.trim(),
+      phone: _phoneController.text.trim(),
     );
 
     if (!mounted) return;
@@ -114,6 +117,14 @@ class _RegisterViewState extends State<_RegisterView> {
                   keyboardType: TextInputType.emailAddress,
                   prefixIcon: Icons.email_outlined,
                   validator: viewModel.validateEmail,
+                ),
+                const SizedBox(height: 16),
+                AppTextField(
+                  controller: _phoneController,
+                  labelText: AppStrings.registerPhone,
+                  keyboardType: TextInputType.phone,
+                  prefixIcon: Icons.phone_outlined,
+                  validator: viewModel.validatePhone,
                 ),
                 const SizedBox(height: 16),
                 AppTextField(

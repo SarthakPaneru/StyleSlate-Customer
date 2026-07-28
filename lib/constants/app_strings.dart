@@ -31,6 +31,8 @@ class AppStrings {
   static const validationConfirmNewPasswordRequired =
       'Confirm your new password';
   static const validationPasswordsDoNotMatch = 'Passwords do not match';
+  static const validationPhoneRequired = 'Phone number is required';
+  static const validationPhoneInvalid = 'Enter a valid phone number';
   static String validationFieldRequired(String fieldName) =>
       '$fieldName is required';
 
@@ -55,6 +57,7 @@ class AppStrings {
   static const registerTitle = 'Create account';
   static const registerFirstName = 'First name';
   static const registerLastName = 'Last name';
+  static const registerPhone = 'Phone number';
   static const registerButton = 'Sign Up';
   static const registerSuccess = 'Account created. Please log in.';
   static const registerFailedGeneric =
