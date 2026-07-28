@@ -28,6 +28,13 @@ class _ProfileAvatarView extends StatelessWidget {
 
   static const _avatarSize = 120.0;
 
+  // A raw camera capture can be 10+ MB, which nginx in front of the
+  // backend rejects with 413 before the request even reaches the app.
+  // Downscale + re-encode on pick so both camera and gallery photos
+  // upload as a reasonably sized JPEG regardless of the original.
+  static const _maxImageDimension = 1024.0;
+  static const _imageQuality = 80;
+
   Future<void> _editPicture(
     BuildContext context,
     ProfileAvatarViewModel viewModel,
@@ -37,7 +44,12 @@ class _ProfileAvatarView extends StatelessWidget {
 
     XFile? pickedFile;
     try {
-      pickedFile = await ImagePicker().pickImage(source: source);
+      pickedFile = await ImagePicker().pickImage(
+        source: source,
+        maxWidth: _maxImageDimension,
+        maxHeight: _maxImageDimension,
+        imageQuality: _imageQuality,
+      );
     } catch (_) {
       if (!context.mounted) return;
       AppSnackbar.showError(context, AppStrings.imageSourcePickFailed);
