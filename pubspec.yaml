@@ -62,6 +62,7 @@ dependencies:
   intl: ^0.18.1
   shimmer: ^3.0.0
   local_auth: ^3.0.2
+  pretty_dio_logger: ^1.4.0
 
 dev_dependencies:
   flutter_test:
