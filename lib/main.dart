@@ -5,9 +5,6 @@ import 'package:hamro_barber_mobile/core/walk_through/splash_screen.dart';
 import 'package:hamro_barber_mobile/firebase_options.dart';
 import 'package:hamro_barber_mobile/utils/kalti.dart';
 
-import 'modules/screens/homepage.dart';
-
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -21,6 +18,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const KhaltiInitializer(child: HomePage());
+    return const KhaltiInitializer(child: SplashScreen());
   }
 }
