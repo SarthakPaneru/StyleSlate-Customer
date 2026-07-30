@@ -47,6 +47,38 @@ class HomeViewModel extends ChangeNotifier {
     unawaited(_loadRecentBarbers());
   }
 
+  // ==========================================================================
+  // TEMPORARY -- DEBUG-ONLY MOCK DATA. DELETE BEFORE PRODUCTION.
+  // Lets the "Book Again" design be previewed on accounts with no real
+  // completed appointments yet. Only ever used when deduped is empty AND
+  // kDebugMode is true, so it can never appear in a release build even if
+  // this cleanup is forgotten -- but still remove _mockRecentBarbers and
+  // every reference to it below once real data is available for review.
+  // ==========================================================================
+  static const _mockRecentBarbers = [
+    AppointmentModel(
+      bookingStart: 0,
+      barberId: 9001,
+      barberUserId: 9001,
+      barberName: 'Prajwal Shrestha',
+      serviceName: 'Haircut',
+    ),
+    AppointmentModel(
+      bookingStart: 0,
+      barberId: 9002,
+      barberUserId: 9002,
+      barberName: 'Sagar Thapa',
+      serviceName: 'Beard Trim',
+    ),
+    AppointmentModel(
+      bookingStart: 0,
+      barberId: 9003,
+      barberUserId: 9003,
+      barberName: 'Bikash Gurung',
+      serviceName: 'Hair Styling',
+    ),
+  ];
+
   Future<void> _loadRecentBarbers() async {
     try {
       final completed = await _appointmentRepository.getAppointments('completed');
@@ -62,7 +94,10 @@ class HomeViewModel extends ChangeNotifier {
         if (deduped.length >= 6) break;
       }
 
-      recentBarbers = deduped;
+      // TODO(remove-before-production): drop this fallback (and
+      // _mockRecentBarbers above) -- see the banner comment above it.
+      recentBarbers =
+          deduped.isNotEmpty ? deduped : (kDebugMode ? _mockRecentBarbers : deduped);
       notifyListeners();
     } on AppException {
       // "Book Again" is a nice-to-have, not core functionality -- if it
