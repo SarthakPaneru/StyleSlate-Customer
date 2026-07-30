@@ -24,7 +24,7 @@ class UserResponse {
   Map<String, dynamic> toJson() => _$UserResponseToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class LoggedInUserResponse {
   const LoggedInUserResponse({required this.id, required this.user});
 

@@ -32,4 +32,4 @@ LoggedInUserResponse _$LoggedInUserResponseFromJson(
 
 Map<String, dynamic> _$LoggedInUserResponseToJson(
   LoggedInUserResponse instance,
-) => <String, dynamic>{'id': instance.id, 'user': instance.user};
+) => <String, dynamic>{'id': instance.id, 'user': instance.user.toJson()};
