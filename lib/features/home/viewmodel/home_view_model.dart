@@ -1,16 +1,21 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hamro_barber_mobile/core/mvvm/view_status.dart';
 import 'package:hamro_barber_mobile/core/network/api_exception.dart';
+import 'package:hamro_barber_mobile/data/appointments/appointment_repository.dart';
+import 'package:hamro_barber_mobile/data/appointments/models/appointment_model.dart';
 import 'package:hamro_barber_mobile/data/barbers/barber_repository.dart';
 import 'package:hamro_barber_mobile/data/barbers/models/nearest_barber_model.dart';
 
 class HomeViewModel extends ChangeNotifier {
-  HomeViewModel(this._repository);
+  HomeViewModel(this._repository, this._appointmentRepository);
 
   final BarberRepository _repository;
+  final AppointmentRepository _appointmentRepository;
 
   ViewStatus status = ViewStatus.loading;
   String? errorMessage;
@@ -23,6 +28,12 @@ class HomeViewModel extends ChangeNotifier {
   String placeName = '';
   List<NearestBarberModel> barbers = const [];
 
+  /// One most-recent completed appointment per barber the customer has
+  /// actually visited before, for the "Book Again" section. Empty for a
+  /// new customer with no history -- the section just doesn't show, same
+  /// as a real "reorder" shelf in a food-delivery app.
+  List<AppointmentModel> recentBarbers = const [];
+
   Future<void> initialize() async {
     final prefs = await SharedPreferences.getInstance();
     latitude = prefs.getDouble('latitude') ?? 0;
@@ -33,6 +44,31 @@ class HomeViewModel extends ChangeNotifier {
     await _refreshLocation(prefs);
     await _resolvePlaceName(prefs);
     await loadBarbers();
+    unawaited(_loadRecentBarbers());
+  }
+
+  Future<void> _loadRecentBarbers() async {
+    try {
+      final completed = await _appointmentRepository.getAppointments('completed');
+      final sorted = [...completed]
+        ..sort((a, b) => b.bookingStart.compareTo(a.bookingStart));
+
+      final seenBarberIds = <int>{};
+      final deduped = <AppointmentModel>[];
+      for (final appointment in sorted) {
+        if (seenBarberIds.add(appointment.barberId)) {
+          deduped.add(appointment);
+        }
+        if (deduped.length >= 6) break;
+      }
+
+      recentBarbers = deduped;
+      notifyListeners();
+    } on AppException {
+      // "Book Again" is a nice-to-have, not core functionality -- if it
+      // fails to load, the section just stays hidden rather than showing
+      // an error state for something the user didn't explicitly ask for.
+    }
   }
 
   Future<void> _refreshLocation(SharedPreferences prefs) async {

@@ -4,10 +4,12 @@ import 'package:hamro_barber_mobile/Screen/detailScreen.dart';
 import 'package:hamro_barber_mobile/constants/app_strings.dart';
 import 'package:hamro_barber_mobile/core/auth/current_user_state.dart';
 import 'package:hamro_barber_mobile/core/mvvm/view_status.dart';
+import 'package:hamro_barber_mobile/data/appointments/appointment_repository_factory.dart';
 import 'package:hamro_barber_mobile/data/barbers/barber_repository_factory.dart';
 import 'package:hamro_barber_mobile/features/home/view/barber_card.dart';
 import 'package:hamro_barber_mobile/features/home/view/barber_card_shimmer.dart';
 import 'package:hamro_barber_mobile/features/home/view/barber_search_screen.dart';
+import 'package:hamro_barber_mobile/features/home/view/recent_barber_card.dart';
 import 'package:hamro_barber_mobile/features/home/viewmodel/home_view_model.dart';
 import 'package:hamro_barber_mobile/modules/screens/categories_bubble.dart';
 import 'package:hamro_barber_mobile/ui_kit/feedback/app_empty_state.dart';
@@ -19,7 +21,10 @@ class UserHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => HomeViewModel(createBarberRepository())..initialize(),
+      create: (_) => HomeViewModel(
+        createBarberRepository(),
+        createAppointmentRepository(),
+      )..initialize(),
       child: const _UserHomeView(),
     );
   }
@@ -153,6 +158,36 @@ class _UserHomeViewState extends State<_UserHomeView> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: _buildBarberList(viewModel),
                 ),
+                if (viewModel.recentBarbers.isNotEmpty) ...[
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: const AppSectionHeader(
+                        title: AppStrings.homeBookAgainTitle),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 190,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: viewModel.recentBarbers.length,
+                      itemBuilder: (context, index) {
+                        final appointment = viewModel.recentBarbers[index];
+                        return RecentBarberCard(
+                          appointment: appointment,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  DetailScreen(barberId: appointment.barberId),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 20),
               ],
             ),

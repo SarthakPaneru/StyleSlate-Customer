@@ -123,6 +123,7 @@ class AppStrings {
   static const homeRecommendedBarbersTitle = 'Recommended Barbers';
   static const homeBarbersLoadFailed = 'Could not load barbers.';
   static const homeNoBarbersNearby = 'No barbers found nearby.';
+  static const homeBookAgainTitle = 'Book Again';
   static const categoryHaircut = 'Haircut';
   static const categoryHairStyle = 'Hair Style';
   static const categoryBeard = 'Beard';

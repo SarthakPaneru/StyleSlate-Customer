@@ -5,12 +5,20 @@
 class AppointmentModel {
   const AppointmentModel({
     required this.bookingStart,
+    required this.barberId,
     required this.barberUserId,
     required this.barberName,
     required this.serviceName,
   });
 
   final int bookingStart;
+
+  /// The barber entity's own id -- what DetailScreen/BarberRepository
+  /// expect, distinct from [barberUserId] below.
+  final int barberId;
+
+  /// The barber's underlying user id, used only for building their
+  /// avatar image URL (ImageUrlBuilder.forUser).
   final int barberUserId;
   final String barberName;
   final String serviceName;
@@ -23,6 +31,7 @@ class AppointmentModel {
 
     return AppointmentModel(
       bookingStart: json['bookingStart'] as int,
+      barberId: barber['id'] as int,
       barberUserId: user['id'] as int,
       barberName: '${user['firstName']} ${user['lastName']}',
       serviceName: firstService['serviceName'] as String,
