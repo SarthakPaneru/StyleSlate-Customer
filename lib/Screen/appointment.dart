@@ -1,14 +1,65 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:hamro_barber_mobile/constants/app_strings.dart';
 import 'package:hamro_barber_mobile/core/mvvm/view_status.dart';
 import 'package:hamro_barber_mobile/core/utils/image_url_builder.dart';
 import 'package:hamro_barber_mobile/data/appointments/appointment_repository_factory.dart';
+import 'package:hamro_barber_mobile/data/appointments/models/appointment_model.dart';
 import 'package:hamro_barber_mobile/features/appointments/viewmodel/appointments_view_model.dart';
 import 'package:hamro_barber_mobile/theme/app_colors.dart';
 import 'package:hamro_barber_mobile/ui_kit/feedback/app_empty_state.dart';
 import 'package:hamro_barber_mobile/ui_kit/feedback/app_shimmer.dart';
 import 'package:hamro_barber_mobile/ui_kit/surfaces/app_avatar_image.dart';
+
+// ============================================================================
+// TEMPORARY -- DEBUG-ONLY MOCK DATA for design review.
+// Shown only when the real appointments list for a tab comes back empty
+// (kDebugMode-gated). DO NOT remove until told to.
+// ============================================================================
+final _mockAppointmentsByStatus = <String, List<AppointmentModel>>{
+  'upcoming': [
+    AppointmentModel(
+      bookingStart: DateTime.now().add(const Duration(days: 2)).millisecondsSinceEpoch ~/ 1000,
+      barberId: 9001,
+      barberUserId: 9001,
+      barberName: 'Prajwal Shrestha',
+      serviceName: 'Haircut',
+    ),
+    AppointmentModel(
+      bookingStart: DateTime.now().add(const Duration(days: 5)).millisecondsSinceEpoch ~/ 1000,
+      barberId: 9002,
+      barberUserId: 9002,
+      barberName: 'Sagar Thapa',
+      serviceName: 'Beard Trim',
+    ),
+  ],
+  'completed': [
+    AppointmentModel(
+      bookingStart: DateTime.now().subtract(const Duration(days: 10)).millisecondsSinceEpoch ~/ 1000,
+      barberId: 9003,
+      barberUserId: 9003,
+      barberName: 'Bikash Gurung',
+      serviceName: 'Hair Styling',
+    ),
+    AppointmentModel(
+      bookingStart: DateTime.now().subtract(const Duration(days: 24)).millisecondsSinceEpoch ~/ 1000,
+      barberId: 9001,
+      barberUserId: 9001,
+      barberName: 'Prajwal Shrestha',
+      serviceName: 'Haircut',
+    ),
+  ],
+  'cancelled': [
+    AppointmentModel(
+      bookingStart: DateTime.now().subtract(const Duration(days: 3)).millisecondsSinceEpoch ~/ 1000,
+      barberId: 9002,
+      barberUserId: 9002,
+      barberName: 'Sagar Thapa',
+      serviceName: 'Beard Trim',
+    ),
+  ],
+};
 
 class ScheduledAppointmentPage extends StatefulWidget {
   const ScheduledAppointmentPage({super.key});
@@ -115,20 +166,32 @@ class _AppointmentTabState extends State<_AppointmentTab> {
       );
     }
     if (_viewModel.appointments.isEmpty) {
-      return ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: const [
-          SizedBox(height: 80),
-          AppEmptyState(message: AppStrings.appointmentsEmpty),
-        ],
-      );
+      // TEMPORARY -- DEBUG-ONLY: fall back to mock data so the tab isn't
+      // blank during design review. DO NOT remove until told to.
+      final mockAppointments = kDebugMode
+          ? _mockAppointmentsByStatus[widget.status] ?? const <AppointmentModel>[]
+          : const <AppointmentModel>[];
+      if (mockAppointments.isEmpty) {
+        return ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: const [
+            SizedBox(height: 80),
+            AppEmptyState(message: AppStrings.appointmentsEmpty),
+          ],
+        );
+      }
+      return _buildAppointmentList(mockAppointments);
     }
 
+    return _buildAppointmentList(_viewModel.appointments);
+  }
+
+  Widget _buildAppointmentList(List<AppointmentModel> appointments) {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: _viewModel.appointments.length,
+      itemCount: appointments.length,
       itemBuilder: (context, index) {
-        final appointment = _viewModel.appointments[index];
+        final appointment = appointments[index];
         final dateTime = DateTime.fromMillisecondsSinceEpoch(
           appointment.bookingStart * 1000,
         );
