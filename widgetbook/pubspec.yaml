@@ -1,0 +1,38 @@
+name: hamro_barber_widgetbook
+description: Component catalog for the hamro_barber_mobile ui_kit -- browse, interact with, and review every ui_kit widget in isolation without running the real app.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The real app, pulled in as a local path dependency so use-case files
+  # can import its ui_kit widgets and theme directly.
+  hamro_barber_mobile:
+    path: ../
+
+  widgetbook: ^3.25.0
+  widgetbook_annotation: ^3.11.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  widgetbook_generator: ^3.24.0
+  build_runner: ^2.15.1
+
+dependency_overrides:
+  # dependency_overrides don't propagate transitively from a path
+  # dependency, so the main app's khalti_flutter vendored-copy fix (see
+  # its own pubspec.yaml for why) has to be repeated here too.
+  khalti_flutter:
+    path: ../vendor/khalti_flutter
+  device_info_plus: ^13.2.0
+  package_info_plus: ^10.2.1
+
+flutter:
+  uses-material-design: true
