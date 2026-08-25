@@ -48,12 +48,11 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   // ==========================================================================
-  // TEMPORARY -- DEBUG-ONLY MOCK DATA. DELETE BEFORE PRODUCTION.
-  // Lets the "Book Again" design be previewed on accounts with no real
-  // completed appointments yet. Only ever used when deduped is empty AND
-  // kDebugMode is true, so it can never appear in a release build even if
-  // this cleanup is forgotten -- but still remove _mockRecentBarbers and
-  // every reference to it below once real data is available for review.
+  // TEMPORARY -- DEBUG-ONLY MOCK DATA for design review.
+  // Lets "Book Again" and "Recommended Barbers" be previewed on accounts/
+  // areas with no real data yet. Only ever used when the real list comes
+  // back empty AND kDebugMode is true, so it can never appear in a release
+  // build. DO NOT remove until told to -- kept for UI review on request.
   // ==========================================================================
   static const _mockRecentBarbers = [
     AppointmentModel(
@@ -76,6 +75,32 @@ class HomeViewModel extends ChangeNotifier {
       barberUserId: 9003,
       barberName: 'Bikash Gurung',
       serviceName: 'Hair Styling',
+    ),
+  ];
+
+  static const _mockNearbyBarbers = [
+    NearestBarberModel(
+      id: 9001,
+      distance: 1.2,
+      user: NearestBarberUser(
+          id: 9001, firstName: 'Prajwal', lastName: 'Shrestha'),
+    ),
+    NearestBarberModel(
+      id: 9002,
+      distance: 2.8,
+      user: NearestBarberUser(id: 9002, firstName: 'Sagar', lastName: 'Thapa'),
+    ),
+    NearestBarberModel(
+      id: 9003,
+      distance: 0.6,
+      user: NearestBarberUser(
+          id: 9003, firstName: 'Bikash', lastName: 'Gurung'),
+    ),
+    NearestBarberModel(
+      id: 9004,
+      distance: 3.4,
+      user: NearestBarberUser(
+          id: 9004, firstName: 'Anish', lastName: 'Karki'),
     ),
   ];
 
@@ -166,10 +191,14 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      barbers = await _repository.getNearestBarbers(
+      final nearest = await _repository.getNearestBarbers(
         latitude: latitude,
         longitude: longitude,
       );
+      // TODO(remove-on-request): drop this fallback (and _mockNearbyBarbers
+      // above) -- see the banner comment above it.
+      barbers =
+          nearest.isNotEmpty ? nearest : (kDebugMode ? _mockNearbyBarbers : nearest);
       status = ViewStatus.success;
     } on AppException catch (e) {
       status = ViewStatus.error;
